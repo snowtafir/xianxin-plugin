@@ -516,7 +516,8 @@ export class mys extends plugin {
           if (isPrivate) {
             return;
           }
-          await this.e.reply(await Bot.makeForwardMsg(msgList));
+          msgList = await this.e.group.makeForwardMsg(msgList);
+          e.reply(msgList);
         }
       }
     } else {
