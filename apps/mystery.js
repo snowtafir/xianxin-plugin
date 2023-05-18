@@ -222,7 +222,8 @@ export class mystery extends plugin {
       if (isPrivate) {
         return;
       }
-      const res = await this.e.reply(await Bot.makeForwardMsg(msgList), false, {
+      msgList = await this.e.group.makeForwardMsg(msgList);
+      const res = await this.e.reply(msgList, false, {
         recallMsg: this.mysterySetData.delMsg,
       });
       if (!res) {
@@ -539,7 +540,8 @@ export class mystery extends plugin {
         return;
       }
 
-      const res = await this.e.reply(await Bot.makeForwardMsg(msgList), false, {
+      msgList = await this.e.group.makeForwardMsg(msgList);
+      const res = await this.e.reply(msgList, false, {
         recallMsg: this.mysterySetData.delMsg,
       });
       if (!res) {
