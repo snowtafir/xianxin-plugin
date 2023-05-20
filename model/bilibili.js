@@ -183,6 +183,8 @@ export default class Bilibili extends base {
 
     this.key = "Yz:xianxin:bilibili:upPush:";
 
+    Bot.logger.mark("xianxin-plugin —— B站动态定时检测");
+
     for (let [key, value] of uidMap) {
       // const accInfoRes = await this.getBilibiliUserInfo(key);
 
@@ -299,7 +301,7 @@ export default class Bilibili extends base {
 
       redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
-      Bot.logger.mark("xianxin-plugin —— B站动态定时推送");
+      Bot.logger.mark("xianxin-plugin —— B站动态执行推送");
 
       await this.e.group.sendMsg(this[id_str].img).catch((err) => {
         logger.error(`群[${groupId}]推送失败：${JSON.stringify(err)}`);
