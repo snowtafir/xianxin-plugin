@@ -464,7 +464,8 @@ export class mys extends plugin {
         const renderInfo = await new Mys().strategySearch(data, isSplit);
         if (!renderInfo) return;
 
-        const { img, code } = renderInfo;
+        const img = renderInfo;
+        const code = renderInfo;
 
         if (code === "limit") {
           if (this.mysSetData.isExactMatch) {
@@ -490,7 +491,7 @@ export class mys extends plugin {
           return "return";
         }
 
-        if (img.length == 1) {
+        if (img && img.length == 1) {
           await this.e.reply(img[0]);
         } else {
           let msgList = [];
@@ -517,7 +518,7 @@ export class mys extends plugin {
             return;
           }
           msgList = await this.e.group.makeForwardMsg(msgList);
-          e.reply(msgList);
+          this.e.reply(msgList);
         }
       }
     } else {
