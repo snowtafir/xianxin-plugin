@@ -3,6 +3,7 @@ import xxCfg from "../model/xxCfg.js";
 import fs from "node:fs";
 import fetch from "node-fetch";
 import Bilibili from "../model/bilibili.js";
+import lodash from 'lodash'
 
 let bilibiliSetFile = "./plugins/xianxin-plugin/config/bilibili.set.yaml";
 if (!fs.existsSync(bilibiliSetFile)) {
@@ -57,6 +58,11 @@ export class bilibili extends plugin {
           fnc: "newPushTask",
           permission: "master",
         },
+        {
+          reg: "^#*(添加|绑定|新增|增加)*(b|B)站*(ck|CK|cK|Ck)*(:|：)*.*$",
+          fnc: "bingBiliCk",
+          permission: "master",
+        },
       ],
     });
     this.bilibiliSetData = xxCfg.getConfig("bilibili", "set");
@@ -78,6 +84,42 @@ export class bilibili extends plugin {
     await bilibili.upTask();
   }
 
+  /** 绑定B站ck */
+  async bingBiliCk() {
+    let Bck = this.e.msg
+      .replace(/#|'|"*(添加|绑定|新增|增加)*(b|B)站*(ck|CK|cK|Ck)*(:|：)*/g, "")
+      .trim();
+    let user = await this.e.getUser(user_id)
+
+    let param = {}
+    Bck.split(';').forEach((v) => {
+      // 处理分割特殊cookie_token
+      let tmp = lodash.trim(v).replace('=', '~').split('~')
+      param[tmp[0]] = tmp[1]
+    })
+
+    if (!param.buvid3 && !param._uuid && !param.buvid4 && !param.rpdid && !param.fingerprint && !param.DedeUserID) {
+      await this.e.reply(`B站cookie：获取方法请百度一下`)
+      await this.e.reply('发送cookie不完整\n请退出B站【重新登录】，刷新完整cookie，使用该ck期间保持B站登录状态')
+      return
+    }
+
+    /*this.Bck = `buvid3=${param.buvid3};buvid4=${param.buvid4};_uuid=${param._uuid}; rpdid=${param.rpdid}; fingerprint=${param.fingerprint};`*/
+
+    await xxCfg.addBiliCk(xxCfg.getBCk(user))
+
+    logger.mark(`${this.e.logFnc} 保存cookie成功 [UID:${param.DedeUserID}]`)
+
+    let uidMsg = [`绑定B站cookie成功：\n${param.DedeUserID}`]
+
+    if (!lodash.isEmpty(this.user)) {
+      this.user.forEach(v => {
+        uidMsg.push(`绑定的B站ck的UID：${v.param.DedeUserID}`)
+      })
+    }
+    await this.e.reply(uidMsg)
+  }
+
   /** 添加b站推送 */
   async addPush() {
     let uid = this.e.msg
@@ -87,9 +129,16 @@ export class bilibili extends plugin {
       )
       .trim();
     // (直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*
+    if ((await xxCfg.getBiliCk()).Bck.length == 0) {
+      this.e.reply(
+        `还未绑定B站ck，请先绑定B站ck`
+      );
+      return;
+    }
+
     if (!uid) {
       this.e.reply(
-        `请输入推送的uid\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377`
+        `请输入正确的推送的uid\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377`
       );
       return true;
     }
@@ -129,7 +178,7 @@ export class bilibili extends plugin {
 
     if (resJson.code != 0 || !resJson?.data) {
       this.e.reply(
-        "uid不对啊老兄，别乱搞哦～\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
+        "uid错误或B站ck未绑定\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
       );
       return;
     }
@@ -242,8 +291,7 @@ export class bilibili extends plugin {
       }
 
       messages.push(
-        `${item.uid}  ${item.name}${
-          types.size ? `[${Array.from(types).join("、")}]` : "[全部动态]"
+        `${item.uid}  ${item.name}${types.size ? `[${Array.from(types).join("、")}]` : "[全部动态]"
         }`
       );
       return item;
@@ -318,8 +366,7 @@ export class bilibili extends plugin {
     res.data.result.map((item, index) => {
       if (index < 5) {
         messages.push(
-          `${item.uname}\nUID：${item.mid}\n粉丝数：${item.fans}${
-            index < 4 ? "\n" : ""
+          `${item.uname}\nUID：${item.mid}\n粉丝数：${item.fans}${index < 4 ? "\n" : ""
           }`
         );
       }

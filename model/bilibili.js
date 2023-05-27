@@ -6,7 +6,6 @@ import base from "./base.js";
 import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
-
 const _path = process.cwd();
 
 export default class Bilibili extends base {
@@ -21,9 +20,10 @@ export default class Bilibili extends base {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie:
-          "buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
-        pragma: "no-cache",
+        cookie: (await xxCfg.getBiliCk()).Bck,
+          /*"buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
+        */
+          pragma: "no-cache",
         "sec-ch-ua":
           '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
         "sec-ch-ua-mobile": "?0",
@@ -47,9 +47,10 @@ export default class Bilibili extends base {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie:
-          "buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
-        pragma: "no-cache",
+        cookie: (await xxCfg.getBiliCk()).Bck,
+          /*"buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
+        */
+          pragma: "no-cache",
         "sec-ch-ua":
           '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
         "sec-ch-ua-mobile": "?0",
@@ -81,8 +82,8 @@ export default class Bilibili extends base {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie:
-          "buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",
+        cookie: (await xxCfg.getBiliCk()).Bck,
+          /*"buvid3=677DD7BA-C683-36BD-A749-226C4038A15C90212infoc; i-wanna-go-back=-1; _uuid=BC24CE7C-327C-EA21-1557-E2AD56B349F290616infoc; buvid4=D00106D3-4627-6AB5-08A4-17ACD359B52091194-022030518-zz+ybRUH3EO6AQfFzHmMAg%3D%3D; buvid_fp_plain=undefined; b_ut=5; CURRENT_BLACKGAP=0; fingerprint3=8c6bc1805046dddcb5b845e6c6cd78c3; blackside_state=0; rpdid=|(YlmJuJm||0J'uYRYR~lRYJ; LIVE_BUVID=AUTO6316464756111112; hit-dyn-v2=1; nostalgia_conf=-1; PVID=1; b_nut=100; fingerprint=b29b926764456b8a66beafee5d73ea1d; buvid_fp=b29b926764456b8a66beafee5d73ea1d; CURRENT_FNVAL=16",*/
         pragma: "no-cache",
         "sec-ch-ua":
           '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
@@ -107,9 +108,10 @@ export default class Bilibili extends base {
       method: "GET",
       headers: {
         authority: "api.bilibili.com",
-        cookie:
-          "_uuid=04A91AF9-817E-5568-C260-F738C6992B3E65500infoc; buvid3=89F4F8FC-EC89-F339-53E0-BEB8917E839A65849infoc; buvid4=2D3B9929-A59A-751A-A267-64B84561875568042-022072912-ptQYXgw9NYmp0JTqr/FVmw%3D%3D; PVID=1; CURRENT_FNVAL=4048; nostalgia_conf=-1; i-wanna-go-back=-1; b_ut=7; innersign=0; b_lsid=D95BBB69_182DE35FC2B; fingerprint=8d0ef00128271df9bb681430277b95d0; buvid_fp_plain=undefined; buvid_fp=8d0ef00128271df9bb681430277b95d0",
-        "cache-control": "no-cache",
+        cookie: (await xxCfg.getBiliCk()).Bck,
+          /*"_uuid=04A91AF9-817E-5568-C260-F738C6992B3E65500infoc; buvid3=89F4F8FC-EC89-F339-53E0-BEB8917E839A65849infoc; buvid4=2D3B9929-A59A-751A-A267-64B84561875568042-022072912-ptQYXgw9NYmp0JTqr/FVmw%3D%3D; PVID=1; CURRENT_FNVAL=4048; nostalgia_conf=-1; i-wanna-go-back=-1; b_ut=7; innersign=0; b_lsid=D95BBB69_182DE35FC2B; fingerprint=8d0ef00128271df9bb681430277b95d0; buvid_fp_plain=undefined; buvid_fp=8d0ef00128271df9bb681430277b95d0",
+        */
+          "cache-control": "no-cache",
         pragma: "no-cache",
         "sec-ch-ua":
           '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
