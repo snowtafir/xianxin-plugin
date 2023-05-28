@@ -26,42 +26,59 @@ export class bilibili extends plugin {
     super({
       name: "B站功能",
       dsc: "b站相关指令",
-      event: "message.group",
+      event: "message",
       priority: 500,
       rule: [
         {
           reg: "^#*up\\s*[0-9]*$",
           fnc: "detail",
+          event: "message.group",
         },
         {
           reg: "^#*(添加|订阅|新增|增加)up推送\\s*(直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*.*$",
           fnc: "addPush",
           permission: "master",
+          event: "message.group",
         },
         {
           reg: "^#*(删除|取消|移除|去除)up推送\\s*(直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*.*$",
           fnc: "delPush",
           permission: "master",
+          event: "message.group",
         },
         {
           reg: "^#*推送(up)?列表$",
           fnc: "listPush",
           permission: "master",
+          event: "message.group",
         },
         {
           reg: "^#*搜索up.*$",
           fnc: "searchup",
           permission: "master",
+          event: "message.group",
         },
         {
           reg: "^#*手动推送up$",
           fnc: "newPushTask",
           permission: "master",
+          event: "message.group",
         },
         {
-          reg: "^#*(添加|绑定|新增|增加)*(b|B)站*(ck|CK|cK|Ck)*(:|：)*.*$",
+          reg: "^#*绑定*(b|B)站*(ck|CK|cK|Ck)*(:|：)*.*$",
           fnc: "bingBiliCk",
           permission: "master",
+          event: 'message'
+        },
+        {
+          reg: '^#*我的*(b|B)站(ck|CK|Ck|Ck|cookie)$',
+          event: 'message',
+          fnc: 'myBCk'
+        },
+        {
+          reg: '^#*(b|B)站*(ck|CK|Ck|Ck|cookie)帮助$',
+          event: 'message',
+          fnc: 'BCkHelp'
         },
       ],
     });
@@ -86,38 +103,66 @@ export class bilibili extends plugin {
 
   /** 绑定B站ck */
   async bingBiliCk() {
-    let Bck = this.e.msg
-      .replace(/#|'|"*(添加|绑定|新增|增加)*(b|B)站*(ck|CK|cK|Ck)*(:|：)*/g, "")
-      .trim();
-    let user = await this.e.getUser(user_id)
-
-    let param = {}
-    Bck.split(';').forEach((v) => {
-      // 处理分割特殊cookie_token
-      let tmp = lodash.trim(v).replace('=', '~').split('~')
-      param[tmp[0]] = tmp[1]
-    })
-
-    if (!param.buvid3 && !param._uuid && !param.buvid4 && !param.rpdid && !param.fingerprint && !param.DedeUserID) {
-      await this.e.reply(`B站cookie：获取方法请百度一下`)
-      await this.e.reply('发送cookie不完整\n请退出B站【重新登录】，刷新完整cookie，使用该ck期间保持B站登录状态')
+    if (this.e.isGroup) {
+      await this.reply('请撤回，并私聊绑定')
       return
-    }
+    } else {
+      let Bck = this.e.msg
+        .replace(/#|'|"*(添加|绑定|新增|增加)*(b|B)站*(ck|CK|cK|Ck)*(:|：)*/g, "")
+        .trim();
 
-    /*this.Bck = `buvid3=${param.buvid3};buvid4=${param.buvid4};_uuid=${param._uuid}; rpdid=${param.rpdid}; fingerprint=${param.fingerprint};`*/
-
-    await xxCfg.addBiliCk(xxCfg.getBCk(user))
-
-    logger.mark(`${this.e.logFnc} 保存cookie成功 [UID:${param.DedeUserID}]`)
-
-    let uidMsg = [`绑定B站cookie成功：\n${param.DedeUserID}`]
-
-    if (!lodash.isEmpty(this.user)) {
-      this.user.forEach(v => {
-        uidMsg.push(`绑定的B站ck的UID：${v.param.DedeUserID}`)
+      let param = {}
+      Bck.split(';').forEach((v) => {
+        // 处理分割特殊cookie_token
+        let tmp = lodash.trim(v).replace('=', '~').split('~')
+        param[tmp[0]] = tmp[1]
       })
+
+      if (!param.buvid3 && !param._uuid && !param.buvid4 && !param.rpdid && !param.fingerprint && !param.DedeUserID) {
+        await this.e.reply(`B站cookie：获取方法请百度一下`)
+        await this.e.reply('发送cookie不完整\n请退出B站【重新登录】，刷新完整cookie，使用该ck期间保持B站登录状态')
+        return
+      }
+      if (!param.DedeUserID) {
+        await this.e.reply(`B站cookie：DedeUserID缺失`)
+        return
+      }
+      var UID = param.DedeUserID
+      /*this.Bck = `buvid3=${param.buvid3};buvid4=${param.buvid4};_uuid=${param._uuid}; rpdid=${param.rpdid}; fingerprint=${param.fingerprint};`*/
+
+      await xxCfg.saveBiliCk(UID, Bck)
+
+      logger.mark(`${this.e.logFnc} 保存B站cookie成功 [UID:${param.DedeUserID}]`)
+
+      let uidMsg = [`绑定B站cookie成功：\n${param.DedeUserID}`]
+
+      await this.e.reply(uidMsg)
     }
-    await this.e.reply(uidMsg)
+  }
+
+  /** 我的B站ck */
+  async myBCk() {
+    if (this.e.isGroup) {
+      await this.reply('请私聊查看')
+      return
+    } else {
+      const ck = await xxCfg.getBiliCk();
+      if (ck && ck.length == 0) {
+        this.e.reply(
+          `当前尚未配置B站ck`
+        );
+      } else {
+        this.e.reply(
+          `当前配置的B站ck为：${ck}`
+        );
+      }
+    }
+  }
+
+  /** 我的B站ck */
+  async BCkHelp() {
+    await this.reply(`B站ck的获取方法请百度\n务必包含以下字段的相等式内容 \nbuvid3 \n_uuid \nbuvid4 \nrpdid \nfingerprint \nDedeUserID`)
+    return
   }
 
   /** 添加b站推送 */
@@ -129,12 +174,7 @@ export class bilibili extends plugin {
       )
       .trim();
     // (直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*
-    if ((await xxCfg.getBiliCk()).Bck.length == 0) {
-      this.e.reply(
-        `还未绑定B站ck，请先绑定B站ck`
-      );
-      return;
-    }
+
 
     if (!uid) {
       this.e.reply(
@@ -176,11 +216,18 @@ export class bilibili extends plugin {
 
     const resJson = await res.json();
 
+    /* 用于debug的代码段
+    const ck = await xxCfg.getBiliCk()
+    this.e.reply(
+      `当前绑定的B站ck为：${ck}`
+    );
+    */
+
     if (resJson.code != 0 || !resJson?.data) {
       this.e.reply(
-        "uid错误或B站ck未绑定\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
+        "uid错误或绑定的B站ck失效\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
       );
-      return;
+      return true;
     }
 
     const dynamics = resJson?.data?.items || [];

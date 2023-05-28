@@ -2,6 +2,7 @@ import YAML from "yaml";
 import fs from "node:fs";
 import chokidar from "chokidar";
 import lodash from "lodash";
+import { promisify } from 'node:util';
 
 /** 配置文件 直接借鉴yunzai配置代码 */
 class XsCfg {
@@ -94,87 +95,37 @@ class XsCfg {
 
   /** 读取绑定的B站ck */
   async getBiliCk() {
-    let Bck = {}
-    let BckQQ = {}
-    let dir = '.data/BilibiliCookie/'
+    let dir = `./data/BilibiliCookie/`
+    let Bck = []
     let files = fs.readdirSync(dir).filter(file => file.endsWith('.yaml'))
 
     const readFile = promisify(fs.readFile)
 
-    let promises = bilibiliSetFile.promises /*[master] /*为空则允许所有用户*/
+    let promises = []
 
     files.forEach((v) => promises.push(readFile(`${dir}${v}`, 'utf8')))
-
-    const res = await Promise(promises)
-
-    res.forEach((v) => {
+    const res = await Promise.all(promises)
+    res.forEach((v, index) => {
       let tmp = YAML.parse(v)
-      let qq
-      lodash.forEach(tmp, (item, UID) => {
-        qq = item.qq
-        Bck[String(UID)] = item
-        if (item.isMain && !BckQQ[String(item.qq)]) {
-          BckQQ[String(item.qq)] = item
-        }
-      })
-      if (qq && !BckQQ[String(qq)]) {
-        BckQQ[String(qq)] = Object.values(tmp)[0]
-      }
+      Bck.push(tmp)
     })
-
-    return { Bck, BckQQ }
+    return Bck
   }
 
-  /** 获取qq号绑定的B站ck */
-  getBiliCkSingle(userId) {
-    let file = `./data/BilibiliCookie/${userId}.yaml`
-    try {
-      let Bck = fs.readFileSync(file, 'utf-8')
-      Bck = YAML.parse(Bck)
-      return Bck
-    } catch (error) {
-      return {}
-    }
-  }
-
-  saveBiliCk(userId, data) {
-    let file = `./data/BilbiliCookie/${userId}.yaml`
+  /** 覆盖保存绑定的B站ck */
+  saveBiliCk(UID, data) {
+    let dir = `./data/BilibiliCookie/`
+    let file = dir + `${UID}.yaml`
     if (lodash.isEmpty(data)) {
       fs.existsSync(file) && fs.unlinkSync(file)
     } else {
-      let yaml = YAML.stringify(data)
+      const absPath = dir;
+      if (!absPath) {
+        fs.mkdir(absPath); //Create dir in case not found
+      }
+      let yaml = YAML.stringify(data);
       fs.writeFileSync(file, yaml, 'utf8')
     }
-  }
-  /**
- * 为当前用户增加B站CK
- * @param cks 绑定的ck
- */
-  async addBiliCk(Bcks) {
-    let BckData = this.BckData
-    lodash.forEach(Bcks, (Bck, UID) => {
-      BckData[UID] = Bck
-    })
-    this._saveCkData()
-    await this.initCache()
-  }
-
-  /** 保存ck */
-  getBCk() {
-    let Bck = this.getBiliCkSingle(this.e.user_id)
-
-    lodash.map(Bck, o => {
-      o.isMain = false
-      return o
-    })
-
-    Bck[this.userId] = {
-      UID: this.DedeUserID,
-      qq: this.e.user_id,
-      Bck: this.Bck,
-      isMain: true
-    }
-    return Bck
   }
 }
 
