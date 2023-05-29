@@ -73,6 +73,7 @@ export class bilibili extends plugin {
         {
           reg: '^#*我的*(b|B)站(ck|CK|Ck|Ck|cookie)$',
           event: 'message',
+          permission: "master",
           fnc: 'myBCk'
         },
         {
