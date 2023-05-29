@@ -73,6 +73,7 @@ export class bilibili extends plugin {
         {
           reg: '^#*我的*(b|B)站(ck|CK|Ck|Ck|cookie)$',
           event: 'message',
+          permission: "master",
           fnc: 'myBCk'
         },
         {
@@ -159,7 +160,7 @@ export class bilibili extends plugin {
     }
   }
 
-  /** 我的B站ck */
+  /** B站ck帮助 */
   async BCkHelp() {
     await this.reply(`B站ck的获取方法请百度\n务必包含以下字段的相等式内容 \nbuvid3 \n_uuid \nbuvid4 \nrpdid \nfingerprint \nDedeUserID`)
     return

@@ -16,7 +16,7 @@ export default class Bilibili extends base {
   async getBilibiliDetail(uid) {
     let url = `https://api.bilibili.com/x/relation/stat?vmid=${uid}`;
 
-    let Bck =  xxCfg.getBiliCk();
+    let Bck = await xxCfg.getBiliCk();
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -42,7 +42,7 @@ export default class Bilibili extends base {
 
   async getBilibiliUserInfo(uid) {
     let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&jsonp=jsonp`;
-    let Bck =  xxCfg.getBiliCk();
+    let Bck = await xxCfg.getBiliCk();
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -76,7 +76,7 @@ export default class Bilibili extends base {
 
   async getBilibiliDynamicInfo(uid) {
     let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}`;
-    let Bck =  xxCfg.getBiliCk();
+    let Bck = await xxCfg.getBiliCk();
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -102,7 +102,7 @@ export default class Bilibili extends base {
 
   async getBilibiliUp(keyword) {
     let url = `https://api.bilibili.com/x/web-interface/search/type?keyword=${keyword}&page=1&search_type=bili_user&order=totalrank&pagesize=5`;
-    let Bck =  xxCfg.getBiliCk();
+    let Bck = await xxCfg.getBiliCk();
     const response = await fetch(url, {
       method: "GET",
       headers: {
