@@ -81,6 +81,12 @@ export class bilibili extends plugin {
           event: 'message',
           fnc: 'BCkHelp'
         },
+        {
+          reg: '^#*验证*(b|B)站*(ck|CK|Ck|Ck|cookie)$',
+          event: 'message',
+          permission: "master",
+          fnc: 'checkBck'
+        },
       ],
     });
     this.bilibiliSetData = xxCfg.getConfig("bilibili", "set");
@@ -105,7 +111,7 @@ export class bilibili extends plugin {
   /** 绑定B站ck */
   async bingBiliCk() {
     if (this.e.isGroup) {
-      await this.reply('请撤回，并私聊绑定')
+      await this.reply('密钥要泄露了惹，请撤回，并私聊绑定！')
       return
     } else {
       let Bck = this.e.msg
@@ -120,22 +126,40 @@ export class bilibili extends plugin {
       })
 
       if (!param.buvid3 && !param._uuid && !param.buvid4 && !param.rpdid && !param.fingerprint && !param.DedeUserID) {
-        await this.e.reply(`B站cookie：获取方法请百度一下`)
-        await this.e.reply('发送cookie不完整\n请退出B站【重新登录】，刷新完整cookie，使用该ck期间保持B站登录状态')
+        await this.e.reply('诶呀~发送cookie不完整\n请退出B站【重新登录】，刷新完整cookie，使用该ck期间保持B站登录状态\nB站cookie的获取方法请百度一下');
+
+        if (!param.buvid3) {
+          let buvid3_ = 'buvid3';
+          await this.e.reply(`B站cookie：当前缺失：\n${buvid3_}`)
+        }
+        if (!!param.buvid4) {
+          let buvid4_ = 'buvid4';
+          await this.e.reply(`B站cookie：当前缺失：\n${buvid4_}`)
+        }
+        if (!!param._uuid) {
+          let _uuid_ = '_uuid';
+          await this.e.reply(`B站cookie：当前缺失：\n${_uuid_}`)
+        } if (!!param.rpdid) {
+          let rpdid_ = 'rpdid';
+          await this.e.reply(`B站cookie：当前缺失：\n${rpdid_}`)
+        } if (!!param.fingerprint) {
+          let fingerprint_ = 'fingerprint';
+          await this.e.reply(`B站cookie：当前缺失：\n${fingerprint_}`)
+        } if (!!param.DedeUserID) {
+          let DedeUserID_ = 'DedeUserID';
+          await this.e.reply(`B站cookie：当前缺失：\n${DedeUserID_}`)
+        }
         return
       }
-      if (!param.DedeUserID) {
-        await this.e.reply(`B站cookie：DedeUserID缺失`)
-        return
-      }
-      var UID = param.DedeUserID
+
+      //var UID = param.DedeUserID
       /*this.Bck = `buvid3=${param.buvid3};buvid4=${param.buvid4};_uuid=${param._uuid}; rpdid=${param.rpdid}; fingerprint=${param.fingerprint};`*/
 
-      await xxCfg.saveBiliCk(UID, Bck)
+      xxCfg.saveBiliCk(Bck)
 
       logger.mark(`${this.e.logFnc} 保存B站cookie成功 [UID:${param.DedeUserID}]`)
 
-      let uidMsg = [`绑定B站cookie成功：\n${param.DedeUserID}`]
+      let uidMsg = [`好耶~绑定B站cookie成功：\n${param.DedeUserID}`]
 
       await this.e.reply(uidMsg)
     }
@@ -144,17 +168,17 @@ export class bilibili extends plugin {
   /** 我的B站ck */
   async myBCk() {
     if (this.e.isGroup) {
-      await this.reply('请私聊查看')
+      await this.reply('请私聊查看叭')
       return
     } else {
       const ck = await xxCfg.getBiliCk();
       if (ck && ck.length == 0) {
         this.e.reply(
-          `当前尚未配置B站ck`
+          `惹~当前尚未配置B站ck`
         );
       } else {
         this.e.reply(
-          `当前配置的B站ck为：${ck}`
+          `芜湖~当前配置的B站ck为：${ck}`
         );
       }
     }
@@ -162,8 +186,59 @@ export class bilibili extends plugin {
 
   /** B站ck帮助 */
   async BCkHelp() {
-    await this.reply(`B站ck的获取方法请百度\n务必包含以下字段的相等式内容 \nbuvid3 \n_uuid \nbuvid4 \nrpdid \nfingerprint \nDedeUserID`)
+    await this.reply(`B站ck的获取方法请找度娘叭\n务必包含以下字段的相等式内容 \nbuvid3 \n_uuid \nbuvid4 \nrpdid \nfingerprint \nDedeUserID`)
     return
+  }
+
+  /** 验证B站ck */
+  async checkBck() {
+    //验证CK是否有效
+
+    let Bck = await xxCfg.getBiliCk();
+
+    Bck = String(Bck);
+
+    if (Bck.length == 0) {
+      this.e.reply("惹，还未绑定B站ck捏~");
+      return;
+    };
+
+    this.e.reply("开始验证绑定的B站ck~♡~\n这将会需要约60秒捏~")
+
+    Bck.split(';').forEach((v) => {
+      // 处理分割特殊cookie_token
+      let tmp = lodash.trim(v).replace('=', '~').split('~')
+      param[tmp[0]] = tmp[1]
+    });
+
+    let UID = param.DedeUserID;
+
+    const res = await new Bilibili(this.e).getBilibiliDynamicInfo(UID);
+
+    if (!res.ok) {
+      this.e.reply("诶嘿~出了点网络问题，无法验证ck的有效性呢，等会再试试叭~");
+      return;
+    }
+
+    const resJson = await res.json();
+
+    if (resJson.code != 0 || !resJson?.data) {
+      this.e.reply(
+        "绑定的B站ck失效了欸~\n请更新ck进行绑定叭~"
+      );
+      return;
+    }
+
+    const dynamics = resJson?.data?.items || [];
+
+    let name = UID;
+
+    if (dynamics.length) {
+      let dynamic = dynamics[0];
+      name = dynamic?.modules?.module_author?.name || UID;
+    }
+
+    this.e.reply(`好耶~当前为xianxin-plugin绑定的B站ck有效捏~\n${name}：${UID}`);
   }
 
   /** 添加b站推送 */
@@ -179,7 +254,7 @@ export class bilibili extends plugin {
 
     if (!uid) {
       this.e.reply(
-        `请输入正确的推送的uid\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377`
+        `请输入正确的推送的uid叭\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377`
       );
       return true;
     }
@@ -226,7 +301,7 @@ export class bilibili extends plugin {
 
     if (resJson.code != 0 || !resJson?.data) {
       this.e.reply(
-        "uid错误或绑定的B站ck失效\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
+        "uid错误或绑定的B站ck失效了耶\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
       );
       return;
     }
@@ -257,7 +332,7 @@ export class bilibili extends plugin {
 
     xxCfg.saveSet("bilibili", "push", "config", data);
 
-    this.e.reply(`添加b站推送成功~\n${name}：${uid}`);
+    this.e.reply(`好耶~添加b站推送成功~\n${name}：${uid}`);
   }
 
   /** 删除b站推送 */
@@ -270,7 +345,7 @@ export class bilibili extends plugin {
       .trim();
     if (!uid) {
       this.e.reply(
-        `请输入推送的uid\n示例1(取消全部动态推送)：#取消up推送 401742377\n示例2(取消订阅直播动态)：#取消up推送 直播 401742377\n示例3(取消订阅直播、转发、图文、文章、视频动态)：#取消up推送 直播 转发 图文 文章 视频 401742377`
+        `请输入推送的uid啦\n示例1(取消全部动态推送)：#取消up推送 401742377\n示例2(取消订阅直播动态)：#取消up推送 直播 401742377\n示例3(取消订阅直播、转发、图文、文章、视频动态)：#取消up推送 直播 转发 图文 文章 视频 401742377`
       );
       return;
     }
@@ -282,7 +357,7 @@ export class bilibili extends plugin {
 
     if (!upData) {
       this.e.reply(
-        `未找到该uid，请核实是否输入指令正确\n示例1(取消全部动态推送)：#取消up推送 401742377\n示例2(取消订阅直播动态)：#取消up推送 直播 401742377\n示例3(取消订阅直播、转发、图文、文章、视频动态)：#取消up推送 直播 转发 图文 文章 视频 401742377`
+        `唔，未找到该uid欸，请核实是否输入指令正确喔\n示例1(取消全部动态推送)：#取消up推送 401742377\n示例2(取消订阅直播动态)：#取消up推送 直播 401742377\n示例3(取消订阅直播、转发、图文、文章、视频动态)：#取消up推送 直播 转发 图文 文章 视频 401742377`
       );
       return;
     }
