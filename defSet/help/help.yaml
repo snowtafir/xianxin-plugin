@@ -53,6 +53,9 @@
     - icon: ledger
       title: "#我的B站ck"
       desc: "查看配置的B站ck,仅限私聊"
+    - icon: 统计
+      title: "#验证B站ck"
+      desc: "验证绑定的B站ck是否有效"
     - icon: ledger
       title: "#B站ck帮助"
       desc: "查看B站ck帮助"

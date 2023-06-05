@@ -113,9 +113,9 @@ class XsCfg {
   }
 
   /** 覆盖保存绑定的B站ck */
-  saveBiliCk(UID, data) {
+  saveBiliCk(data) {
     let dir = `./data/BilibiliCookie/`
-    let file = dir + `${UID}.yaml`
+    let file = dir + `bili_Ck.yaml`
     if (lodash.isEmpty(data)) {
       fs.existsSync(file) && fs.unlinkSync(file)
     } else {
