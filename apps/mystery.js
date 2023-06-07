@@ -1,6 +1,5 @@
 import plugin from "../../../lib/plugins/plugin.js";
 import fetch from "node-fetch";
-import { segment } from "oicq";
 import lodash from "lodash";
 import common from "../../../lib/common/common.js";
 import xxCfg from "../model/xxCfg.js";

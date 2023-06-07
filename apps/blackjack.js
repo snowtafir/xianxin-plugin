@@ -1,5 +1,4 @@
 import plugin from "../../../lib/plugins/plugin.js";
-import { segment } from "oicq";
 
 // 21点信息存放
 let blackjaceState = {};

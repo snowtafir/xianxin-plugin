@@ -1,6 +1,5 @@
 import moment from "moment";
 import xxCfg from "../model/xxCfg.js";
-import { segment } from "oicq";
 import base from "./base.js";
 import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 import fetch from "node-fetch";

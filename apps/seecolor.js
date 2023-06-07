@@ -1,5 +1,4 @@
 import plugin from "../../../lib/plugins/plugin.js";
-import { segment } from "oicq";
 import fs from "node:fs";
 import Game from "../model/game.js";
 import lodash from "lodash";

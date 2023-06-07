@@ -1,6 +1,5 @@
 import plugin from "../../../lib/plugins/plugin.js";
 import fs from "node:fs";
-import { segment } from "oicq";
 import Game from "../model/game.js";
 import moment from "moment";
 import puppeteer from "../../../lib/puppeteer/puppeteer.js";

@@ -1,5 +1,4 @@
 import plugin from "../../../lib/plugins/plugin.js";
-import { segment } from "oicq";
 import lodash from "lodash";
 import xxCfg from "../model/xxCfg.js";
 import fs from "node:fs";

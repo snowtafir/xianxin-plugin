@@ -1,4 +1,3 @@
-import { segment } from "oicq";
 import plugin from "../../../lib/plugins/plugin.js";
 import Mys from "../model/mys.js";
 import common from "../../../lib/common/common.js";

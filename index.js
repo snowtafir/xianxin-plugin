@@ -1,6 +1,14 @@
 import fs from "node:fs";
 import xxCfg from "./model/xxCfg.js";
 
+if (!global.segment) {
+  try {
+    global.segment = (await import("oicq")).segment;
+  } catch (err) {
+    global.segment = (await import("icqq")).segment;
+  }
+}
+
 const versionData = xxCfg.getdefSet("version", "version");
 
 logger.info(`--------------------------`);
