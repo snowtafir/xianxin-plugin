@@ -17,9 +17,7 @@ class Bili_Wbi {
   // 获取最新的 img_key 和 sub_key
   static async getWbiKeys() {
     const url = 'https://api.bilibili.com/x/web-interface/nav';
-    const resp = await fetch(url, {
-      method: 'GET',
-    });
+    const resp = await fetch(url);
     const json_content = await resp.json();
     const img_url = json_content.data.wbi_img.img_url;
     const sub_url = json_content.data.wbi_img.sub_url;
@@ -79,12 +77,32 @@ class Bili_Wbi {
           "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
       }
     };
-    const wbi_keys = await this.getWbiKeys();
-    this.encWbi(
-      params,
-      wbi_keys.img_key,
-      wbi_keys.sub_key
-    );
+
+    /**缓存获取的 img_key 和 sub_key到redis并设置过期时间 30分钟 && 执行 wbi签名*/
+    this.key = "Yz:xianxin:bilibili:Wbi_Nav_Keys";
+    try {
+      let wbi_keys = JSON.parse(await redis.get(`${this.key}`));
+      /** 执行 wbi签名*/
+      this.encWbi(
+        params,
+        wbi_keys.img_key,
+        wbi_keys.sub_key
+      );
+      Bot.logger.mark("xianxin插件：B站接口 wbi_keys读取成功");
+    } catch (e) {
+      Bot.logger.mark("xianxin插件：正在更新wbi_keys");
+      let wbi_keys = await this.getWbiKeys();
+      let wbikeys = wbi_keys;
+      let wbi = JSON.stringify(wbi_keys)
+      redis.set(`${this.key}`, `${wbi}`, { EX: 1800 });
+      /** 执行 wbi签名*/
+      this.encWbi(
+        params,
+        wbikeys.img_key,
+        wbikeys.sub_key
+      );
+      Bot.logger.mark("xianxin插件：B站接口 更新wbi_keys成功");
+    };
   }
 }
 
@@ -120,84 +138,99 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUserInfo(uid) {
-    const wrid = await Bili_Wbi.wbi_Code();
-    let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&${wrid}jsonp=jsonp`;
-    let Bck = await xxCfg.getBiliCk();
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "cache-control": "no-cache",
-        cookie: Bck,
-        pragma: "no-cache",
-        "sec-ch-ua":
-          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "none",
-        "sec-fetch-user": "?1",
-        "upgrade-insecure-requests": 1,
-        "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
-      },
-      redirect: "follow",
-    });
-    return response;
+    try {
+      let wrid = await Bili_Wbi.wbi_Code();
+      let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&${wrid}jsonp=jsonp`;
+      let Bck = await xxCfg.getBiliCk();
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "cache-control": "no-cache",
+          cookie: Bck,
+          pragma: "no-cache",
+          "sec-ch-ua":
+            '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"macOS"',
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "none",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": 1,
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+        },
+        redirect: "follow",
+      });
+      return response;
+    } catch (e) {
+      Bot.logger.mark("xianxin插件：B站up信息请求失败");
+      return;
+    }
   }
 
   async getBilibiliUserInfoDetail(uid) {
-    const wrid = await Bili_Wbi.wbi_Code();
-    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
-    let Bck = await xxCfg.getBiliCk();
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "cache-control": "no-cache",
-        cookie: Bck,
-        pragma: "no-cache",
-        "sec-ch-ua":
-          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "none",
-        "sec-fetch-user": "?1",
-        "upgrade-insecure-requests": 1,
-        "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
-      },
-      redirect: "follow",
-    });
-    return response;
+    try {
+      let wrid = await Bili_Wbi.wbi_Code();
+      let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
+      let Bck = await xxCfg.getBiliCk();
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "cache-control": "no-cache",
+          cookie: Bck,
+          pragma: "no-cache",
+          "sec-ch-ua":
+            '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"macOS"',
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "none",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": 1,
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+        },
+        redirect: "follow",
+      });
+      return response;
+    } catch (e) {
+      Bot.logger.mark("xianxin插件：B站up详情请求失败");
+      return;
+    }
   }
 
   async getBilibiliDynamicInfo(uid) {
-    const wrid = await Bili_Wbi.wbi_Code();
-    let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
-    let Bck = await xxCfg.getBiliCk();
-    const response = await fetch(url, {
-      method: "GET",
-      headers: {
-        "cache-control": "no-cache",
-        cookie: Bck,
-        pragma: "no-cache",
-        "sec-ch-ua":
-          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
-        "sec-fetch-dest": "document",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "none",
-        "sec-fetch-user": "?1",
-        "upgrade-insecure-requests": 1,
-        "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
-      },
-      redirect: "follow",
-    });
-    return response;
+    try {
+      let wrid = await Bili_Wbi.wbi_Code();
+      let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
+      let Bck = await xxCfg.getBiliCk();
+      const response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "cache-control": "no-cache",
+          cookie: Bck,
+          pragma: "no-cache",
+          "sec-ch-ua":
+            '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"macOS"',
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "none",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": 1,
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+        },
+        redirect: "follow",
+      });
+      return response;
+    } catch (e) {
+      Bot.logger.mark("xianxin插件：B站up动态请求失败");
+      return;
+    }
   }
 
   async getBilibiliUp(keyword) {
@@ -256,7 +289,7 @@ export default class Bilibili extends base {
 
         const response = await this.getBilibiliDynamicInfo(up.uid);
 
-        if (response.ok) {
+        if (response) {
           const res = await response.json();
           if (res.code == 0) {
             const dynamicData = res?.data?.items || [];
@@ -282,7 +315,7 @@ export default class Bilibili extends base {
 
     this.key = "Yz:xianxin:bilibili:upPush:";
 
-    Bot.logger.mark("xianxin-plugin —— B站动态定时检测");
+    Bot.logger.mark("xianxin插件：B站动态定时检测");
 
     for (let [key, value] of uidMap) {
       // const accInfoRes = await this.getBilibiliUserInfo(key);
@@ -400,7 +433,7 @@ export default class Bilibili extends base {
 
       redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
-      Bot.logger.mark("xianxin-plugin —— B站动态执行推送");
+      Bot.logger.mark("xianxin插件：B站动态执行推送");
 
       await this.e.group.sendMsg(this[id_str].img).catch((err) => {
         logger.error(`群[${groupId}]推送失败：${JSON.stringify(err)}`);

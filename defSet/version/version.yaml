@@ -1,4 +1,11 @@
 - {
+    version: 2.0.0,
+    data:
+      [
+        添加独立绑定B站ck功能，<span class="cmd">#绑定B站ck： xxx</span>如果不进行绑定B站动态将无法推送,
+      ],
+  }
+- {
     version: 1.1.6,
     data:
       [

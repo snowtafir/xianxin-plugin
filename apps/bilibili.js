@@ -204,7 +204,8 @@ export class bilibili extends plugin {
     };
 
     this.e.reply("开始验证绑定的B站ck~♡~\n这将会需要约60秒捏~")
-
+    
+    let param = {};
     Bck.split(';').forEach((v) => {
       // 处理分割特殊cookie_token
       let tmp = lodash.trim(v).replace('=', '~').split('~')
