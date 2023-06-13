@@ -88,7 +88,7 @@ class Bili_Wbi {
         wbi_keys.img_key,
         wbi_keys.sub_key
       );
-      Bot.logger.mark("xianxin插件：B站接口 wbi_keys读取成功");
+      /*Bot.logger.mark("xianxin插件：B站接口 wbi_keys读取成功");*/
     } catch (e) {
       Bot.logger.mark("xianxin插件：正在更新wbi_keys");
       let wbi_keys = await this.getWbiKeys();
