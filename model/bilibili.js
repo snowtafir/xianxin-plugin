@@ -475,11 +475,20 @@ export default class Bilibili extends base {
       redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
       Bot.logger.mark("xianxin插件：B站动态执行推送");
-
-      await this.e.group.sendMsg(this[id_str].img).catch((err) => {
+      
+      /*QQ频道午夜时间推送限制报错 code: 304022*/
+      const message = [
+        this[id_str].img,
+      ];
+      await Bot.pickGroup(groupId)
+        .sendMsg(message)
+        .catch((err) => {
+          Bot.logger.mark(`群[${groupId}]推送失败：${JSON.stringify(err)}`);
+        });
+      /*await this.e.group.sendMsg(this[id_str].img).catch((err) => {
         logger.error(`群[${groupId}]推送失败：${JSON.stringify(err)}`);
         // this.pushAgain(Number(groupId), this[id_str].img);
-      });
+      });*/
       await common.sleep(1000);
     } else {
       const dynamicMsg = this.buildDynamic(
