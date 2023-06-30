@@ -14,6 +14,8 @@ const mixinKeyEncTab = [
   36, 20, 34, 44, 52
 ]
 class Bili_Wbi {
+  static temporaryCookie = null;
+  static cookieTimeStamp = -1;
   // 获取最新的 img_key 和 sub_key
   static async getWbiKeys() {
     const url = 'https://api.bilibili.com/x/web-interface/nav';
@@ -104,6 +106,45 @@ class Bili_Wbi {
       Bot.logger.mark("xianxin插件：B站接口 更新wbi_keys成功");
     };
   }
+  /**获取临时cookie*/
+  static async refreshTemporaryCookie() {
+    const url = 'https://www.bilibili.com/';
+    const response = await fetch(url,
+      {
+        method: "GET",
+        headers: {
+          "cache-control": "no-cache",
+          pragma: "no-cache",
+          "sec-ch-ua":
+            '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": '"Windows"',
+          "sec-fetch-dest": "document",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "none",
+          "sec-fetch-user": "?1",
+          "upgrade-insecure-requests": 1,
+          "user-agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+        },
+      });
+
+    this.temporaryCookie = response.headers.get['set-cookie'];
+  }
+  static async getTempCookie() {
+    const permanentCookie = await xxCfg.getBiliCk();;
+    if (permanentCookie) {
+      return permanentCookie;
+    } else {
+      logger.mark('CustomCookie is Null');
+    }
+    const date = new Date();
+    if (!this.temporaryCookie || date.getDate() != this.cookieTimeStamp) {
+      await this.refreshTemporaryCookie();
+      this.cookieTimeStamp = date.getDate();
+    }
+    return this.temporaryCookie;
+  }
 }
 
 export default class Bilibili extends base {
@@ -113,7 +154,7 @@ export default class Bilibili extends base {
   }
   async getBilibiliDetail(uid) {
     let url = `https://api.bilibili.com/x/relation/stat?vmid=${uid}`;
-    let Bck = await xxCfg.getBiliCk();
+    let Bck = await Bili_Wbi.getTempCookie();
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -121,16 +162,16 @@ export default class Bilibili extends base {
         cookie: Bck,
         pragma: "no-cache",
         "sec-ch-ua":
-          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+          '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
         "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
+        "sec-ch-ua-platform": '"Windows"',
         "sec-fetch-dest": "document",
         "sec-fetch-mode": "navigate",
         "sec-fetch-site": "none",
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
       },
       redirect: "follow",
     });
@@ -141,7 +182,7 @@ export default class Bilibili extends base {
     try {
       let wrid = await Bili_Wbi.wbi_Code();
       let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&${wrid}jsonp=jsonp`;
-      let Bck = await xxCfg.getBiliCk();
+      let Bck = await Bili_Wbi.getTempCookie();
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -149,16 +190,16 @@ export default class Bilibili extends base {
           cookie: Bck,
           pragma: "no-cache",
           "sec-ch-ua":
-            '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+            '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
           "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"macOS"',
+          "sec-ch-ua-platform": '"Windows"',
           "sec-fetch-dest": "document",
           "sec-fetch-mode": "navigate",
           "sec-fetch-site": "none",
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": 1,
           "user-agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
         },
         redirect: "follow",
       });
@@ -173,7 +214,7 @@ export default class Bilibili extends base {
     try {
       let wrid = await Bili_Wbi.wbi_Code();
       let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
-      let Bck = await xxCfg.getBiliCk();
+      let Bck = await Bili_Wbi.getTempCookie();
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -181,16 +222,16 @@ export default class Bilibili extends base {
           cookie: Bck,
           pragma: "no-cache",
           "sec-ch-ua":
-            '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+            '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
           "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"macOS"',
+          "sec-ch-ua-platform": '"Windows"',
           "sec-fetch-dest": "document",
           "sec-fetch-mode": "navigate",
           "sec-fetch-site": "none",
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": 1,
           "user-agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
         },
         redirect: "follow",
       });
@@ -205,7 +246,7 @@ export default class Bilibili extends base {
     try {
       let wrid = await Bili_Wbi.wbi_Code();
       let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
-      let Bck = await xxCfg.getBiliCk();
+      let Bck = await Bili_Wbi.getTempCookie();
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -213,16 +254,16 @@ export default class Bilibili extends base {
           cookie: Bck,
           pragma: "no-cache",
           "sec-ch-ua":
-            '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+            '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
           "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": '"macOS"',
+          "sec-ch-ua-platform": '"Windows"',
           "sec-fetch-dest": "document",
           "sec-fetch-mode": "navigate",
           "sec-fetch-site": "none",
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": 1,
           "user-agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
         },
         redirect: "follow",
       });
@@ -235,7 +276,7 @@ export default class Bilibili extends base {
 
   async getBilibiliUp(keyword) {
     let url = `https://api.bilibili.com/x/web-interface/search/type?keyword=${keyword}&page=1&search_type=bili_user&order=totalrank&pagesize=5`;
-    let Bck = await xxCfg.getBiliCk();
+    let Bck = await Bili_Wbi.getTempCookie();
     const response = await fetch(url, {
       method: "GET",
       headers: {
@@ -244,16 +285,16 @@ export default class Bilibili extends base {
         "cache-control": "no-cache",
         pragma: "no-cache",
         "sec-ch-ua":
-          '"Microsoft Edge";v="105", "Not)A;Brand";v="8", "Chromium";v="105"',
+          '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
         "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": '"macOS"',
+        "sec-ch-ua-platform": '"Windows"',
         "sec-fetch-dest": "document",
         "sec-fetch-mode": "navigate",
         "sec-fetch-site": "none",
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
       },
       redirect: "follow",
     });
