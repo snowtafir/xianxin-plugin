@@ -8,7 +8,7 @@
 
 <div align="center">
 
-是 <a href="https://gitee.com/Le-niao/Yunzai-Bot" target="_blank">TRSS-Yunzai</a> 关于原神cos、B站推送、wiki查询和群战等功能的扩展插件
+是 <a href="https://gitee.com/TimeRainStarSky/Yunzai" target="_blank">TRSS-Yunzai</a> 关于原神cos、B站推送、wiki查询和群战等功能的扩展插件
 
 [![访问量](https://profile-counter.glitch.me/xianxin-plugin/count.svg)](https://gitee.com/xianxincoder/xianxin-plugin)
 
