@@ -4,11 +4,11 @@
   </a>
 </p>
 
-<h1 align="center">xianxin-plugin</h1>
+<h1 align="center">适配TRSS-Yunzai的xianxin-plugin</h1>
 
 <div align="center">
 
-是 <a href="https://gitee.com/Le-niao/Yunzai-Bot" target="_blank">Yunzai-Bot</a> 关于原神cos、B站推送、wiki查询和群战等功能的扩展插件
+是 <a href="https://gitee.com/Le-niao/Yunzai-Bot" target="_blank">TRSS-Yunzai</a> 关于原神cos、B站推送、wiki查询和群战等功能的扩展插件
 
 [![访问量](https://profile-counter.glitch.me/xianxin-plugin/count.svg)](https://gitee.com/xianxincoder/xianxin-plugin)
 
@@ -37,7 +37,22 @@ git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/xianxin-plugi
 1. 在浏览器中登录自己的b站账号
 2. 处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入document.cookie并回车 -> 复制给到的cookie文本
 3. 私聊Bot下发送`#绑定B站ck: xxx`进行添加，提示添加成功即可愉快使用。
-## ✨ 功能
+
+## ⌨️ 功能可用状态
+* 以下可用功能QQ频道可用
+
+- [x] 米游社功能
+- [x] B站功能
+- [x] 群战
+- [x] 五子棋
+- [x] 21点
+- [x] 给我点颜色看看
+- [x] 其他指令
+- [x] 神秘指令
+- [ ] 赞我/转发等小功能，请自测
+- [ ] 任意功能
+
+## ✨ 功能指令
 
 | 命令 | 🌰 |
 | --- | --- |
@@ -59,106 +74,17 @@ git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/xianxin-plugi
 - [Miao-Yunzai v3](https://gitee.com/yoimiya-kokomi/Miao-Yunzai)
 
 ## ⌨️ todo
-- [ ] 群战迭代功能
-- [ ] 神秘指令增加限制次数配置
-- [ ] wiki样式的优化
-- [ ] 群管优化(撤@群友不针对消息)
-- [ ] 21点小游戏中的A动态计算作为1点或者11点
+- [x] 基本适配TRSS-Yunzai
+- [ ] 偶尔维护
 
 
 ## 🌈 其他
 - 素材来源于网络，仅供交流学习使用
 - 严禁用于任何商业用途和非法行为
 - 如果对你有帮助辛苦给个star，这是对我最大的鼓励
-- xianxin-plugin QQ群：426961091 进群问题答案：woc
 
 
 ## 🔗 链接
-
+- [原版xianxin-plugin](https://gitee.com/xianxincoder/xianxin-plugin)
 - [云崽](https://gitee.com/Le-niao/Yunzai-Bot)
 - [插件库](https://gitee.com/Hikari666/Yunzai-Bot-plugins-index)
-
-
-## ❤️ 赞助者
-
-- [爱发电](https://afdian.net/@xianxin)
-
-
-| 昵称 | 金额 |
-| --- | --- |
-| Fei. | 33 |
-| 林木森つ | 25 |
-| 星辰之梦 | 6.6 |
-| 唉嘿 | 5.2 |
-| 萍| 5 |
-| Lie| 15 |
-| 妙娃种子不妙了| 5 |
-| 遇到问题摆大烂| 5 |
-| Gimme| 10 |
-| 吃瓜群众| 20 |
-| 长楠| 15 |
-| Tears| 40 |
-| [时雨🌌星空](https://gitee.com/TimeRainStarSky) | 5 |
-| 夏-.-曙＆宙@象 | 10 |
-| 枫叶霜华 | 10 |
-| 抛物线 | 43 |
-| 白熊 | 6.66 |
-| 肆拾壹号糖水铺 | 5 |
-| 啊这. | 6.66 |
-| 漠漠轻寒 | 5 |
-| 迷路的孩子 | 5 |
-| 白无常啊(wdnmd) | 5 |
-| Persistent.zw | 5.88 |
-| 闪光Asuna | 5 |
-| 墨水囊王 | 5 |
-|   | 10 |
-| Victoria. | 15 |
-| 三十一. | 15 |
-| 纪元 | 10 |
-| 零食 | 10 |
-| 落叶红尘君莫笑 | 73.5 |
-| 不要欺负一一 | 10 |
-| 小源 | 28.2 |
-| AAA | 10 |
-| 乐笙 | 30 |
-| 爱发电用户_hQA7 | 5 |
-| 爱发电用户_BTSu | 5 |
-| 夜夜 | 5 |
-| 瑞霖 | 28.2 |
-| 逝灰 | 5 |
-| 樱庭晴海 | 50 |
-| 尘埃未定 | 5.21 |
-| Gin | 30 |
-| 枫木 | 5 |
-| 萝莉分布 | 6.66 | 
-| 提瓦特最伟大的占星术士 | 4 |
-| 地球生物 | 15 |
-| 无想无念 | 5.21 |
-| 箐呓 | 1.88 |
-| ccchizhao | 10 |
-| ADonut | 28.2 |
-| 拝淚 | 5 |
-| 敷灬衍丷 | 10 |
-| 米妖 | 5 |
-| Aliceikkk | 5 |
-| 傑 | 28.2 |
-| 猫尾特调 | 10 |
-| 内鬼 | 5 |
-| •ᴥ• | 5 |
-| 爱发电用户_FKAD | 5 |
-| 巳雨 | 5 |
-| 会飞的芒果猫 | 9.91 |
-| 111222333 | 5 |
-| 绝对不熬夜 | 65 |
-| 希娜小姐 | 5 |
-| 没有抱枕不开心 | 28.2 |
-| 夜岚星茕 | 10 |
-| 漾人心 | 5.21 |
-| Starry | 10 |
-| 雪梨很可爱 | 5 |
-| 溯流光 | 10 |
-| MC | 5 |
-| o | 5 |
-| 爱发电用户_E7yP | 5 |
-
- 
