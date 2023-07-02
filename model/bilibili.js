@@ -92,7 +92,7 @@ class Bili_Wbi {
       );
       /*Bot.logger.mark("xianxin插件：B站接口 wbi_keys读取成功");*/
     } catch (e) {
-      Bot.logger.mark("xianxin插件：正在更新wbi_keys");
+      //Bot.logger.mark("xianxin插件：正在更新wbi_keys");
       let wbi_keys = await this.getWbiKeys();
       let wbikeys = wbi_keys;
       let wbi = JSON.stringify(wbi_keys)
@@ -103,7 +103,7 @@ class Bili_Wbi {
         wbikeys.img_key,
         wbikeys.sub_key
       );
-      Bot.logger.mark("xianxin插件：B站接口 更新wbi_keys成功");
+      //Bot.logger.mark("xianxin插件：B站接口 更新wbi_keys成功");
     };
   }
   /**获取临时cookie*/
@@ -330,7 +330,7 @@ export default class Bilibili extends base {
 
         const response = await this.getBilibiliDynamicInfo(up.uid);
 
-        if (response) {
+        if (response.ok) {
           const res = await response.json();
           if (res.code == 0) {
             const dynamicData = res?.data?.items || [];
@@ -453,7 +453,7 @@ export default class Bilibili extends base {
     let sended = await redis.get(`${this.key}${groupId}:${id_str}`);
     if (sended) return;
 
-    this.e.group = Bot.pickGroup(Number(groupId));
+    this.e.group = Bot.pickGroup(String(groupId));
 
     if (!!setData.pushMsgMode) {
       const data = this.dynamicDataHandle(pushDynamicData);
@@ -468,27 +468,22 @@ export default class Bilibili extends base {
         const img = dynamicMsg;
 
         this[id_str] = {
-          img: img[0],
+          img: img,
         };
       }
 
       redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
       Bot.logger.mark("xianxin插件：B站动态执行推送");
-      
-      /*QQ频道午夜时间推送限制报错 code: 304022*/
-      const message = [
-        this[id_str].img,
-      ];
-      await Bot.pickGroup(groupId)
-        .sendMsg(message)
-        .catch((err) => {
-          Bot.logger.mark(`群[${groupId}]推送失败：${JSON.stringify(err)}`);
-        });
-      /*await this.e.group.sendMsg(this[id_str].img).catch((err) => {
-        logger.error(`群[${groupId}]推送失败：${JSON.stringify(err)}`);
-        // this.pushAgain(Number(groupId), this[id_str].img);
-      });*/
+
+      /*QQ频道午夜时间推送有限制，会报错code: 304022*/
+      for (var i = 0; i < (this[id_str].img).length; i++) {
+        await this.e.group
+          .sendMsg(this[id_str].img[i])
+          .catch((err) => {
+            Bot.logger.mark(`群[${groupId}]推送失败：${JSON.stringify(err)}`);
+          });
+      }
       await common.sleep(1000);
     } else {
       const dynamicMsg = this.buildDynamic(
