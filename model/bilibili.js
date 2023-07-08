@@ -193,7 +193,8 @@ export default class Bilibili extends base {
   async getBilibiliUserInfo(uid) {
     try {
       let wrid = await Bili_Wbi.wbi_Code();
-      let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&${wrid}jsonp=jsonp`;
+      let url = `https://api.bilibili.com/x/space/wbi/acc/info?mid=${uid}&${wrid}&jsonp=jsonp`;
+      //let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&jsonp=jsonp`;
       let miniBck = await Bili_Wbi.getTempCookie(1);
       const response = await fetch(url, {
         method: "GET",
