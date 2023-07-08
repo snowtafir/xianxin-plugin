@@ -37,7 +37,7 @@ git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/xianxin-plugi
 1. 在浏览器中登录自己的b站账号
 2. 处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入document.cookie并回车 -> 复制给到的cookie文本
 3. 私聊Bot下发送`#绑定B站ck: xxx`进行添加，提示添加成功即可愉快使用。
-4. **风险选项**：如推送总失败，权宜之计可考虑绑定cookie时添加/保留`SESSDATA=xxxxxx;`，该选项有封号的可能性（虽逻辑已尽量减少SESSDATA使用的情况），群人数多/推送订阅多的慎用！！
+4. **风险选项**：如推送总失败，权宜之计可考虑绑定cookie时添加/保留`SESSDATA=xxxx;`，该选项如果使用自己真实的`SESSDATA`有封号的可能性（虽逻辑已尽量减少SESSDATA使用的情况）特别是群人数多/推送订阅多的慎用！！目前尚且可用低风险办法请使用 `#B站ck帮助`查看。
 
 ## ⌨️ 功能可用状态
 * 以下可用功能QQ频道可用

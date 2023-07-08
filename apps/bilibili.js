@@ -186,7 +186,7 @@ export class bilibili extends plugin {
 
   /** B站ck帮助 */
   async BCkHelp() {
-    await this.reply(`B站ck的获取方法请找度娘叭\n务必包含以下字段的相等式内容 \nbuvid3 \n_uuid \nbuvid4 \nrpdid \nfingerprint \nDedeUserID`)
+    await this.reply(`B站ck的获取方法请找度娘叭\n务必包含以下字段的相等式内容： \nbuvid3 \n_uuid \nbuvid4 \nrpdid \nfingerprint \nDedeUserID\n风险选项：推送总失败，权宜之计可考虑绑定cookie时添加/保留SESSDATA=xxxxxx;，\n该选项如果使用自己真实的SESSDATA有封号的可能性\n（虽逻辑已尽量减少SESSDATA使用的情况）\n特别是群人数多/推送订阅多的慎用！！\n目前可用解决方法：\n**把获取的真实SESSDATA=xxxxxx;保留相同长度随机修改其中的值\n例如SESSDATA=xxyyaayyfsid;，\n然后添加到要绑定的cookie后面进行绑定即可。`)
     return
   }
 
