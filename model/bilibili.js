@@ -5,6 +5,7 @@ import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
 import md5 from 'md5'
+import lodash from 'lodash'
 
 //重排码
 const mixinKeyEncTab = [
@@ -131,7 +132,7 @@ class Bili_Wbi {
 
     this.temporaryCookie = response.headers.get['set-cookie'];
   }
-  static async getTempCookie() {
+  static async getTempCookie(i) {
     const permanentCookie = await xxCfg.getBiliCk();;
     if (permanentCookie) {
       return permanentCookie;
@@ -143,7 +144,18 @@ class Bili_Wbi {
       await this.refreshTemporaryCookie();
       this.cookieTimeStamp = date.getDate();
     }
-    return this.temporaryCookie;
+    let Bck = this.temporaryCookie;
+    let param = {}
+    String(Bck).split(';').forEach((v) => {
+      let tmp = lodash.trim(v).replace('=', '/').split('/')
+      param[tmp[0]] = tmp[1]
+    })
+    let miniBck = `buvid3=${param.buvid3};buvid4=${param.buvid4};_uuid=${param._uuid}; rpdid=${param.rpdid}; fingerprint=${param.fingerprint};DedeUserID=${param.DedeUserID}`;
+    if (i === 1) {
+      return miniBck
+    } if (i === 0) {
+      return Bck;
+    }
   }
 }
 
@@ -154,12 +166,12 @@ export default class Bilibili extends base {
   }
   async getBilibiliDetail(uid) {
     let url = `https://api.bilibili.com/x/relation/stat?vmid=${uid}`;
-    let Bck = await Bili_Wbi.getTempCookie();
+    let miniBck = await Bili_Wbi.getTempCookie(1);
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "cache-control": "no-cache",
-        cookie: Bck,
+        cookie: miniBck,
         pragma: "no-cache",
         "sec-ch-ua":
           '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
@@ -182,12 +194,12 @@ export default class Bilibili extends base {
     try {
       let wrid = await Bili_Wbi.wbi_Code();
       let url = `https://api.bilibili.com/x/space/acc/info?mid=${uid}&${wrid}jsonp=jsonp`;
-      let Bck = await Bili_Wbi.getTempCookie();
+      let miniBck = await Bili_Wbi.getTempCookie(1);
       const response = await fetch(url, {
         method: "GET",
         headers: {
           "cache-control": "no-cache",
-          cookie: Bck,
+          cookie: miniBck,
           pragma: "no-cache",
           "sec-ch-ua":
             '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
@@ -212,14 +224,14 @@ export default class Bilibili extends base {
 
   async getBilibiliUserInfoDetail(uid) {
     try {
-      let wrid = await Bili_Wbi.wbi_Code();
+      let wrid = await Bili_Wbi.wbi_Code(1);
       let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
-      let Bck = await Bili_Wbi.getTempCookie();
+      let miniBck = await Bili_Wbi.getTempCookie(1);
       const response = await fetch(url, {
         method: "GET",
         headers: {
           "cache-control": "no-cache",
-          cookie: Bck,
+          cookie: miniBck,
           pragma: "no-cache",
           "sec-ch-ua":
             '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
@@ -243,11 +255,35 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliDynamicInfo(uid) {
-    try {
-      let wrid = await Bili_Wbi.wbi_Code();
-      let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
-      let Bck = await Bili_Wbi.getTempCookie();
-      const response = await fetch(url, {
+    let wrid = await Bili_Wbi.wbi_Code();
+    let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}&${wrid}`;
+    let miniBck = await Bili_Wbi.getTempCookie(1);
+    let response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "cache-control": "no-cache",
+        cookie: miniBck,
+        pragma: "no-cache",
+        "sec-ch-ua":
+          '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
+        "sec-fetch-dest": "document",
+        "sec-fetch-mode": "navigate",
+        "sec-fetch-site": "none",
+        "sec-fetch-user": "?1",
+        "upgrade-insecure-requests": 1,
+        "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+      },
+      redirect: "follow",
+    });
+    if (response.ok && (response.json()["code"] === 0)) {
+      Bot.logger.mark(`xianxin插件：B站up动态访问 未使用SESSDATA`)
+      return response;
+    } else {
+      let Bck = await Bili_Wbi.getTempCookie(0);
+      response = await fetch(url, {
         method: "GET",
         headers: {
           "cache-control": "no-cache",
@@ -268,20 +304,18 @@ export default class Bilibili extends base {
         redirect: "follow",
       });
       return response;
-    } catch (e) {
-      Bot.logger.mark("xianxin插件：B站up动态请求失败");
-      return;
     }
+    //Bot.logger.mark("xianxin插件：B站up动态请求失败");
   }
 
   async getBilibiliUp(keyword) {
     let url = `https://api.bilibili.com/x/web-interface/search/type?keyword=${keyword}&page=1&search_type=bili_user&order=totalrank&pagesize=5`;
-    let Bck = await Bili_Wbi.getTempCookie();
+    let miniBck = await Bili_Wbi.getTempCookie(1);
     const response = await fetch(url, {
       method: "GET",
       headers: {
         authority: "api.bilibili.com",
-        cookie: Bck,
+        cookie: miniBck,
         "cache-control": "no-cache",
         pragma: "no-cache",
         "sec-ch-ua":

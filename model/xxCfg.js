@@ -113,17 +113,18 @@ class XsCfg {
   }
 
   /** 覆盖保存绑定的B站ck */
-  saveBiliCk(data) {
+  async saveBiliCk(data) {
     let dir = `./data/BilibiliCookie/`
     let file = dir + `bili_Ck.yaml`
-    if (lodash.isEmpty(data)) {
+    let addData = data.replace(/\s/g, '').trim();
+    if (lodash.isEmpty(addData)) {
       fs.existsSync(file) && fs.unlinkSync(file)
     } else {
       const absPath = dir;
       if (!absPath) {
         fs.mkdir(absPath); //Create dir in case not found
       }
-      let yaml = YAML.stringify(data);
+      let yaml = YAML.stringify(addData);
       fs.writeFileSync(file, yaml, 'utf8')
     }
   }

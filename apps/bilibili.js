@@ -115,13 +115,13 @@ export class bilibili extends plugin {
       return
     } else {
       let Bck = this.e.msg
-        .replace(/#|'|"*(添加|绑定|新增|增加)*(b|B)站*(ck|CK|cK|Ck)*(:|：)*/g, "")
+        .replace(/#|"*(添加|绑定|新增|增加)*(b|B)站*(ck|CK|cK|Ck)*(:|：)/g, "")
         .trim();
 
       let param = {}
       Bck.split(';').forEach((v) => {
         // 处理分割特殊cookie_token
-        let tmp = lodash.trim(v).replace('=', '~').split('~')
+        let tmp = lodash.trim(v).replace('=', '/').split('/')
         param[tmp[0]] = tmp[1]
       })
 
