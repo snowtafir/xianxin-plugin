@@ -77,7 +77,7 @@ class Bili_Wbi {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36 Edg/105.0.1343.50",
+          "Mozilla/5.0",
       }
     };
 
@@ -126,7 +126,7 @@ class Bili_Wbi {
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": 1,
           "user-agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "Mozilla/5.0",
         },
       });
 
@@ -183,7 +183,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+          "Mozilla/5.0",
       },
       redirect: "follow",
     });
@@ -212,7 +212,7 @@ export default class Bilibili extends base {
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": 1,
           "user-agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "Mozilla/5.0",
         },
         redirect: "follow",
       });
@@ -244,7 +244,7 @@ export default class Bilibili extends base {
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": 1,
           "user-agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "Mozilla/5.0",
         },
         redirect: "follow",
       });
@@ -275,7 +275,7 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+          "Mozilla/5.0",
       },
       redirect: "follow",
     });
@@ -300,7 +300,7 @@ export default class Bilibili extends base {
           "sec-fetch-user": "?1",
           "upgrade-insecure-requests": 1,
           "user-agent":
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+            "Mozilla/5.0",
         },
         redirect: "follow",
       });
@@ -329,8 +329,9 @@ export default class Bilibili extends base {
         "sec-fetch-user": "?1",
         "upgrade-insecure-requests": 1,
         "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36",
+          "Mozilla/5.0",
       },
+      //Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36
       redirect: "follow",
     });
     return response;
