@@ -54,8 +54,8 @@
       title: "#我的B站ck"
       desc: "查看配置的B站ck,仅限私聊"
     - icon: 统计
-      title: "#验证B站ck"
-      desc: "验证绑定的B站ck是否有效"
+      title: "#删除b站临时ck"
+      desc: "删除redis缓存的未绑定自己的B站ck而自动获取的临时B站ck"
     - icon: ledger
       title: "#B站ck帮助"
       desc: "查看B站ck帮助"

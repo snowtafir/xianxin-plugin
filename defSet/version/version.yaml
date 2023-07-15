@@ -1,4 +1,11 @@
 - {
+    version: 2.0.1,
+    data:
+      [
+        B站接口添加 ExClimbWuzhi 过校验，绑定B站ck功能改为可选，<span class="cmd">#绑定B站ck： xxx</span>如果总是无法推送可进行该选项,
+      ],
+  }
+- {
     version: 2.0.0,
     data:
       [

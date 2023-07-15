@@ -65,7 +65,7 @@ export class bilibili extends plugin {
           event: "message.group",
         },
         {
-          reg: "^#*绑定*(b|B)站*(ck|CK|cK|Ck)*(:|：)*.*$",
+          reg: "^#*绑定*(b|B)站(ck|CK|cK|Ck)*(:|：)*.*$",
           fnc: "bingBiliCk",
           permission: "master",
           event: 'message'
@@ -77,15 +77,15 @@ export class bilibili extends plugin {
           fnc: 'myBCk'
         },
         {
-          reg: '^#*(b|B)站*(ck|CK|Ck|Ck|cookie)帮助$',
+          reg: '^#*(b|B)站(ck|CK|Ck|Ck|cookie)帮助$',
           event: 'message',
           fnc: 'BCkHelp'
         },
         {
-          reg: '^#*验证*(b|B)站*(ck|CK|Ck|Ck|cookie)$',
+          reg: '^#*删除*(b|B)站临时(ck|CK|Ck|Ck|cookie)$',
           event: 'message',
           permission: "master",
-          fnc: 'checkBck'
+          fnc: 'delTempBck'
         },
       ],
     });
@@ -121,31 +121,30 @@ export class bilibili extends plugin {
       let param = {}
       Bck.split(';').forEach((v) => {
         // 处理分割特殊cookie_token
-        let tmp = lodash.trim(v).replace('=', '/').split('/')
+        let tmp = lodash.trim(v).replace('=', '$').split('$')
         param[tmp[0]] = tmp[1]
       })
 
-      if (!param.buvid3 && !param._uuid && !param.buvid4 && !param.rpdid && !param.fingerprint && !param.DedeUserID) {
-        await this.e.reply('诶呀~发送cookie不完整\n请退出B站【重新登录】，刷新完整cookie，使用该ck期间保持B站登录状态\nB站cookie的获取方法请百度一下');
+      if ((!param.buvid3 || !param._uuid || !param.buvid4 || !param.b_nut) || !param.DedeUserID) {
+        await this.e.reply('诶呀~发送cookie不完整\n请获取完整cookie进行绑定\nB站cookie的获取方法查看仓库主页或者百度一下');
 
-        if (!param.buvid3) {
+        if (!param.buvid3 || (param.buvid3).length === 0) {
           let buvid3_ = 'buvid3';
           await this.e.reply(`B站cookie：当前缺失：\n${buvid3_}`)
         }
-        if (!!param.buvid4) {
+        if (!param.buvid4 || (param.buvid4).length === 0) {
           let buvid4_ = 'buvid4';
           await this.e.reply(`B站cookie：当前缺失：\n${buvid4_}`)
         }
-        if (!!param._uuid) {
+        if (!param._uuid || (param._uuid).length === 0) {
           let _uuid_ = '_uuid';
           await this.e.reply(`B站cookie：当前缺失：\n${_uuid_}`)
-        } if (!!param.rpdid) {
-          let rpdid_ = 'rpdid';
-          await this.e.reply(`B站cookie：当前缺失：\n${rpdid_}`)
-        } if (!!param.fingerprint) {
-          let fingerprint_ = 'fingerprint';
-          await this.e.reply(`B站cookie：当前缺失：\n${fingerprint_}`)
-        } if (!!param.DedeUserID) {
+        }
+        if (!param.b_nut || (param.b_nut).length === 0) {
+          let _b_nut_ = 'b_nut';
+          await this.e.reply(`B站cookie：当前缺失：\n${_b_nut_}`)
+        }
+        if (!param.DedeUserID || (param.DedeUserID).length === 0) {
           let DedeUserID_ = 'DedeUserID';
           await this.e.reply(`B站cookie：当前缺失：\n${DedeUserID_}`)
         }
@@ -186,60 +185,15 @@ export class bilibili extends plugin {
 
   /** B站ck帮助 */
   async BCkHelp() {
-    await this.reply(`B站ck的获取方法请找度娘叭\n务必包含以下字段的相等式内容： \nbuvid3 \n_uuid \nbuvid4 \nrpdid \nfingerprint \nDedeUserID\n风险选项：推送总失败，权宜之计可考虑绑定cookie时添加/保留SESSDATA=xxxxxx;，\n该选项如果使用自己真实的SESSDATA有封号的可能性\n（虽逻辑已尽量减少SESSDATA使用的情况）\n特别是群人数多/推送订阅多的慎用！！\n目前可用解决方法：\n**把获取的真实SESSDATA=xxxxxx;保留相同长度随机修改其中的值\n例如SESSDATA=xxyyaayyfsid;，\n然后添加到要绑定的cookie后面进行绑定即可。`)
+    await this.reply(`B站ck的获取方法请查看仓库主页/找度娘叭~\n如果出现总是推送失败或执行 #删除b站临时ck 后仍失败，\n请绑定自己的B站ck：\n务必包含以下字段的相等式内容： \nbuvid3 \n_uuid \nbuvid4 \b_nut \nDedeUserID\n风险选项：推送总失败，权宜之计可考虑绑定cookie时添加/保留SESSDATA=xxxxxx;，\n该选项如果使用自己真实的SESSDATA有封号的可能性\n特别是群人数多/推送订阅多的慎用！！\n目前可用解决方法：\n**把获取的真实SESSDATA=xxxxxx;保留相同长度随机修改其中的值\n例如SESSDATA=xxyyaayyfsid;，\n然后添加到要绑定的cookie后面进行绑定即可。`)
     return
   }
 
-  /** 验证B站ck */
-  async checkBck() {
-    //验证CK是否有效
-
-    let Bck = await xxCfg.getBiliCk();
-
-    Bck = String(Bck);
-
-    if (Bck.length == 0) {
-      this.e.reply("惹，还未绑定B站ck捏~");
-      return;
-    };
-
-    this.e.reply("开始验证绑定的B站ck~♡~\n这将会需要约60秒捏~")
-    
-    let param = {};
-    Bck.split(';').forEach((v) => {
-      // 处理分割特殊cookie_token
-      let tmp = lodash.trim(v).replace('=', '~').split('~')
-      param[tmp[0]] = tmp[1]
-    });
-
-    let UID = param.DedeUserID;
-
-    const res = await new Bilibili(this.e).getBilibiliDynamicInfo(UID);
-
-    if (!res.ok) {
-      this.e.reply("诶嘿~出了点网络问题，无法验证ck的有效性呢，等会再试试叭~");
-      return;
-    }
-
-    const resJson = await res.json();
-
-    if (resJson.code != 0 || !resJson?.data) {
-      this.e.reply(
-        "绑定的B站ck失效了欸~\n请更新ck进行绑定叭~"
-      );
-      return;
-    }
-
-    const dynamics = resJson?.data?.items || [];
-
-    let name = UID;
-
-    if (dynamics.length) {
-      let dynamic = dynamics[0];
-      name = dynamic?.modules?.module_author?.name || UID;
-    }
-
-    this.e.reply(`好耶~当前为xianxin-plugin绑定的B站ck有效捏~\n${name}：${UID}`);
+  /** 删除redis缓存的临时B站ck */
+  async delTempBck() {
+    let ckKey = "Yz:xianxin:bilibili:biliTempCookie";
+    redis.set(ckKey, '', { EX: 3600 * 24 * 30 })
+    this.e.reply(`~当前xianxin-plugin自动获取的临时b站ck已删除~`);
   }
 
   /** 添加b站推送 */
@@ -286,12 +240,12 @@ export class bilibili extends plugin {
 
     const res = await new Bilibili(this.e).getBilibiliDynamicInfo(uid);
 
-    if (!res.ok) {
+    if (!res) {
       this.e.reply("诶嘿，出了点网络问题，等会再试试吧~");
       return;
     }
-
-    const resJson = await res.json();
+    const resJson = res;
+    //const resJson = await res.json();
 
     /* 用于debug的代码段
     const ck = await xxCfg.getBiliCk()
