@@ -27,9 +27,9 @@
 git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/trss-xianxin-plugin/
 ```
 ### B站推送 使用前配置
-自 2023 年三月起，B站风控升级，为保证旅行者们的使用体验，目前需要配置使用自己的B站cookie增加稳定性。
+自 2023 年三月起，B站风控升级，为保证旅行者们的使用体验，如果总是出现动态推送获取失败，可考虑配置使用自己的B站cookie增加稳定性。
 
-目前插件已支持配置自定义Cookie，请在私聊Bot下发送`#绑定B站ck: xxx`进行添加自己本地浏览器登录b站后获取到的B站cookie，其中`xxx`请替换为自己获取到的cookie。
+目前插件已支持 *配置自定义Cookie，配置使用自己的B站cookie请在 私聊/私信 Bot下发送`#绑定B站ck: xxx`进行添加自己本地浏览器 登录b站 后获取到的B站cookie，其中`xxx`请替换为自己获取到的cookie(为降低风险，如无必要，请手动删除包含的 SESSDATA=xxxx)。
 
 添加的cookie会自动新建并保存于`Yunzai/data/BilibiliCookie/Bili_Ck.yaml`，如需更换/更新cookie 使用新的cookie发送`#绑定B站ck: xxx`覆盖绑定即可。
 
@@ -37,7 +37,7 @@ git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/trss-xianxin-
 1. 在浏览器中登录自己的b站账号
 2. 处于bilibili首页 -> 在网页空白处右键 -> 检查（即打开开发工具） -> 找到调试台 -> 在下方输入document.cookie并回车 -> 复制给到的cookie文本
 3. 私聊Bot下发送`#绑定B站ck: xxx`进行添加，提示添加成功即可愉快使用。
-4. **风险选项**：如果未绑定自己b站ck而出现总是推送失败以及执行 #删除b站临时ck 后仍失败，并且在绑定自己的B站ck后仍失败的，最后的最后权宜之计可考虑绑定cookie时添加/保留`SESSDATA=xxxx;`，该选项如果使用自己真实的`SESSDATA`有封号的可能性特别是群人数多/推送订阅多的慎用！！目前尚且可用低风险办法请使用 `#B站ck帮助`查看。
+4. **风险选项**：如果未绑定自己b站ck而出现总是推送失败以及执行 `#删除b站临时ck` 后仍失败，并且在绑定自己的B站ck后仍失败的，最后的最后权宜之计可考虑绑定cookie时添加/保留`SESSDATA=xxxx;`，该选项如果使用自己真实的`SESSDATA`有封号的可能性特别是群人数多/推送订阅多的慎用！！目前尚且可用低风险办法请使用 `#B站ck帮助`查看。
 
 ## ⌨️ 功能可用状态
 * 以下可用功能QQ频道可用
