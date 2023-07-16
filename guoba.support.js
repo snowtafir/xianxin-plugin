@@ -1,5 +1,5 @@
 import path from "path";
-const _path = process.cwd() + "/plugins/xianxin-plugin";
+const _path = process.cwd() + "/plugins/trss-xianxin-plugin";
 import xxCfg from "./model/xxCfg.js";
 
 /**

@@ -7,9 +7,9 @@ import fs from "node:fs";
 /**
  * 初始化米游社设置文件
  */
-let mysSetFile = "./plugins/xianxin-plugin/config/mys.set.yaml";
+let mysSetFile = "./plugins/trss-xianxin-plugin/config/mys.set.yaml";
 if (!fs.existsSync(mysSetFile)) {
-  fs.copyFileSync("./plugins/xianxin-plugin/defSet/mys/set.yaml", mysSetFile);
+  fs.copyFileSync("./plugins/trss-xianxin-plugin/defSet/mys/set.yaml", mysSetFile);
 }
 
 /**

@@ -12,11 +12,14 @@ if (!global.segment) {
 const versionData = xxCfg.getdefSet("version", "version");
 
 logger.info(`--------------------------`);
-logger.info(`闲心插件${versionData[0].version}初始化~`);
+logger.info(`适配trss版 闲心插件 ${versionData[0].version} 初始化~`);
+logger.info(`仓库地址：https://gitee.com/snowtafir/xianxin-plugin`);
+logger.info(`trss版维护者：杉星雪/snowtafir`);
+logger.info(`原作者：@闲心/xianxincoder`);
 logger.info(`--------------------------`);
 
 const files = fs
-  .readdirSync("./plugins/xianxin-plugin/apps")
+  .readdirSync("./plugins/trss-xianxin-plugin/apps")
   .filter((file) => file.endsWith(".js"));
 
 let ret = [];

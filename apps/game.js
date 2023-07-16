@@ -6,16 +6,16 @@ import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 import xxCfg from "../model/xxCfg.js";
 import common from "../../../lib/common/common.js";
 
-const _path = process.cwd() + "/plugins/xianxin-plugin";
+const _path = process.cwd() + "/plugins/trss-xianxin-plugin";
 
 // PK信息存放
 let pkArr = {};
 
 let expPlayer = {};
 
-let gameSetFile = "./plugins/xianxin-plugin/config/game.set.yaml";
+let gameSetFile = "./plugins/trss-xianxin-plugin/config/game.set.yaml";
 if (!fs.existsSync(gameSetFile)) {
-  fs.copyFileSync("./plugins/xianxin-plugin/defSet/game/set.yaml", gameSetFile);
+  fs.copyFileSync("./plugins/trss-xianxin-plugin/defSet/game/set.yaml", gameSetFile);
 }
 
 export class game extends plugin {

@@ -6,9 +6,9 @@ import common from "../../../lib/common/common.js";
 
 let textArr = {};
 
-let gmSetFile = "./plugins/xianxin-plugin/config/gm.set.yaml";
+let gmSetFile = "./plugins/trss-xianxin-plugin/config/gm.set.yaml";
 if (!fs.existsSync(gmSetFile)) {
-  fs.copyFileSync("./plugins/xianxin-plugin/defSet/gm/set.yaml", gmSetFile);
+  fs.copyFileSync("./plugins/trss-xianxin-plugin/defSet/gm/set.yaml", gmSetFile);
 }
 
 export class gm extends plugin {

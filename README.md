@@ -1,6 +1,6 @@
 <p align="center">
-  <a href="https://gitee.com/xianxincoder/xianxin-plugin">
-    <img width="200" src="https://gitee.com/xianxincoder/xianxin-plugin/raw/master/resources/img/rank/top.png">
+  <a href="https://gitee.com/snowtafir/xianxin-plugin">
+    <img width="200" src="https://gitee.com/snowtafir/xianxin-plugin/raw/main/resources/img/rank/top.png">
   </a>
 </p>
 
@@ -24,7 +24,7 @@
 推荐使用 git 进行安装，以方便后续升级。在[Yunzai-Bot](https://gitee.com/Le-niao/Yunzai-Bot)根目录打开终端，运行如下命令进行安装。
 
 ```base
-git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/xianxin-plugin/
+git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/trss-xianxin-plugin/
 ```
 ### B站推送 使用前配置
 自 2023 年三月起，B站风控升级，为保证旅行者们的使用体验，目前需要配置使用自己的B站cookie增加稳定性。
@@ -86,6 +86,6 @@ git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/xianxin-plugi
 
 
 ## 🔗 链接
-- [原版xianxin-plugin](https://gitee.com/xianxincoder/xianxin-plugin)
+- [@闲心 | 原版 xianxin-plugin](https://gitee.com/xianxincoder/xianxin-plugin)
 - [云崽](https://gitee.com/Le-niao/Yunzai-Bot)
 - [插件库](https://gitee.com/Hikari666/Yunzai-Bot-plugins-index)

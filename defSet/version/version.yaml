@@ -168,7 +168,7 @@
         添加<span class="cmd">#cos 角色名</span>例如<span class="cmd">#cos 刻晴</span>获取指定角色的cos图,
         <span class="cmd">#cos 角色名</span>支持自定义设置发送单张照片还是一组照片,
         <span class="cmd">#cos 角色名</span>支持自定义设置随机图库数量最大数,
-        cos配置文件为 - xianxin-plugin/config/mys.set.yaml,
+        cos配置文件为 - trss-xianxin-plugin/config/mys.set.yaml,
       ],
   }
 - {
@@ -178,7 +178,7 @@
         <span class="cmd">#cos</span><span class="cmd">#同人</span>修复私聊转发图片破裂问题，私聊改为分开发送,
         <span class="cmd">战</span>支持设置每日每人限制挑战次数,
         <span class="cmd">#战榜</span>支持自定义上榜人数,
-        群战小游戏配置文件为 - xianxin-plugin/config/game.set.yaml,
+        群战小游戏配置文件为 - trss-xianxin-plugin/config/game.set.yaml,
       ],
   }
 - {

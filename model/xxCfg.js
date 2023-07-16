@@ -8,11 +8,11 @@ import { promisify } from 'node:util';
 class XsCfg {
   constructor() {
     /** 默认设置 */
-    this.defSetPath = "./plugins/xianxin-plugin/defSet/";
+    this.defSetPath = "./plugins/trss-xianxin-plugin/defSet/";
     this.defSet = {};
 
     /** 用户设置 */
-    this.configPath = "./plugins/xianxin-plugin/config/";
+    this.configPath = "./plugins/trss-xianxin-plugin/config/";
     this.config = {};
 
     /** 监听文件 */

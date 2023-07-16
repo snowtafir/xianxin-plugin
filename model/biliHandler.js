@@ -402,7 +402,7 @@ class BiliHandler {
 
     /**获取 buvid3 b_nut*/
     static async get_buvid3_b_nut() {
-        const url = 'https://www.bilibili.com/';
+        const url = 'https://space.bilibili.com/401742377/dynamic';
         const response = await fetch(url, {
             method: 'GET',
             headers: _headers,

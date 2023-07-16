@@ -124,7 +124,7 @@ export default class Bilibili extends base {
 
     const resData = await response.json()
     let resDataCode = resData.code
-    Bot.logger.mark(`resDataCode:${JSON.stringify(resDataCode)}`)
+    Bot.logger.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`)
 
     /**执行分支 */
     if (resDataCode === 0) {
@@ -217,8 +217,8 @@ export default class Bilibili extends base {
 
         const response = await this.getBilibiliDynamicInfo(up.uid);
 
-        if (response.ok) {
-          const res = await response.json();
+        if (response) {
+          const res = response
           if (res.code == 0) {
             const dynamicData = res?.data?.items || [];
             dynamicList[up.uid] = dynamicData;
