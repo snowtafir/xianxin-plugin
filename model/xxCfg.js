@@ -120,9 +120,8 @@ class XsCfg {
     if (lodash.isEmpty(addData)) {
       fs.existsSync(file) && fs.unlinkSync(file)
     } else {
-      const absPath = dir;
-      if (!absPath) {
-        fs.mkdir(absPath); //Create dir in case not found
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true }) // 创建目录，包括父目录
       }
       let yaml = YAML.stringify(addData);
       fs.writeFileSync(file, yaml, 'utf8')
