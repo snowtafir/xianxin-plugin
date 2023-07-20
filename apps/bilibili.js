@@ -82,6 +82,12 @@ export class bilibili extends plugin {
           fnc: 'BCkHelp'
         },
         {
+          reg: '^#*删除*(b|B)站(ck|CK|Ck|Ck|cookie)$',
+          event: 'message',
+          permission: "master",
+          fnc: 'delMyBCk'
+        },
+        {
           reg: '^#*删除*(b|B)站临时(ck|CK|Ck|Ck|cookie)$',
           event: 'message',
           permission: "master",
@@ -162,6 +168,14 @@ export class bilibili extends plugin {
 
       await this.e.reply(uidMsg)
     }
+  }
+
+  /** 删除绑定的B站ck */
+  async delMyBCk() {
+    let Bck = ''
+    xxCfg.saveBiliCk(Bck)
+    await this.e.reply(`绑定的B站ck已删除`)
+
   }
 
   /** 我的B站ck */

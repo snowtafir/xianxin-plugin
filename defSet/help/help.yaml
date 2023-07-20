@@ -49,13 +49,16 @@
       desc: "查看up信息"
     - icon: 统计
       title: "#绑定B站ck: xxx"
-      desc: "为B站动态推送配置ck,若ck缺失则功能不可用,仅限私聊"
+      desc: "如果推送总失败，可配置使用自己的B站cookie,仅限私聊/私信"
     - icon: ledger
       title: "#我的B站ck"
       desc: "查看配置的B站ck,仅限私聊"
+    - icon: 树脂
+      title: "#删除B站ck"
+      desc: "删除已绑定的自己的B站cookie"
     - icon: 统计
-      title: "#删除b站临时ck"
-      desc: "删除redis缓存的未绑定自己的B站ck而自动获取的临时B站ck"
+      title: "#删除B站临时ck"
+      desc: "删除redis缓存的未绑定自己的B站ck而自动获取的临时B站cookie"
     - icon: ledger
       title: "#B站ck帮助"
       desc: "查看B站ck帮助"
