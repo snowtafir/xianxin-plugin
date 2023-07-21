@@ -21,11 +21,21 @@
 
 ## 📦 安装与更新与配置
 
-推荐使用 git 进行安装，以方便后续升级。在`Yunzai`根目录打开终端，运行如下命令进行安装。
+* 推荐使用 git 进行安装，以方便后续升级。在`Yunzai`根目录打开 `终端shell`/`git bash`，运行如下命令进行安装：
 
 ```shell
 git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/trss-xianxin-plugin/
 ```
+* 如果是下载压缩包到本地，解压后把插件文件夹重命名为`trss-xianxin-plugin`放到`Yunzai/plugins/`下即可。
+* 后续更新可通过 `#闲心插件更新` 进行，或者在`Yunzai/plugins/trss-xianxin-plugin/`目录下打开 `终端shell`/`git bash`执行：
+```shell
+git pull
+```
+接着在`Yunzai`根目录已经打开的运行着的 `终端shell`/`git bash`里，`Ctrl  c`键盘组合键停止运行，接着执行如下命令进行重启即可：
+```shell
+npm stop && node app
+```
+
 ### B站推送 使用前配置
 自 2023 年三月起，B站风控升级，为保证旅行者们的使用体验，如果总是出现动态推送获取失败，可考虑配置使用自己的B站cookie增加稳定性。
 
