@@ -56,7 +56,7 @@ export default class Bilibili extends base {
       let url = `https://api.bilibili.com/x/space/wbi/acc/info?mid=${uid}${wrid}&jsonp=jsonp`;
       let localCk = await BiliHandler.getLocalCookie();
       var miniBck = ''
-  
+
       if (!localCk || localCk.trim().length === 0) {
         miniBck = await BiliHandler.getTempCk()
       } else {
@@ -81,7 +81,7 @@ export default class Bilibili extends base {
       let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
       let localCk = await BiliHandler.getLocalCookie();
       var miniBck = ''
-  
+
       if (!localCk || localCk.trim().length === 0) {
         miniBck = await BiliHandler.getTempCk()
       } else {
@@ -364,9 +364,10 @@ export default class Bilibili extends base {
       Bot.logger.mark("xianxin插件：B站动态执行推送");
 
       /*QQ频道午夜时间推送有限制，会报错code: 304022*/
-      for (var i = 0; i < (this[id_str].img).length; i++) {
+      const images = Array.from(this[id_str].img, item => ({ ...item }));
+      for (let i = 0; i < images.length; i++) {
         await this.e.group
-          .sendMsg(this[id_str].img[i])
+          .sendMsg(images[i])
           .catch((err) => {
             Bot.logger.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
           });
