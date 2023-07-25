@@ -37,7 +37,7 @@ export default class Bilibili extends base {
     var miniBck = ''
 
     if (!localCk || localCk.trim().length === 0) {
-      miniBck = await BiliHandler.getTempCk()
+      miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
     } else {
       miniBck = localCk
     }
@@ -58,7 +58,7 @@ export default class Bilibili extends base {
       var miniBck = ''
 
       if (!localCk || localCk.trim().length === 0) {
-        miniBck = await BiliHandler.getTempCk()
+        miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
       } else {
         miniBck = localCk
       }
@@ -83,7 +83,7 @@ export default class Bilibili extends base {
       var miniBck = ''
 
       if (!localCk || localCk.trim().length === 0) {
-        miniBck = await BiliHandler.getTempCk()
+        miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
       } else {
         miniBck = localCk
       }
@@ -106,7 +106,7 @@ export default class Bilibili extends base {
     var cookie = ''
 
     if (!localCk || localCk.trim().length === 0) {
-      cookie = await BiliHandler.getTempCk()
+      cookie = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
     } else {
       cookie = localCk
     }
@@ -175,7 +175,7 @@ export default class Bilibili extends base {
     var miniBck = ''
 
     if (!localCk || localCk.trim().length === 0) {
-      miniBck = await BiliHandler.getTempCk()
+      miniBck = `${await BiliHandler.getTempCk()}DedeUserID=401742377;`
     } else {
       miniBck = localCk
     }
