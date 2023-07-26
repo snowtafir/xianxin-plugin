@@ -70,7 +70,7 @@ export default class Bilibili extends base {
       });
       return response;
     } catch (e) {
-      Bot.logger.mark("xianxin插件：B站up信息请求失败");
+      Bot.logger?.mark("xianxin插件：B站up信息请求失败");
       return;
     }
   }
@@ -95,7 +95,7 @@ export default class Bilibili extends base {
       });
       return response;
     } catch (e) {
-      Bot.logger.mark("xianxin插件：B站up详情请求失败");
+      Bot.logger?.mark("xianxin插件：B站up详情请求失败");
       return;
     }
   }
@@ -124,7 +124,7 @@ export default class Bilibili extends base {
 
     const resData = await response.json()
     let resDataCode = resData.code
-    Bot.logger.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`)
+    Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`)
 
     /**执行分支 */
     if (resDataCode === 0) {
@@ -166,7 +166,7 @@ export default class Bilibili extends base {
         return resData3;
       }
     }
-    /*Bot.logger.mark("xianxin插件：B站up动态请求失败")*/
+    /*Bot.logger?.mark("xianxin插件：B站up动态请求失败")*/
   }
 
   async getBilibiliUp(keyword) {
@@ -243,7 +243,7 @@ export default class Bilibili extends base {
 
     this.key = "Yz:xianxin:bilibili:upPush:";
 
-    Bot.logger.mark("xianxin插件：B站动态定时检测");
+    Bot.logger?.mark("xianxin插件：B站动态定时检测");
 
     for (let [key, value] of uidMap) {
       // const accInfoRes = await this.getBilibiliUserInfo(key);
@@ -361,7 +361,7 @@ export default class Bilibili extends base {
 
       redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
-      Bot.logger.mark("xianxin插件：B站动态执行推送");
+      Bot.logger?.mark("xianxin插件：B站动态执行推送");
 
       /*QQ频道午夜时间推送有限制，会报错code: 304022*/
       const images = Array.from(this[id_str].img, item => ({ ...item }));
@@ -369,7 +369,7 @@ export default class Bilibili extends base {
         await this.e.group
           .sendMsg(images[i])
           .catch((err) => {
-            Bot.logger.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+            Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
           });
       }
       await common.sleep(1000);
@@ -652,7 +652,7 @@ export default class Bilibili extends base {
 
         return msg;
       default:
-        Bot.logger.mark(`未处理的B站推送【${upName}】：${dynamic.type}`);
+        Bot.logger?.mark(`未处理的B站推送【${upName}】：${dynamic.type}`);
         return "continue";
     }
   }
