@@ -55,10 +55,10 @@
       desc: "查看配置的B站ck,仅限私聊"
     - icon: 树脂
       title: "#删除B站ck"
-      desc: "删除已绑定的自己的B站cookie"
+      desc: "删除已绑定的自己的B站cookie，删除后将会自动启用临时ck"
     - icon: 统计
       title: "#删除B站临时ck"
-      desc: "删除redis缓存的未绑定自己的B站ck而自动获取的临时B站cookie"
+      desc: "删除redis缓存的未绑定自己的B站ck而自动获取的 临时B站cookie，并刷新"
     - icon: ledger
       title: "#B站ck帮助"
       desc: "查看B站ck帮助"

@@ -26,7 +26,7 @@
 ```shell
 git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/trss-xianxin-plugin/
 ```
-* 如果是下载压缩包到本地，解压后把插件文件夹重命名为`trss-xianxin-plugin`放到`Yunzai/plugins/`下即可。
+* 如果是下载压缩包到本地，解压后把插件文件夹重命名为`trss-xianxin-plugin`放到`Yunzai/plugins/`下即可（该方式不能使用`#闲心插件更新`或git方式更新插件）。
 * 后续更新可通过 `#闲心插件更新` 进行，或者在`Yunzai/plugins/trss-xianxin-plugin/`目录下打开 `终端shell`/`git bash`执行：
 ```shell
 git pull
@@ -68,7 +68,7 @@ npm stop && node app
 | 命令 | 🌰 |
 | --- | --- |
 | 米游社功能 | ` #cos 角色名 ` - 指定角色随机查看cos图片<br/>` #cos #cos1 #cos详情 ` - 查看米游社中cos榜<br/>` #攻略 xxx ` - 查询原神精选的玩家攻略内容<br/>` #wiki xxx ` - 查询原神wiki的内容<br/>` #cosdby #cosdby1 #cosdby详情 ` - 查看米游社中大别野cos榜<br/>` #同人 #同人1 #同人详情 ` - 查看米游社中同人榜<br/>` #热门话题 ` - 查看米游社中热聊话题 |
-| B站功能 | ` #订阅up推送 UID #订阅up推送 直播 UID ` - 检测up的B站动态进行推送<br/>` #取消up推送 UID #取消up推送 直播 UID ` - 删除对应up的B站对应动态推送<br/>` #推送up列表 ` - 查看本群添加的up推送列表<br/>` #手动推送up ` - 手动触发定时推送任务<br/>` #搜索up xxx ` - 根据昵称在b站搜索up<br/>` #绑定B站ck: xxx ` - (可选)若出现总是推送失败，可通过此命令为B站动态推送配置ck,仅限私聊<br/>` #我的B站ck ` - 查看配置的B站ck,仅限私聊<br/>` #删除B站ck ` - 删除已绑定的自己的B站cookie<br/>` #删除b站临时ck ` - 删除redis缓存的未绑定自己的B站ck而自动获取的临时B站ck<br/>` #B站ck帮助 ` - 查看B站ck帮助 |
+| B站功能 | ` #订阅up推送 UID #订阅up推送 直播 UID ` - 检测up的B站动态进行推送<br/>` #取消up推送 UID #取消up推送 直播 UID ` - 删除对应up的B站对应动态推送<br/>` #推送up列表 ` - 查看本群添加的up推送列表<br/>` #手动推送up ` - 手动触发定时推送任务<br/>` #搜索up xxx ` - 根据昵称在b站搜索up<br/>` #绑定B站ck: xxx ` - (可选)若出现总是推送失败，可通过此命令为B站动态推送配置ck,仅限私聊<br/>` #我的B站ck ` - 查看配置的B站ck,仅限私聊<br/>` #删除B站ck ` - 删除已绑定的自己的B站cookie，删除后将会自动启用临时ck<br/>` #删除b站临时ck ` - 删除redis缓存的未绑定自己的B站ck而自动获取的临时B站ck，并刷新<br/>` #B站ck帮助 ` - 查看B站ck帮助 |
 | 群战 | ` #加入群战 #群战信息 ` - 初始化群战信息<br/>` #战宝 ` - 战胜战宝获得双倍战力<br/>` 战@群友 #战@群友 ` - @一名群友进行群战<br/>` 狂战@群友 #狂战@群友 ` - 战狂(战斗次数最多)的专属技能<br/>` #逆天改命 ` - 战力最低的专属技能<br/>` #战榜 ` - 查看群战rank榜<br/>` #战狂榜 ` - 查看战斗次数排行榜<br/>` #摆烂榜 ` - 查看战力倒数排行榜 |
 | 五子棋 | ` #五子棋 ` - 开局五子棋游戏<br/>` 落子+字母+数字 落子H8 ` - 五子棋落子<br/>` #弃子 ` - 五子棋认输 |
 | 21点 | ` #21点 ` - 开局21点游戏<br/>` 叫牌 ` - 21点叫牌<br/>` 停牌 ` - 停止叫牌 |
