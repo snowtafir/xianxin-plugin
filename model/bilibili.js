@@ -103,70 +103,57 @@ export default class Bilibili extends base {
   async getBilibiliDynamicInfo(uid) {
     let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}`;
     let localCk = await BiliHandler.getLocalCookie();
-    var cookie = ''
+    let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}DedeUserID=${uid};` : localCk;
 
-    if (!localCk || localCk.trim().length === 0) {
-      cookie = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
-    } else {
-      cookie = localCk
+    /**动态请求函数 */
+    async function fetchDynamicInfo(url, addHeader) {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: lodash.merge(_headers, addHeader),
+        redirect: 'follow',
+      });
+      if (!response.ok) {
+        Bot.logger?.mark(`xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
+      }
+      return response.json();
     }
 
-    var mergeCookie = { cookie: `${cookie}`, }
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: lodash.merge(_headers, mergeCookie),
-      redirect: 'follow',
-    }).then(res => {
-      if (res.ok) {
-        return res
-      }
-    })
+    /**传入cookie */
+    const mergeCookie = { cookie: `${cookie}`, };
+    /**首层请求动态 */
+    const resData = await fetchDynamicInfo(url, mergeCookie);
 
-    const resData = await response.json()
-    let resDataCode = resData.code
-    Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`)
+    const resDataCode = resData.code;
+    Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`);
 
-    /**执行分支 */
     if (resDataCode === 0) {
       return resData;
-    } else {
+    }
+    if (resDataCode !== 0) {
+
+      /**执行接口校验 */
       const result = await BiliHandler.postExClimbWuzhiParam(cookie);
       const data = await result.json();
       const dataCode = data.code;
 
+      if (dataCode !== 0) {
+        /**接口校验失败，使用 Mozilla/5.0*/
+        return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie });
+      }
       if (dataCode === 0) {
-        const response1 = await fetch(url, {
-          method: 'GET',
-          headers: lodash.merge(_headers, mergeCookie),
-          redirect: 'follow',
-        });
-        const resData1 = await response1.json();
-        const resDataCode1 = resData1.code
 
-        if (resDataCode1 === 0) {
-          return resData1
-        } else {
-          let userAgent = { 'user-agent': 'Mozilla/5.0', 'cookie': `${cookie}` };
-          const response4 = await fetch(url, {
-            method: 'GET',
-            headers: lodash.merge(_headers, userAgent),
-            redirect: 'follow',
-          });
-          const resData4 = await response4.json()
-          return resData4
+        const resData = fetchDynamicInfo(url, mergeCookie);
+        const resDataCode = resData.code;
+
+        if (resDataCode !== 0) {
+          /**接口校验成功，但是动态请求仍失败，使用 Mozilla/5.0*/
+          return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie });
         }
-      } else if (dataCode !== 0) {
-        let userAgent = { 'user-agent': 'Mozilla/5.0', 'cookie': `${cookie}` };
-        const response3 = await fetch(url, {
-          method: 'GET',
-          headers: lodash.merge(_headers, userAgent),
-          redirect: 'follow',
-        });
-        const resData3 = await response3.json()
-        return resData3;
+        if (resDataCode === 0) {
+          return resData;
+        }
       }
     }
-    /*Bot.logger?.mark("xianxin插件：B站up动态请求失败")*/
   }
 
   async getBilibiliUp(keyword) {
