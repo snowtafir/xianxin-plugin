@@ -124,12 +124,13 @@ export default class Bilibili extends base {
     const resData = await fetchDynamicInfo(url, mergeCookie);
 
     const resDataCode = resData.code;
-    Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`);
 
     if (resDataCode === 0) {
       return resData;
     }
     if (resDataCode !== 0) {
+
+      Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`);
 
       /**执行接口校验 */
       const result = await BiliHandler.postExClimbWuzhiParam(cookie);

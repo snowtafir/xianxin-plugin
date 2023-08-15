@@ -103,7 +103,7 @@ export class bilibili extends plugin {
       cron: !!this.bilibiliSetData.pushStatus
         ? this.bilibiliSetData.pushTime
         : "",
-      name: "检测b站推送定时任务",
+      name: "xianxin插件---B站推送定时任务",
       fnc: () => this.newPushTask(),
       log: !!this.bilibiliSetData.pushTaskLog,
     };
