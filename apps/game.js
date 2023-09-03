@@ -563,8 +563,7 @@ export class game extends plugin {
 
     this.reply([
       segment.at(this.e.user_id, this.e.sender.card || this.e.user_id),
-      ` 逆天改命技能使用成功，获得战力${tempExp}，当前战力为${
-        selfInfo.exp + tempExp
+      ` 逆天改命技能使用成功，获得战力${tempExp}，当前战力为${selfInfo.exp + tempExp
       }`,
     ]);
   }
@@ -584,8 +583,7 @@ export class game extends plugin {
     // 判断有没有战宝，有则直接返回
     if (expPlayer[this.group_id]) {
       this.e.reply(
-        `当前战宝：${
-          players.find((item) => item.user_id == expPlayer[this.group_id]).nick
+        `当前战宝：${players.find((item) => item.user_id == expPlayer[this.group_id]).nick
         }`
       );
     } else {
@@ -785,7 +783,14 @@ export class game extends plugin {
     for (let i in message) {
       if (message[i].type == "at") {
         enemy = message[i].qq;
-        enemyNick = message[i].text.replace("@", "");
+        if (!message[i].text || (message[i].text = undefined) || (message[i].text = null)) {
+          const mentionedUserId = enemy.replace(/(^qg_|ko_|tg_|dc_|wx_)/, "")
+          // 获取被 @ 的成员的 nickname
+          const mentionedNickname = Bot[mentionedUserId]?.nickname || null;
+          enemyNick = mentionedNickname
+        } else {
+          enemyNick = message[i].text.replace("@", "")
+        }
       }
     }
     return { enemy, enemyNick };
