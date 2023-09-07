@@ -784,7 +784,7 @@ export class game extends plugin {
       if (message[i].type == "at") {
         enemy = message[i].qq;
         if (!message[i].text || (message[i].text = undefined) || (message[i].text = null)) {
-          const mentionedUserId = enemy.replace(/(^qg_|ko_|tg_|dc_|wx_)/, "")
+          const mentionedUserId = enemy.replace(/(^qg_|ko_|tg_|dc_|wx_|mv_)/, "")
           // 获取被 @ 的成员的 nickname
           const mentionedNickname = Bot[mentionedUserId]?.nickname || null;
           enemyNick = mentionedNickname
