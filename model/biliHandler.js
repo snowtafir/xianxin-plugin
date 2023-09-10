@@ -2,6 +2,7 @@ import xxCfg from "./xxCfg.js";
 import { _headers } from "./bilibili.js";
 import lodash from 'lodash';
 import fetch from "node-fetch";
+import md5 from 'md5';
 
 const PayloadReplaceCode = {
     abtest: "54ef",

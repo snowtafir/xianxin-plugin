@@ -5,7 +5,6 @@ import base from "./base.js";
 import puppeteer from "../../../lib/puppeteer/puppeteer.js";
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
-import md5 from 'md5'
 import lodash from 'lodash'
 
 /**统一设定请求头 header */
@@ -51,7 +50,6 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUserInfo(uid) {
-    try {
       let wrid = await BiliWbi.wbi_Code();
       let url = `https://api.bilibili.com/x/space/wbi/acc/info?mid=${uid}${wrid}&jsonp=jsonp`;
       let localCk = await BiliHandler.getLocalCookie();
@@ -69,15 +67,10 @@ export default class Bilibili extends base {
         redirect: "follow",
       });
       return response;
-    } catch (e) {
-      Bot.logger?.mark("xianxin插件：B站up信息请求失败");
-      return;
-    }
   }
 
   async getBilibiliUserInfoDetail(uid) {
-    try {
-      let wrid = await BiliWbi.wbi_Code(1);
+      let wrid = await BiliWbi.wbi_Code();
       let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
       let localCk = await BiliHandler.getLocalCookie();
       var miniBck = ''
@@ -94,10 +87,6 @@ export default class Bilibili extends base {
         redirect: "follow",
       });
       return response;
-    } catch (e) {
-      Bot.logger?.mark("xianxin插件：B站up详情请求失败");
-      return;
-    }
   }
 
   async getBilibiliDynamicInfo(uid) {
