@@ -2,7 +2,7 @@ import moment from "moment";
 import lodash from "lodash";
 import base from "./base.js";
 import fetch from "node-fetch";
-import puppeteer from "../../../lib/puppeteer/puppeteer.js";
+import { screenshot } from "../components/screenshot.js";
 import common from "../../../lib/common/common.js";
 
 const _path = process.cwd();
@@ -243,7 +243,7 @@ export default class Mys extends base {
 
     const param = await this.wikiDetail(id);
 
-    const renderInfo = await this.render(param, isSplit, true);
+    const renderInfo = await this.render(true, param, isSplit);
 
     return renderInfo;
   }
@@ -274,12 +274,12 @@ export default class Mys extends base {
     // tag:标签名，cls：类名，html：要处理的字符串
     var reg = new RegExp(
       "<" +
-        tag +
-        "[^>]*class[\\s]?=[\\s]?['\"]" +
-        cls +
-        "[^'\"]*['\"][\\s\\S]*?</" +
-        tag +
-        ">",
+      tag +
+      "[^>]*class[\\s]?=[\\s]?['\"]" +
+      cls +
+      "[^'\"]*['\"][\\s\\S]*?</" +
+      tag +
+      ">",
       "g"
     );
     return html.replace(reg, "");
@@ -297,7 +297,7 @@ export default class Mys extends base {
 
     const param = await this.newsDetail(postId);
 
-    const renderInfo = await this.render(param, isSplit, false);
+    const renderInfo = await this.render(false, param, isSplit);
 
     return renderInfo;
   }
@@ -369,7 +369,7 @@ export default class Mys extends base {
     let json;
     try {
       json = JSON.parse(data.post.content);
-    } catch (error) {}
+    } catch (error) { }
 
     if (typeof json == "object") {
       if (json.imgs && json.imgs.length > 0) {
@@ -382,7 +382,7 @@ export default class Mys extends base {
         data.post.content = data.post.content.replace(
           img,
           img +
-            "?x-oss-process=image//resize,s_600/quality,q_80/auto-orient,0/interlace,1/format,jpg"
+          "?x-oss-process=image//resize,s_600/quality,q_80/auto-orient,0/interlace,1/format,jpg"
         );
       }
 
@@ -448,10 +448,10 @@ export default class Mys extends base {
   /**
    * 处理米游社详情页图片生成
    * @param {object} param
-   * @param {boolean} isSplit 是否为分片截图
+   * @param {boolean} isSplit 是否为分片截图 true / false
    * @returns {img: string[], code: string}
    */
-  async render(param) {
-    return await puppeteer.screenshots(this.model, param)
+  async render(isWiki, param, isSplit) {
+    return await screenshot(isWiki ? "wikiDetail" : "mysDetail", param, isSplit || true)
   }
 }

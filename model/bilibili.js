@@ -2,7 +2,7 @@ import moment from "moment";
 import xxCfg from "../model/xxCfg.js";
 import { BiliHandler, BiliWbi } from "./biliHandler.js";
 import base from "./base.js";
-import puppeteer from "../../../lib/puppeteer/puppeteer.js";
+import { screenshot } from "../components/screenshot.js";
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
 import lodash from 'lodash'
@@ -50,43 +50,43 @@ export default class Bilibili extends base {
   }
 
   async getBilibiliUserInfo(uid) {
-      let wrid = await BiliWbi.wbi_Code();
-      let url = `https://api.bilibili.com/x/space/wbi/acc/info?mid=${uid}${wrid}&jsonp=jsonp`;
-      let localCk = await BiliHandler.getLocalCookie();
-      var miniBck = ''
+    let wrid = await BiliWbi.wbi_Code();
+    let url = `https://api.bilibili.com/x/space/wbi/acc/info?mid=${uid}${wrid}&jsonp=jsonp`;
+    let localCk = await BiliHandler.getLocalCookie();
+    var miniBck = ''
 
-      if (!localCk || localCk.trim().length === 0) {
-        miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
-      } else {
-        miniBck = localCk
-      }
-      const cookie = { 'cookie': `${miniBck}`, }
-      const response = await fetch(url, {
-        method: "GET",
-        headers: lodash.merge(_headers, cookie),
-        redirect: "follow",
-      });
-      return response;
+    if (!localCk || localCk.trim().length === 0) {
+      miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
+    } else {
+      miniBck = localCk
+    }
+    const cookie = { 'cookie': `${miniBck}`, }
+    const response = await fetch(url, {
+      method: "GET",
+      headers: lodash.merge(_headers, cookie),
+      redirect: "follow",
+    });
+    return response;
   }
 
   async getBilibiliUserInfoDetail(uid) {
-      let wrid = await BiliWbi.wbi_Code();
-      let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
-      let localCk = await BiliHandler.getLocalCookie();
-      var miniBck = ''
+    let wrid = await BiliWbi.wbi_Code();
+    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
+    let localCk = await BiliHandler.getLocalCookie();
+    var miniBck = ''
 
-      if (!localCk || localCk.trim().length === 0) {
-        miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
-      } else {
-        miniBck = localCk
-      }
-      const cookie = { 'cookie': `${miniBck}`, }
-      const response = await fetch(url, {
-        method: "GET",
-        headers: lodash.merge(_headers, cookie),
-        redirect: "follow",
-      });
-      return response;
+    if (!localCk || localCk.trim().length === 0) {
+      miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
+    } else {
+      miniBck = localCk
+    }
+    const cookie = { 'cookie': `${miniBck}`, }
+    const response = await fetch(url, {
+      method: "GET",
+      headers: lodash.merge(_headers, cookie),
+      redirect: "follow",
+    });
+    return response;
   }
 
   async getBilibiliDynamicInfo(uid) {
@@ -329,7 +329,7 @@ export default class Bilibili extends base {
 
       if (!this[id_str]) {
         const dynamicMsg = await this.render(data);
-        const img = dynamicMsg;
+        const { img, code } = dynamicMsg;
 
         this[id_str] = {
           img: img,
@@ -340,15 +340,12 @@ export default class Bilibili extends base {
 
       Bot.logger?.mark("xianxin插件：B站动态执行推送");
 
-      /*QQ频道午夜时间推送有限制，会报错code: 304022*/
-      const images = Array.from(this[id_str].img, item => ({ ...item }));
-      for (let i = 0; i < images.length; i++) {
+        /*QQ频道午夜时间推送有限制，会报错code: 304022*/
         await this.e.group
-          .sendMsg(images[i])
+          .sendMsg(this[id_str].img)
           .catch((err) => {
             Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
           });
-      }
       await common.sleep(1000);
     } else {
       const dynamicMsg = this.buildDynamic(
@@ -481,7 +478,7 @@ export default class Bilibili extends base {
    * @returns {img: string[], code: string}
    */
   async render(param) {
-    return await puppeteer.screenshots(this.model, param)
+    return await screenshot(this.model, param, false)
   }
 
   // 生成动态消息文字内容

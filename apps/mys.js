@@ -463,8 +463,7 @@ export class mys extends plugin {
         const renderInfo = await new Mys().strategySearch(data, isSplit);
         if (!renderInfo) return;
 
-        const img = renderInfo;
-        const code = renderInfo;
+        const { img, code } = renderInfo;
 
         if (code === "limit") {
           if (this.mysSetData.isExactMatch) {
