@@ -2,7 +2,7 @@ import moment from "moment";
 import lodash from "lodash";
 import base from "./base.js";
 import fetch from "node-fetch";
-import { screenshot } from "../components/screenshot.js";
+import { puppeteerRender } from "../components/puppeteerRender.js";
 import common from "../../../lib/common/common.js";
 
 const _path = process.cwd();
@@ -452,6 +452,6 @@ export default class Mys extends base {
    * @returns {img: string[], code: string}
    */
   async render(isWiki, param, isSplit) {
-    return await screenshot(isWiki ? "wikiDetail" : "mysDetail", param, isSplit || true)
+    return await puppeteerRender.screenshot(isWiki ? "wikiDetail" : "mysDetail", param, isSplit || true)
   }
 }

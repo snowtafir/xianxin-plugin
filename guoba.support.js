@@ -8,11 +8,11 @@ import xxCfg from "./model/xxCfg.js";
 export function supportGuoba() {
   return {
     pluginInfo: {
-      name: "xianxin-plugin",
-      title: "xianxin-plugin",
+      name: "trss-xianxin-plugin",
+      title: "trss-xianxin-plugin",
       author: "@闲心",
       authorLink: "https://gitee.com/xianxincoder",
-      link: "https://gitee.com/xianxincoder/xianxin-plugin",
+      link: "https://gitee.com/snowtafir/xianxin-plugin.git",
       isV3: true,
       isV2: false,
       description: "提供B站推送、群战小游戏、米游社cos、米游社wiki攻略等功能",
@@ -74,6 +74,19 @@ export function supportGuoba() {
               { label: "图片模式", value: 1 },
             ],
             placeholder: "请选择B站动态推送消息模式",
+          },
+        },
+        {
+          field: "bilibili.isSplit",
+          label: "B站推送分片截图模式",
+          bottomHelpMessage: "设置B站动态推分片截图模式，仅分片截图模式下才会推送全部长动态，默认开启",
+          component: "Select",
+          componentProps: {
+            options: [
+              { label: "关闭分片截图", value: 0 },
+              { label: "开启分片截图", value: 1 },
+            ],
+            placeholder: "请选择是否开启B站动态分片截图模式",
           },
         },
         {

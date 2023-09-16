@@ -2,7 +2,7 @@ import moment from "moment";
 import xxCfg from "../model/xxCfg.js";
 import { BiliHandler, BiliWbi } from "./biliHandler.js";
 import base from "./base.js";
-import { screenshot } from "../components/screenshot.js";
+import { puppeteerRender } from "../components/puppeteerRender.js";
 import fetch from "node-fetch";
 import common from "../../../lib/common/common.js";
 import lodash from 'lodash'
@@ -327,8 +327,17 @@ export default class Bilibili extends base {
         return "return";
       }
 
+      //判断是否启用分片截图，默认为 true
+      let isSplit = !!setData.isSplit === false ? false : true;
+
+      /**分片截图模式的css样式参数 */
+      let style = ''
+      if (isSplit == true) {
+        style = '.ql-editor { max-height: 100% !important; }'
+      }
+
       if (!this[id_str]) {
-        const dynamicMsg = await this.render(data);
+        const dynamicMsg = await this.render(data, isSplit, style);
         const { img, code } = dynamicMsg;
 
         this[id_str] = {
@@ -340,12 +349,15 @@ export default class Bilibili extends base {
 
       Bot.logger?.mark("xianxin插件：B站动态执行推送");
 
-        /*QQ频道午夜时间推送有限制，会报错code: 304022*/
+      /*QQ频道午夜时间推送有限制，会报错code: 304022*/
+      const images = Array.from(this[id_str].img, item => ({ ...item }));
+      for (let i = 0; i < images.length; i++) {
         await this.e.group
-          .sendMsg(this[id_str].img)
+          .sendMsg(images[i])
           .catch((err) => {
             Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
           });
+      }
       await common.sleep(1000);
     } else {
       const dynamicMsg = this.buildDynamic(
@@ -475,10 +487,12 @@ export default class Bilibili extends base {
   /**
    * 处理b站动态页图片生成
    * @param {object} param
+   * @param {boolean} isSplit 是否为分片截图：true / false
+   * @param {string} style 修改模版渲染后的html中某元素的css样式，传入示例 '.ql-editor { max-height: 100% !important; }'
    * @returns {img: string[], code: string}
    */
-  async render(param) {
-    return await screenshot(this.model, param, false)
+  async render(param, isSplit, style) {
+    return await puppeteerRender.screenshot(this.model, param, isSplit, style)
   }
 
   // 生成动态消息文字内容
