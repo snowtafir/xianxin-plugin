@@ -9,7 +9,7 @@ class puppeteerRender {
      * @param {string} name 模块名称
      * @param {object} param 传入资源数据
      * @param {boolean} isSplit 是否为分片截图：true / false
-     * @param {string} style 修改模版渲染后的html中某元素的css样式，传入示例 '.ql-editor { max-height: 100% !important;; overflow-x: hidden }'
+     * @param {string} style 修改模版渲染后的html中某元素的css样式，传入示例 '.ql-editor { max-height: 100% !important; overflow-x: hidden; }'
      * @param param.imgType  screenshot参数，生成图片类型：jpeg，png
      * @param param.quality  screenshot参数，图片质量 0-100，jpeg是可传，默认90
      * @param param.multiPageHeight 分页状态下页面高度，默认8000

@@ -103,8 +103,10 @@ export default class Bilibili extends base {
       });
       if (!response.ok) {
         Bot.logger?.mark(`xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
+        return null;
+      } else {
+        return response.json();
       }
-      return response.json();
     }
 
     /**传入cookie */
