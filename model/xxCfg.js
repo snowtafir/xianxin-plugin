@@ -97,6 +97,10 @@ class XsCfg {
   async getBiliCk() {
     let dir = `./data/BilibiliCookie/`
     let Bck = []
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true }) // 创建目录，包括父目录
+    }
     let files = fs.readdirSync(dir).filter(file => file.endsWith('.yaml'))
 
     const readFile = promisify(fs.readFile)
