@@ -4,7 +4,7 @@
   </a>
 </p>
 
-<h1 align="center">适配TRSS-Yunzai的xianxin-plugin</h1>
+<h1 align="center">主要适配TRSS-Yunzai的xianxin-plugin</h1>
 
 <div align="center">
 
@@ -21,10 +21,16 @@
 
 ## 📦 安装与更新与配置
 
-* 推荐使用 git 进行安装，以方便后续升级。在`Yunzai`根目录打开 `终端shell`/`git bash`，运行如下命令进行安装：
+* 推荐使用 git 进行安装，以方便后续升级。在`Yunzai`根目录打开 `终端shell`/`git bash`，运行如下命令（gitee/github选其一）进行安装：
+
+Gitee：
 
 ```shell
 git clone https://gitee.com/snowtafir/xianxin-plugin.git ./plugins/trss-xianxin-plugin/
+```
+Github：
+```shell
+git clone https://github.com/snowtafir/xianxin-plugin.git ./plugins/trss-xianxin-plugin/
 ```
 * 如果是下载压缩包到本地，解压后把插件文件夹重命名为`trss-xianxin-plugin`放到`Yunzai/plugins/`下即可（该方式不能使用`#闲心插件更新`或git方式更新插件）。
 * 后续更新可通过 `#闲心插件更新` 进行，或者在`Yunzai/plugins/trss-xianxin-plugin/`目录下打开 `终端shell`/`git bash`执行：
@@ -36,8 +42,8 @@ git pull
 npm stop && node app
 ```
 
-### B站推送 使用前配置
-自 2023 年三月起，B站风控升级，为保证旅行者们的使用体验，如果总是出现动态推送获取失败，可考虑配置使用自己的B站cookie增加稳定性。
+### B站推送 可选配置
+自 2023 年三月起，B站风控升级，为保证旅行者们的使用体验，如果`总是`出现动态推送获取失败，可考虑配置使用自己的B站cookie增加稳定性。
 
 目前插件已支持 *配置自定义Cookie，配置使用自己的B站cookie请在 私聊/私信 Bot下发送`#绑定B站ck: xxx`进行添加自己本地浏览器 登录b站 后获取到的B站cookie，其中`xxx`请替换为自己获取到的cookie(为降低风险，如无必要，请手动删除包含的 SESSDATA=xxxx)。
 
@@ -81,7 +87,7 @@ npm stop && node app
 ## 🖥 依赖
 
 - [TRSS-Yunzai v3](https://gitee.com/TimeRainStarSky/Yunzai)
-或
+- 或
 - [Miao-Yunzai v3](https://gitee.com/yoimiya-kokomi/Miao-Yunzai)
 
 ## ⌨️ todo
