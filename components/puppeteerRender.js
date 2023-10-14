@@ -10,13 +10,14 @@ class puppeteerRender {
      * @param {object} param 传入资源数据
      * @param {boolean} isSplit 是否为分片截图：true / false
      * @param {string} style 修改模版渲染后的html中某元素的css样式，传入示例 '.ql-editor { max-height: 100% !important; overflow-x: hidden; }'
+     * @param {object} header 添加puppeteer渲染时网络资源获取请求头，例如：{ 'referer': 'https://example.com' }
      * @param param.imgType  screenshot参数，生成图片类型：jpeg，png
      * @param param.quality  screenshot参数，图片质量 0-100，jpeg是可传，默认90
      * @param param.multiPageHeight 分页状态下页面高度，默认8000
      * @param param.pageGotoParams 页面goto时的参数
      * @returns {img: string[], code: string}
      */
-    static async screenshot(name, param, isSplit, style) {
+    static async screenshot(name, param, isSplit, style, header) {
 
         let pageHeight = param.multiPageHeight || 8000;
 
@@ -40,6 +41,11 @@ class puppeteerRender {
         try {
             const page = await puppeteer.browser.newPage(); // 创建新页面
             let pageGotoParams = lodash.extend({ timeout: 120000 }, param.pageGotoParams || {});
+            // 设置请求 Header
+            if (header && (header.length !== 0)) {
+                await page.setExtraHTTPHeaders(header);
+            }
+
             await page.goto(`file://${_path}${lodash.trim(savePath, '.')}`, pageGotoParams); // 跳转到指定页面
 
             // 根据 style 的值来修改 CSS 样式

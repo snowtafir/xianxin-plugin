@@ -17,7 +17,7 @@ pushContentLenLimit: 100
 pushContentLineLimit: 5
 
 # 是否展示定时任务的日志，0 不显示 1 显示
-pushTaskLog: 0
+pushTaskLog: 1
 
 # 包含关键词不推送
 banWords:

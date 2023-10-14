@@ -1,4 +1,11 @@
 - {
+    version: 2.0.2,
+    data:
+      [
+        新增微博动态推送功能，<span class="cmd">#订阅微博推送6593199887 </span>通过博主uid进行订阅，微博api限制可能每5次会报错connect ETIMEDOUT，可无视,
+      ],
+  }
+- {
     version: 2.0.1,
     data:
       [

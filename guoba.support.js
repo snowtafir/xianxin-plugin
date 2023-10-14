@@ -90,6 +90,67 @@ export function supportGuoba() {
           },
         },
         {
+          field: "weibo.pushStatus",
+          label: "微博推送状态",
+          bottomHelpMessage: "微博推送任务状态",
+          component: "Select",
+          componentProps: {
+            options: [
+              { label: "不推送", value: 0 },
+              { label: "推送", value: 1 },
+            ],
+            placeholder: "请选择微博推送状态",
+          },
+        },
+        {
+          field: "weibo.pushTime",
+          label: "微博定时任务",
+          bottomHelpMessage: "检测微博推送定时任务，Cron表达式",
+          component: "Input",
+          componentProps: {
+            placeholder: "请输入检测微博推送定时任务",
+          },
+        },
+        {
+          field: "weibo.pushTransmit",
+          label: "推送转发动态",
+          bottomHelpMessage: "推送转发动态设置",
+          component: "Select",
+          componentProps: {
+            options: [
+              { label: "不推送", value: 0 },
+              { label: "推送", value: 1 },
+            ],
+            placeholder: "请选择推送转发动态设置",
+          },
+        },
+        {
+          field: "weibo.pushMsgMode",
+          label: "微博推送消息模式",
+          bottomHelpMessage: "设置微博动态推送消息模式",
+          component: "Select",
+          componentProps: {
+            options: [
+              { label: "文字模式", value: 0 },
+              { label: "图片模式", value: 1 },
+            ],
+            placeholder: "请选择微博动态推送消息模式",
+          },
+        },
+        {
+          field: "weibo.isSplit",
+          label: "微博推送分片截图模式",
+          bottomHelpMessage: "设置微博动态推分片截图模式，仅分片截图模式下才会推送全部长动态，默认开启",
+          component: "Select",
+          componentProps: {
+            options: [
+              { label: "关闭分片截图", value: 0 },
+              { label: "开启分片截图", value: 1 },
+            ],
+            placeholder: "请选择是否开启微博动态分片截图模式",
+          },
+        },
+        {
           field: "mystery.permission",
           label: "woc权限",
           bottomHelpMessage: "设置woc权限",
@@ -203,6 +264,9 @@ export function supportGuoba() {
         const bilibiliSetData = {
           bilibili: xxCfg.getConfig("bilibili", "set"),
         };
+        const weiboSetData = {
+          weibo: xxCfg.getConfig("weibo", "set"),
+        };
         const gameSetData = {
           game: xxCfg.getConfig("game", "set"),
         };
@@ -215,6 +279,7 @@ export function supportGuoba() {
 
         return {
           ...bilibiliSetData,
+          ...weiboSetData,
           ...gameSetData,
           ...mysSetData,
           ...mysterySetData,
@@ -223,22 +288,27 @@ export function supportGuoba() {
       // 设置配置的方法（前端点确定后调用的方法）
       setConfigData(data, { Result }) {
         const bilibiliSetData = xxCfg.getConfig("bilibili", "set");
+        const weiboSetData = xxCfg.getConfig("weibo", "set");
         const gameSetData = xxCfg.getConfig("game", "set");
         const mysSetData = xxCfg.getConfig("mys", "set");
         const mysterySetData = xxCfg.getConfig("mystery", "set");
 
         const mergedData = {
           ...bilibiliSetData,
+          ...weiboSetData,
           ...gameSetData,
           ...mysSetData,
           ...mysterySetData,
         };
 
-        const setedData = { bilibili: {}, game: {}, mys: {}, mystery: {} };
+        const setedData = { bilibili: {}, weibo: {}, game: {}, mys: {}, mystery: {} };
 
         for (let key in mergedData) {
           if (typeof data[`bilibili.${key}`] != "undefined") {
             setedData.bilibili[key] = data[`bilibili.${key}`];
+          }
+          if (typeof data[`weibo.${key}`] != "undefined") {
+            setedData.weibo[key] = data[`weibo.${key}`];
           }
           if (typeof data[`game.${key}`] != "undefined") {
             setedData.game[key] = data[`game.${key}`];
@@ -254,6 +324,11 @@ export function supportGuoba() {
         xxCfg.saveSet("bilibili", "set", "config", {
           ...bilibiliSetData,
           ...setedData.bilibili,
+        });
+
+        xxCfg.saveSet("weibo", "set", "config", {
+          ...weiboSetData,
+          ...setedData.weibo,
         });
 
         xxCfg.saveSet("game", "set", "config", {

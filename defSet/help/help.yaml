@@ -62,6 +62,29 @@
     - icon: ledger
       title: "#B站ck帮助"
       desc: "查看B站ck帮助"
+- group: 微博功能
+  list:
+    - icon: 树脂
+      title: "#订阅微博推送 UID<br/>#订阅微博推送 图文 UID"
+      desc: 检测博主的微博动态进行推送
+    - icon: 统计
+      title: "#取消微博推送 UID<br/>#取消微博推送 图文 UID"
+      desc: "删除对应博主的微博对应动态推送"
+    - icon: 攻略
+      title: "#推送微博列表"
+      desc: "查看本群添加的博主推送列表"
+    - icon: 问号
+      title: "#手动推送微博"
+      desc: "手动触发定时推送任务"
+    - icon: 绑定账号
+      title: "#搜索博主 xxx"
+      desc: "根据昵称在微博搜索博主"
+    - icon: ledger
+      title: "#博主 UID"
+      desc: "查看博主信息"
+    - icon: ledger
+      title: "#微博帮助"
+      desc: "查看微博帮助"
 - group: 群战
   list:
     - icon: 养成计算

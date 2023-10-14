@@ -222,7 +222,7 @@ export default class Bilibili extends base {
 
     this.key = "Yz:xianxin:bilibili:upPush:";
 
-    Bot.logger?.mark("xianxin插件：B站动态定时检测");
+    //Bot.logger?.mark("xianxin插件：B站动态定时检测");
 
     for (let [key, value] of uidMap) {
       // const accInfoRes = await this.getBilibiliUserInfo(key);

@@ -1,0 +1,23 @@
+{
+  "name": "trss-xianxin-plugin",
+  "version": "2.0.2",
+  "description": "Yunzai-Bot插件扩展",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/snowtafir/xianxin-plugin"
+  },
+  "keywords": [
+    "Yunzai-Bot",
+    "trss-xianxin-plguin"
+  ],
+  "author": "xianxincoder，snowtafir",
+  "dependencies": {
+    "cheerio": "1.0.0-rc.12"
+  },
+  "license": "GPL-3.0"
+}
