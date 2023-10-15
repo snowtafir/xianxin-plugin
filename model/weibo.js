@@ -36,16 +36,17 @@ export default class Weibo extends base {
         return res_dict;
     }
 
-    /**通过关键词搜索微博 */
+    /**通过关键词搜索微博大v */
     async search_bozhu_info(keyword) {
         let url = `https://weibo.com/ajax/side/search?q=${keyword}`;
 
         const response = await fetch(url, {
             method: "GET",
-            headers: header,
+            headers: { 'accept': '*/*', 'Content-Type': 'application/json', 'referer': 'https://weibo.com' },
             redirect: "follow",
         });
-        return response;
+        const res = await response.json();
+        return res;
     }
 
     /**获取主页动态资源相关数组 */

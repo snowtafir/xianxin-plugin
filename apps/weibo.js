@@ -28,8 +28,7 @@ export class weibo extends plugin {
       dsc: "微博相关指令",
       event: "message",
       priority: 500,
-      rule: [
-        {
+      rule: [{
           reg: "^#*博主\\s*[0-9]*$",
           fnc: "detail",
           event: "message.group",
@@ -76,9 +75,8 @@ export class weibo extends plugin {
 
     /** 定时任务 */
     this.task = {
-      cron: !!this.weiboSetData.pushStatus
-        ? this.weiboSetData.pushTime
-        : "",
+      cron: !!this.weiboSetData.pushStatus ?
+        this.weiboSetData.pushTime : "",
       name: "xianxin插件---微博推送定时任务",
       fnc: () => this.newPushTask(),
       log: !!this.weiboSetData.pushTaskLog,
@@ -100,24 +98,32 @@ export class weibo extends plugin {
   async detail() {
     let target = this.e.msg.replace(/#*博主/g, "").trim();
 
-    const infoRes = await new Weibo(this.e).get_bozhu_info(target);
+    const Res = await new Weibo(this.e).get_bozhu_info(target);
 
-    if (!infoRes) {
+    if (!Res) {
       this.reply("诶嘿，出了点网络问题，等会再试试吧~");
       return true;
     }
 
-    const data = infoRes?.userInfo || null;
+    const userInfo = Res?.data?.userInfo || null;
 
-    if (infoRes.ok !== 1 || !data) {
+    if (Res?.ok !== 1 || !userInfo) {
       this.reply("ID错误捏，请核对一下吧～");
       return true;
     }
+
+    let sex = userInfo.gender === 'f' ? '女' : userInfo.gender === 'm' ? '男' : '未知';
+
     const message = [
-      `博主昵称：${data.screen_name}`,
-      `\n微博认证：${data.verified_reason || 未认证}`,
-      `\n等级：${data.urank}`,
-      `\n粉丝人数：${data.followers_count_str}`,
+      `博主昵称：${userInfo.screen_name || ''}`,
+      `\nUID：${userInfo.id || target}`,
+      `\n性别：${sex}`,
+      `\n微博认证：${userInfo.verified_reason || '未认证'}`,
+      `\n描述：${userInfo.description || ''}`,
+      `\nsvip等级：${userInfo.svip || ''}`,
+      `\nvip等级：${userInfo.mbrank || ''}`,
+      `\n关注：${userInfo.follow_count || ''}`,
+      `\n粉丝人数：${userInfo.followers_count_str || ''}`,
     ];
 
     this.reply(message);
@@ -184,8 +190,7 @@ export class weibo extends plugin {
     data[this.e.group_id].push({
       uid,
       name: name,
-      type: this.typeHandle(
-        {
+      type: this.typeHandle({
           uid,
           name,
         },
@@ -288,33 +293,34 @@ export class weibo extends plugin {
     this.e.reply(`推送列表如下：\n${messages.join("\n")}`);
   }
 
-  /**
-   * rule - 根据昵称搜索博主信息
-   */
+  /** 根据昵称搜索博主信息*/
   async searchup() {
     let keyword = this.e.msg.replace(/#*搜索博主/g, "").trim();
 
-    let response = await new Weibo(this.e).search_bozhu_info(keyword);
-    if (!response.ok) {
+    const res = await new Weibo(this.e).search_bozhu_info(keyword);
+
+    if (!res) {
       this.reply("诶嘿，出了点网络问题，等会再试试吧~");
       return;
     }
 
-    const res = await response.json();
+    const info = res?.data?.user[0];
+    const infos = res?.data?.users[0];
+    const uid = res?.data?.user[0]?.uid;
+    const id = res?.data?.users[0]?.id;
+    const nick = res?.data?.user[0]?.nick;
+    const screen_name = res?.data?.users[0]?.screen_name;
+    const followers_count_str = res?.data?.users[0]?.followers_count_str;
 
-    if (res.ok !== 0 || !res.data.user || !res.data.users) {
-      this.reply("没有搜索到该用户，请换个关键词试试吧");
+    if (res.ok !== 0 && (!info || !infos)) {
+      this.reply("没有搜索到该用户，\n请换个关键词试试吧~ \nPS：该方法只能搜索到大V");
       return;
     }
 
     const messages = [];
 
-    const info = res.data.users[0]
-
-    const info_ = res.data.user[0]
-
     messages.push(
-      `${info.screen_name || info_.nick}\nUID：${info.id || info_.uid}\n粉丝数：${info.followers_count_str || ''}`
+      `博主昵称：${nick || screen_name }\nUID：${uid || id}\n粉丝人数：${followers_count_str || ''}\n`
     );
 
     this.e.reply(messages.join("\n"));
