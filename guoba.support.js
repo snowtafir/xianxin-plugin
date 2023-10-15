@@ -10,8 +10,8 @@ export function supportGuoba() {
     pluginInfo: {
       name: "trss-xianxin-plugin",
       title: "trss-xianxin-plugin",
-      author: "@闲心",
-      authorLink: "https://gitee.com/xianxincoder",
+      author: "@闲心 @snowtafir/珊星雪",
+      authorLink: "https://gitee.com/snowtafir",
       link: "https://gitee.com/snowtafir/xianxin-plugin.git",
       isV3: true,
       isV2: false,
