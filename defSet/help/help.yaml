@@ -1,32 +1,32 @@
 - group: 米游社功能
   list:
     - icon: 绑定账号
-      title: "#cos 角色名 #cos 刻晴"
+      title: "#原神/星铁cos 角色名：#原神cos 刻晴、#星铁cos 克拉拉"
       desc: 指定角色随机查看cos图片
     - icon: paimon
-      title: "#cos #cos1 #cos详情"
-      desc: 查看米游社中cos榜
+      title: "#原神/星铁cos #原神/星铁cos1 #原神/星铁cos详情"
+      desc: 查看米游社中cos榜，示例：#原神cos、#星铁cos
     - icon: abyss
-      title: "#攻略 xxx"
-      desc: 查询原神精选的玩家攻略内容
+      title: "#原神攻略 xxx、#星铁攻略 xxx"
+      desc: 查询 原神 或 星铁 精选的玩家攻略内容
     - icon: wiki
-      title: "#wiki xxx"
-      desc: 查询原神wiki的内容
+      title: "#原神wiki xxx、#星铁wiki xxx"
+      desc: 查询 原神wiki 或 星铁百科 的内容
     - icon: 原石
-      title: "#cosdby 角色名<br/>#cosdby 西施"
+      title: "#原神cosdby 角色名<br/> #星铁cosdby 西施"
       desc: 指定角色随机查看大别野cos图片
     - icon: 纠缠之缘
-      title: "#cosdby #cosdby1 #cosdby详情"
+      title: "#原神/星铁cosdby #原神/星铁cosdby1 #原神/星铁cosdby详情"
       desc: 查看米游社中大别野cos榜
     - icon: abyss
-      title: "#同人 #同人1 #同人详情"
+      title: "#原神/星铁同人 #原神/星铁同人1 #原神/星铁同人详情"
       desc: 查看米游社中同人榜
     - icon: 史莱姆
-      title: "#同人 xx"
-      desc: 搜索同人内容
+      title: "#原神同人 xx、#星铁同人 xx"
+      desc: 搜索 原神 或 星铁 的同人内容
     - icon: team
-      title: "#热门话题"
-      desc: 查看米游社中热聊话题
+      title: "#原神热门话题、#星铁热门话题"
+      desc: 查看米游社中 原神 或 星铁 的热聊话题
 - group: B站功能
   list:
     - icon: 树脂

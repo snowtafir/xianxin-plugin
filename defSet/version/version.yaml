@@ -1,4 +1,11 @@
 - {
+    version: 2.0.3,
+    data:
+      [
+        米游社功能新增星穹铁道内容，<span class="cmd">#星铁cos/wiki/攻略/同人/热门话题 </span>详细使用方法请查看 "#闲心帮助",
+      ],
+  }
+- {
     version: 2.0.2,
     data:
       [

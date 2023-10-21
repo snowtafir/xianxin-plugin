@@ -27,19 +27,26 @@ export default class Mys extends base {
     return checkDate && checkTitle;
   }
 
-  async chatDataHandle() {
+  async chatDataHandle(forum_class) {
     const chatData = []; // 如果过滤后没有数据，那么用全部数据兜底
     const filterChatData = []; // 符合条件的数据
-    const data = await fetch(
-      `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=26&gids=2&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=1`
-    );
 
-    const data1 = await fetch(
-      `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=26&gids=2&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=2`
-    );
-    const data2 = await fetch(
-      `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=26&gids=2&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=3`
-    );
+    let url0, url1, url2;
+    if (forum_class === 'ys') {
+      url0 = `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=26&gids=2&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=1`;
+      url1 = `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=26&gids=2&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=2`;
+      url2 = `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=26&gids=2&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=3`;
+
+    } else if (forum_class === 'sr') {
+
+      url0 = `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=52&gids=6&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=1`;
+      url1 = `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=52&gids=6&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=2`;
+      url2 = `https://bbs-api.mihoyo.com/post/wapi/getForumPostList?forum_id=52&gids=6&is_good=false&is_hot=true&page_size=20&sort_type=2&last_id=3`;
+    }
+
+    const data = await fetch(url0);
+    const data1 = await fetch(url1);
+    const data2 = await fetch(url2);
 
     const dataResJsonData = await data.json();
     const data1ResJsonData = await data1.json();
@@ -59,7 +66,7 @@ export default class Mys extends base {
       mergeData.map((item) => {
         chatData.push({
           title: item.post.subject,
-          url: `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
+          url: forum_class === 'sr' ? `https://bbs.mihoyo.com/sr/article/${item.post.post_id}` : `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
           like: item.stat.like_num,
           reply: item.stat.reply_num,
         });
@@ -67,7 +74,7 @@ export default class Mys extends base {
         if (this.conditionHanle(item)) {
           filterChatData.push({
             title: item.post.subject,
-            url: `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
+            url: forum_class === 'sr' ? `https://bbs.mihoyo.com/sr/article/${item.post.post_id}` : `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
             like: item.stat.like_num,
             reply: item.stat.reply_num,
           });
@@ -75,23 +82,29 @@ export default class Mys extends base {
         return item;
       });
     }
-
     return filterChatData.length ? filterChatData : chatData;
   }
 
-  async getChatData() {
-    const data = await this.chatDataHandle();
+  /**热门话题 */
+  async getChatData(forum_class) {
+    const data = await this.chatDataHandle(forum_class);
     const sortData = data.sort(function (a, b) {
       return b.reply - a.reply;
     });
     return sortData;
   }
 
-  async getAcgnData() {
+  async getAcgnData(forum_class) {
     const cosData = [];
-    const fetchData = await fetch(
-      `https://bbs-api.mihoyo.com/post/wapi/getImagePostList?forum_id=29&gids=2&page_size=20&type=1`
-    );
+
+    let url;
+    if (forum_class === 'ys') {
+      url = `https://bbs-api.mihoyo.com/post/wapi/getImagePostList?forum_id=29&gids=2&page_size=20&type=1`;
+    } else if (forum_class === 'sr') {
+      url = `https://bbs-api.mihoyo.com/post/wapi/getImagePostList?forum_id=56&gids=6&page_size=20&type=1`;
+    }
+
+    const fetchData = await fetch(url);
     const resJsonData = await fetchData.json();
 
     if (
@@ -103,7 +116,7 @@ export default class Mys extends base {
       resJsonData.data.list.map((item) => {
         cosData.push({
           title: item.post.subject,
-          url: `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
+          url: forum_class === 'ys' ? `https://bbs.mihoyo.com/ys/article/${item.post.post_id}` : forum_class === 'sr' ? `https://bbs.mihoyo.com/sr/article/${item.post.post_id}` : '',
           cover: item.cover.url,
           images: item.post.images,
           nickname: item.user.nickname,
@@ -115,13 +128,14 @@ export default class Mys extends base {
     return cosData;
   }
 
-  async getCosData(key) {
+  async getCosData(forum_class, forum_class1) {
     const urlMap = {
       ys: `https://bbs-api.mihoyo.com/post/wapi/getImagePostList?forum_id=49&gids=2&page_size=20&type=1`,
+      sr: `https://bbs-api.miyoushe.com/post/wapi/getForumPostList?forum_id=62&gids=6&page_size=20&type=1`,
       dby: `https://bbs-api.mihoyo.com/post/wapi/getImagePostList?forum_id=47&gids=2&page_size=20&type=1`,
     };
     const cosData = [];
-    const fetchData = await fetch(urlMap[key]);
+    const fetchData = await fetch(urlMap[forum_class]);
     const resJsonData = await fetchData.json();
 
     if (
@@ -133,7 +147,7 @@ export default class Mys extends base {
       resJsonData.data.list.map((item) => {
         cosData.push({
           title: item.post.subject,
-          url: `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
+          url: forum_class1 === 'sr' ? `https://bbs.mihoyo.com/sr/article/${item.post.post_id}` : `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
           cover: item.cover.url,
           images: item.post.images,
           nickname: item.user.nickname,
@@ -145,15 +159,16 @@ export default class Mys extends base {
     return cosData;
   }
 
-  async getCosSearchData(keyword, last_id, key) {
+  async getCosSearchData(keyword, last_id, forum_class, forum_class1) {
     const cosData = [];
 
     const urlMap = {
       ys: `https://bbs-api.mihoyo.com/post/wapi/searchPosts?forum_id=49&gids=2&keyword=${keyword}&last_id=${last_id}&size=20`,
+      sr: `https://bbs-api.mihoyo.com/post/wapi/searchPosts?forum_id=62&gids=6&keyword=${keyword}&last_id=${last_id}&size=20`,
       dby: `https://bbs-api.mihoyo.com/post/wapi/searchPosts?forum_id=47&gids=5&keyword=${keyword}&last_id=${last_id}&size=20`,
     };
 
-    const fetchData = await fetch(urlMap[key]);
+    const fetchData = await fetch(urlMap[forum_class]);
     const resJsonData = await fetchData.json();
 
     if (
@@ -165,7 +180,7 @@ export default class Mys extends base {
       resJsonData.data.posts.map((item) => {
         cosData.push({
           title: item.post.subject,
-          url: `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
+          url: forum_class1 === 'sr' ? `https://bbs.mihoyo.com/sr/article/${item.post.post_id}` : `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
           cover: item.cover && item.cover.url,
           images: item.post.images,
           nickname: item.user.nickname,
@@ -177,10 +192,16 @@ export default class Mys extends base {
     return cosData;
   }
 
-  async getAcgnSearchData(keyword, last_id) {
+  /**搜索并获取 原神同人 数据 */
+  async getAcgnSearchData(keyword, last_id, forum_class) {
     const cosData = [];
 
-    const url = `https://bbs-api.mihoyo.com/post/wapi/searchPosts?forum_id=29&gids=2&keyword=${keyword}&last_id=${last_id}&size=20`;
+    let url;
+    if (forum_class === 'ys') {
+      url = `https://bbs-api.mihoyo.com/post/wapi/searchPosts?forum_id=29&gids=2&keyword=${keyword}&last_id=${last_id}&size=20`;
+    } else if (forum_class === 'sr') {
+      url = `https://bbs-api.mihoyo.com/post/wapi/searchPosts?forum_id=56&gids=6&keyword=${keyword}&last_id=${last_id}&size=20`;
+    };
 
     const fetchData = await fetch(url);
     const resJsonData = await fetchData.json();
@@ -194,7 +215,7 @@ export default class Mys extends base {
       resJsonData.data.posts.map((item) => {
         cosData.push({
           title: item.post.subject,
-          url: `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
+          url: forum_class === 'sr' ? `https://bbs.mihoyo.com/sr/article/${item.post.post_id}` : `https://bbs.mihoyo.com/ys/article/${item.post.post_id}`,
           cover: item.cover.url,
           images: item.post.images,
           nickname: item.user.nickname,
@@ -210,8 +231,9 @@ export default class Mys extends base {
     const wikiData = [];
 
     const urlMap = {
-      wiki: `https://api-takumi.mihoyo.com/common/blackboard/ys_obc/v1/search/content?app_sn=ys_obc&keyword=${keyword}&page=1`,
-      strategy: `https://api-takumi.mihoyo.com/common/blackboard/ys_strategy/v1/search/content?app_sn=ys_strategy&keyword=${keyword}&page=1`,
+      ysWiki: `https://api-takumi.mihoyo.com/common/blackboard/ys_obc/v1/search/content?app_sn=ys_obc&keyword=${keyword}&page=1`,
+      ysStrategy: `https://api-takumi.mihoyo.com/common/blackboard/ys_strategy/v1/search/content?app_sn=ys_strategy&keyword=${keyword}&page=1`,
+      srWiki: `https://api-takumi.mihoyo.com/common/blackboard/sr_wiki/v1/search/content?app_sn=sr_wiki&keyword=${keyword}&page=1`,
     };
 
     const fetchData = await fetch(urlMap[type]);
@@ -238,18 +260,18 @@ export default class Mys extends base {
     return wikiData;
   }
 
-  async getWikiPage(data, isSplit) {
+  async getWikiPage(data, isSplit, forum_class) {
     const id = data.id;
 
-    const param = await this.wikiDetail(id);
+    const param = await this.wikiDetail(id, forum_class);
 
     const renderInfo = await this.render(true, param, isSplit);
 
     return renderInfo;
   }
 
-  async wikiDetail(id) {
-    const res = await this.postData("wiki", {
+  async wikiDetail(id, forum_class) {
+    const res = await this.postData(forum_class, {
       content_id: id,
     });
 
@@ -332,9 +354,13 @@ export default class Mys extends base {
       case "emoticon":
         host = "https://bbs-api-static.mihoyo.com/misc/api/emoticon_set?";
         break;
-      case "wiki":
+      case "ysWiki":
         host =
           "https://api-static.mihoyo.com/common/blackboard/ys_obc/v1/content/info?app_sn=ys_obc&";
+        break;
+      case "srWiki":
+        host =
+          "https://api-static.mihoyo.com/common/blackboard/sr_wiki/v1/content/info?app_sn=sr_wiki&";
         break;
     }
     return host + param;
