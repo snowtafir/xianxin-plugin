@@ -15,7 +15,7 @@ export function supportGuoba() {
       link: "https://gitee.com/snowtafir/xianxin-plugin.git",
       isV3: true,
       isV2: false,
-      description: "提供B站推送、群战小游戏、米游社cos、米游社wiki攻略等功能",
+      description: "提供米游社(原神/星穹铁道：cos、wiki、攻略)、微博博主/B站up主 动态推送(支持长图模式)、神秘指令、群战小游戏、五子棋、21点等功能",
       // 显示图标，此为个性化配置
       // 图标可在 https://icon-sets.iconify.design 这里进行搜索
       icon: "mdi:stove",
