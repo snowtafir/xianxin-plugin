@@ -409,7 +409,7 @@ export class bilibili extends plugin {
     const data = accInfoResJsonData?.data || null;
 
     if (accInfoResJsonData.code != 0 || !data) {
-      this.reply("UID不对啊老兄，别乱搞哦～");
+      this.reply("咦~ UID不对诶，请核对一下吧～");
       return true;
     }
     const message = [
@@ -449,7 +449,7 @@ export class bilibili extends plugin {
     const res = await response.json();
 
     if (res.code !== 0 || !res.data.result || !res.data.result.length) {
-      this.reply("没有搜索到该用户，请换个关键词试试吧");
+      this.reply("哦豁~没有搜索到该用户捏，请换个关键词试试吧~");
       return;
     }
 

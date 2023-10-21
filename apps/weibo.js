@@ -115,7 +115,8 @@ export class weibo extends plugin {
     let sex = userInfo.gender === 'f' ? '女' : userInfo.gender === 'm' ? '男' : '未知';
 
     const message = [
-      `博主昵称：${userInfo.screen_name || ''}`,
+      `-------微博-------`,
+      `\n博主昵称：${userInfo.screen_name || ''}`,
       `\nUID：${userInfo.id || target}`,
       `\n性别：${sex}`,
       `\n微博认证：${userInfo.verified_reason || '未认证'}`,
@@ -313,14 +314,14 @@ export class weibo extends plugin {
     const followers_count_str = res?.data?.users[0]?.followers_count_str;
 
     if (res.ok !== 0 && (!info || !infos)) {
-      this.reply("没有搜索到该用户，\n请换个关键词试试吧~ \nPS：该方法只能搜索到大V");
+      this.reply("惹~没有搜索到该用户捏，\n请换个关键词试试吧~ \nPS：该方法只能搜索到大V");
       return;
     }
 
     const messages = [];
 
     messages.push(
-      `博主昵称：${nick || screen_name }\nUID：${uid || id}\n粉丝人数：${followers_count_str || ''}\n`
+      `-----微博-----\n博主昵称：${nick || screen_name }\nUID：${uid || id}\n粉丝人数：${followers_count_str || ''}`
     );
 
     this.e.reply(messages.join("\n"));

@@ -113,7 +113,7 @@ export default class Weibo extends base {
         let setData = xxCfg.getConfig("weibo", "set");
         let pushData = xxCfg.getConfig("weibo", "push");
 
-        // 推送2小时内的B站动态
+        // 推送2小时内的微博动态
         let interval = 7200;
 
         const uidMap = new Map();
