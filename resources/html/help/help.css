@@ -30,7 +30,8 @@ body {
   padding: 10px 20px;
   position: relative;
   color: white;
-  box-shadow: 0 5px 10px 0 rgb(0 0 0 / 15%);
+  box-shadow: 0 0 1px 0 #ccc, 2px 2px 4px 0 rgba(50, 50, 50, 0.8) /*0 5px 10px 0 rgb(0 0 0 / 15%)*/;
+  backdrop-filter: blur(10px);
 }
 .head_box .id_text {
   font-size: 24px;
@@ -65,7 +66,8 @@ body {
   position: absolute;
   top: -10px;
   left: -8px;
-  background-color: rgb(76, 76, 76);
+  background-color: rgb(76 76 76 / 20%);
+  backdrop-filter: blur(15px);
   box-shadow: 0 0 1px 0 #ccc, 2px 2px 4px 0 rgba(50, 50, 50, 0.8);
   color: #fff;
   font-size: 14px;
@@ -110,6 +112,7 @@ body {
   padding: 8px 6px 8px 6px;
   border-radius: 8px;
   margin: 0 0px 10px 10px;
+  backdrop-filter: blur(10px);
 }
 .list .item .icon{
   width: 24px;
@@ -129,7 +132,7 @@ body {
 } */
 .list .item .title .dec{
   font-size: 12px;
-  color: #999;
+  color: #FBEFFB /*#999*/;
   margin-top: 2px;
 }
 .logo{
