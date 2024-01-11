@@ -9,20 +9,30 @@ import lodash from 'lodash'
 
 /**统一设定请求头 header */
 const _headers = {
-  'cache-control': 'no-cache',
+  'Referer': `https://www.bilibili.com/`,
+  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+  'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+  'Accept-Encoding': 'gzip, deflate, br',
   cookie: '',
-  pragma: 'no-cache',
-  'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
-  'sec-ch-ua-mobile': '?0',
-  'sec-fetch-dest': "document",
-  'sec-fetch-mode': "navigate",
-  'sec-fetch-site': 'none',
-  'sec-fetch-user': '?1',
-  'upgrade-insecure-requests': 1,
-  'user-agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:100.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
+  pragma: "no-cache",
+  "cache-control": "max-age=0",
+  'Connection': 'keep-alive',
+  'DNT': 1,
+  'Sec-GPC': 1,
+  'sec-ch-ua': '"Microsoft Edge";v="114", "Chromium";v="114", "Not-A.Brand";v="24"',
+  'sec-ch-ua-platform': '',
+  'sec-ch-ua-mobile':'?0',
+  'Sec-Fetch-Dest': 'document',
+  'Sec-Fetch-Mode': 'navigate',
+  'Sec-Fetch-Site': 'none',
+  'Sec-Fetch-User': '?1',
+  'TE': 'TE: trailers',
+  "upgrade-insecure-requests": 1,
+  'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1',
 }
 /*Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36*/
 /*'Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0'*/
+// Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1
 export { _headers }
 
 export default class Bilibili extends base {
@@ -98,11 +108,12 @@ export default class Bilibili extends base {
     async function fetchDynamicInfo(url, addHeader) {
       const response = await fetch(url, {
         method: 'GET',
-        headers: lodash.merge(_headers, addHeader),
+        headers: lodash.merge(_headers, addHeader, { 'Host': `api.bilibili.com`, }),
         redirect: 'follow',
+        timeout: 15000, // 设置超时时间为 15 秒
       });
       if (!response.ok) {
-        Bot.logger?.mark(`xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
+        Bot.logger?.mark(`trss-xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
         return null;
       } else {
         return response.json();
@@ -130,16 +141,18 @@ export default class Bilibili extends base {
 
       if (dataCode !== 0) {
         /**接口校验失败，使用 Mozilla/5.0*/
+        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验失败：${JSON.stringify(data)}`);
         return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie });
       }
       if (dataCode === 0) {
 
+        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验成功：${JSON.stringify(data)}`);
         const resData = fetchDynamicInfo(url, mergeCookie);
         const resDataCode = resData.code;
 
         if (resDataCode !== 0) {
           /**接口校验成功，但是动态请求仍失败，使用 Mozilla/5.0*/
-          return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie });
+          return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie, 'Host': `api.bilibili.com`, });
         }
         if (resDataCode === 0) {
           return resData;

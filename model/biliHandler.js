@@ -383,6 +383,25 @@ class BiliHandler {
         }
     }
 
+    /**获取临时cookie的某个值，入参格式： ['buvid3', 'buvid4', '_uuid', 'DedeUserID', 'b_nut', 'b_lsid', 'bili_jct', 'SESSDATA'];*/
+    static async getTemCookieItem(keysToKeep) {
+        let TemCookie = await BiliHandler.getTempCk();
+        let Bck = lodash.trim(TemCookie);
+        if ((Bck !== null) && (Bck !== undefined) && (Bck.length !== 0) && (Bck !== '')) {
+            var map_key = String(Bck)
+                .trim()
+                .match(/(\w+)=([^;|,]+)/g) /**使用正则表达式 /(\w+)=([^;]+);/g 来匹配形式为 a=b 的内容,使用 [^;|,]+ 来匹配值，其中 [^;|,] 表示除了分号和,以外的任意字符*/
+                ?.map(match => match.split('='))
+                .filter(([key, value]) => keysToKeep.includes(key) && value !== '') /**过滤并仅保留键值对中值为非空的情况*/
+                .map(([key, value]) => `${key}=${value}`)
+                .join(';');
+            return `${map_key}`
+        } else {
+            map_key = ''
+            return map_key
+        }
+    }
+
     /**获取 buvid4 */
     static async get_buvid4() {
         const url = 'https://api.bilibili.com/x/frontend/finger/spi/';
@@ -482,16 +501,160 @@ class BiliHandler {
     /**请求参数POST接口(ExClimbWuzhi)过校验*/
     static async postExClimbWuzhiParam(cookie) {
         const payloadData = {
-            '3064': 1,
-            '39c8': `333.999.fp.risk`,
-            '3c43': {
-                'adca': _headers['user-agent'].includes('Windows') ? 'Win32' : 'Linux',
+            "3064": 1, // ptype, mobile => 2, others => 1
+            "5062": `${Date.now()}`, // timestamp
+            "03bf": "https://www.bilibili.com/", // url accessed
+            "39c8": "333.999.fp.risk", // spm_id,
+            "34f1": "", // target_url, default empty now
+            "d402": "", // screenx, default empty
+            "654a": "", // screeny, default empty
+            "6e7c": "1112x1000", // browser_resolution, window.innerWidth || document.body && document.body.clientWidth + "x" + window.innerHeight || document.body && document.body.clientHeight
+            "3c43": { // 3c43 => msg
+                "2673": 0, // hasLiedResolution, window.screen.width < window.screen.availWidth || window.screen.height < window.screen.availHeight
+                "5766": 24, // colorDepth, window.screen.colorDepth
+                "6527": 0, // addBehavior, !!window.HTMLElement.prototype.addBehavior, html5 api
+                "7003": 1, // indexedDb, !!window.indexedDB, html5 api
+                "807e": 1, // cookieEnabled, navigator.cookieEnabled
+                "b8ce": _headers['user-agent'], // ua
+                "641c": 0, // webdriver, navigator.webdriver, like Selenium
+                "07a4": "zh-CN", // language
+                "1c57": 8, // deviceMemory in GB, navigator.deviceMemory
+                "0bd0": 2, // hardwareConcurrency, navigator.hardwareConcurrency
+                "748e": [
+                    1818, // window.screen.width
+                    1080  // window.screen.height
+                ], // screenResolution
+                "d61f": [
+                    1918, // window.screen.availWidth
+                    1080  // window.screen.availHeight
+                ], // availableScreenResolution
+                "fc9d": -480, // timezoneOffset, (new Date).getTimezoneOffset()
+                "6aa9": "Asia/Hong_Kong", //Intl.DateTimeFormat().resolvedOptions().timeZone, // timezone, (new window.Intl.DateTimeFormat).resolvedOptions().timeZone
+                "75b8": 1, // sessionStorage, window.sessionStorage, html5 api
+                "3b21": 1, // localStorage, window.localStorage, html5 api
+                "8a1c": 1, // openDatabase, window.openDatabase, html5 api
+                "d52f": "not available", // cpuClass, navigator.cpuClass
+                "adca": _headers['user-agent'].includes('Windows') ? 'Win32' : 'Linux', // platform, navigator.platform
+                "80c9": [
+                    [
+                        "Chromium PDF Plugin",
+                        "Portable Document Format",
+                        [["application/x-google-chrome-pdf", "pdf"]],
+                    ],
+                    ["Chromium PDF Viewer", "", [["application/pdf", "pdf"]]],
+                ], // plugins
+                "13ab": "ZgAAAABJRU5ErkJggg==", // canvas fingerprint
+                "bfe9": "BAWgcAVlo/OQ0HcCCjA/8D8Y76prQ7F9EAAAAASUVORK5CYII=", // webgl_str
+                "a3c1":
+                    [
+                        "extensions:ANGLE_instanced_arrays;EXT_blend_minmax;EXT_color_buffer_half_float;EXT_float_blend;EXT_frag_depth;EXT_shader_texture_lod;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;EXT_sRGB;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_color_buffer_float;WEBGL_compressed_texture_astc;WEBGL_compressed_texture_etc;WEBGL_compressed_texture_etc1;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_multi_draw",
+                        "webgl aliased line width range:[1, 1]",
+                        "webgl aliased point size range:[1, 1023]",
+                        "webgl alpha bits:8",
+                        "webgl antialiasing:yes",
+                        "webgl blue bits:8",
+                        "webgl depth bits:24",
+                        "webgl green bits:8",
+                        "webgl max anisotropy:16",
+                        "webgl max combined texture image units:64",
+                        "webgl max cube map texture size:16384",
+                        "webgl max fragment uniform vectors:4096",
+                        "webgl max render buffer size:8192",
+                        "webgl max texture image units:32",
+                        "webgl max texture size:8192",
+                        "webgl max varying vectors:31",
+                        "webgl max vertex attribs:16",
+                        "webgl max vertex texture image units:32",
+                        "webgl max vertex uniform vectors:4096",
+                        "webgl max viewport dims:[8192, 8192]",
+                        "webgl red bits:8",
+                        "webgl renderer:WebKit WebGL",
+                        "webgl shading language version:WebGL GLSL ES 1.0 (OpenGL ES GLSL ES 1.0 Chromium)",
+                        "webgl stencil bits:0",
+                        "webgl vendor:WebKit",
+                        "webgl version:WebGL 1.0 (OpenGL ES 2.0 Chromium)",
+                        "webgl unmasked vendor:Google Inc.",
+                        "webgl unmasked renderer:ANGLE (NVIDIA GeForce 405   Direct3D9Ex vs_3_0 ps_3_0)",
+                        "webgl vertex shader high float precision:23",
+                        "webgl vertex shader high float precision rangeMin:127",
+                        "webgl vertex shader high float precision rangeMax:127",
+                        "webgl vertex shader medium float precision:10",
+                        "webgl vertex shader medium float precision rangeMin:15",
+                        "webgl vertex shader medium float precision rangeMax:15",
+                        "webgl vertex shader low float precision:10",
+                        "webgl vertex shader low float precision rangeMin:15",
+                        "webgl vertex shader low float precision rangeMax:15",
+                        "webgl fragment shader high float precision:23",
+                        "webgl fragment shader high float precision rangeMin:127",
+                        "webgl fragment shader high float precision rangeMax:127",
+                        "webgl fragment shader medium float precision:10",
+                        "webgl fragment shader medium float precision rangeMin:15",
+                        "webgl fragment shader medium float precision rangeMax:15",
+                        "webgl fragment shader low float precision:10",
+                        "webgl fragment shader low float precision rangeMin:15",
+                        "webgl fragment shader low float precision rangeMax:15",
+                        "webgl vertex shader high int precision:0",
+                        "webgl vertex shader high int precision rangeMin:31",
+                        "webgl vertex shader high int precision rangeMax:30",
+                        "webgl vertex shader medium int precision:0",
+                        "webgl vertex shader medium int precision rangeMin:15",
+                        "webgl vertex shader medium int precision rangeMax:14",
+                        "webgl vertex shader low int precision:0",
+                        "webgl vertex shader low int precision rangeMin:15",
+                        "webgl vertex shader low int precision rangeMax:14",
+                        "webgl fragment shader high int precision:0",
+                        "webgl fragment shader high int precision rangeMin:31",
+                        "webgl fragment shader high int precision rangeMax:30",
+                        "webgl fragment shader medium int precision:0",
+                        "webgl fragment shader medium int precision rangeMin:15",
+                        "webgl fragment shader medium int precision rangeMax:14",
+                        "webgl fragment shader low int precision:0",
+                        "webgl fragment shader low int precision rangeMin:15",
+                        "webgl fragment shader low int precision rangeMax:14",
+                    ], // webgl_params, cab be set to [] if webgl is not supported
+                "6bc5": "Google Inc.~ANGLE (NVIDIA GeForce 405   Direct3D9Ex vs_3_0 ps_3_0)", // webglVendorAndRenderer
+                "ed31": 0, // hasLiedLanguages
+                "72bd": 0, // hasLiedOs
+                "097b": 0, // hasLiedBrowser
+                "52cd": [
+                    0, // void 0 !== navigator.maxTouchPoints ? t = navigator.maxTouchPoints : void 0 !== navigator.msMaxTouchPoints && (t = navigator.msMaxTouchPoints);
+                    0, // document.createEvent("TouchEvent"), if succeed 1 else 0
+                    0 // "ontouchstart" in window ? 1 : 0
+                ], // touch support
+                "a658": [
+                    "Arial",
+                    "Arial Black",
+                    "Arial Narrow",
+                    "Arial Unicode MS",
+                    "Consolas",
+                    "Helvetica",
+                    "Lucida Console",
+                    "Lucida Sans",
+                    "Lucida Sans Unicode",
+                    "Microsoft Sans Serif",
+                    "Monaco",
+                    "MS Outlook",
+                    "MS Sans Serif",
+                    "MS Serif",
+                    "Tahoma",
+                    "Times",
+                    "Times New Roman",
+                    "Verdana",
+                  ], // font details. see https://github.com/fingerprintjs/fingerprintjs for implementation details
+                "d02f": "124.04347527516074" // audio fingerprint. see https://github.com/fingerprintjs/fingerprintjs for implementation details
             },
+            "54ef": '{"in_new_ab":true,"ab_version":{"waterfall_article":"SHOW"},"ab_split_num":{"waterfall_article":0}}', // abtest info, embedded in html
+            "8b94": "", // refer_url, document.referrer ? encodeURIComponent(document.referrer).substr(0, 1e3) : ""
+            "df35": (await BiliHandler.getLocalCookieItem(['_uuid'])).length === 0 ? (await BiliHandler.getTemCookieItem(['_uuid'])) :(await BiliHandler.getLocalCookieItem(['_uuid'])), // _uuid, set from cookie, generated by client side(algorithm remains unknown)
+            "07a4": "zh-CN", // language
+            "5f45": null, // laboratory, set from cookie, null if empty, source remains unknown
+            "db46": 0 // is_selfdef, default 0
         };
         const json_data = {
             payload: JSON.stringify(payloadData),
         };
-        let mergeCookie = { cookie: `${cookie}`, 'content-type': 'application/json', 'charset': 'UTF-8', }
+        let dataLength = String(json_data).length - 1;
+        let mergeCookie = { cookie: `${cookie}`, 'content-type': 'application/json', 'charset': 'UTF-8', 'Content-Length': `${dataLength}`, }
         const res = await fetch('https://api.bilibili.com/x/internal/gaia-gateway/ExClimbWuzhi', {
             method: 'POST',
             headers: lodash.merge(_headers, mergeCookie),
@@ -511,8 +674,9 @@ class BiliHandler {
             const buvid3_b_nut = await BiliHandler.get_buvid3_b_nut();
             const uuid = await BiliHandler.get_uuid();
             const buvid4 = await BiliHandler.get_buvid4();
+            const b_lsid = await  BiliHandler.get_b_lsid();
 
-            tempCk = `${buvid3_b_nut}${uuid}${buvid4}`
+            tempCk = `${buvid3_b_nut}${uuid}${buvid4}${b_lsid}`
 
             redis.set(ckKey, tempCk, { EX: 3600 * 24 * 30 });
             return tempCk;

@@ -199,7 +199,7 @@ export class bilibili extends plugin {
 
   /** B站ck帮助 */
   async BCkHelp() {
-    await this.reply(`★B站ck获取方法请查看仓库主页/找度娘叭~\n\n★如果出现总是推送失败以及失败后执行:\n#删除b站临时ck\n后仍失败的，\n\n请绑定自己的B站ck,\n务必包含以下字段的相等式内容： \n\nbuvid3 \nbuvid4 \n_uuid  \nb_nut \nDedeUserID\n\n★风险选项：\n推送总失败，权宜之计可考虑绑定cookie时添加/保留 \nSESSDATA=xxxxxx;\n该选项如果使用自己真实的SESSDATA有封号的可能性\n特别是群人数多/推送订阅多的慎用！！\n\n☆目前可用解决方法：\n把获取的真实\nSESSDATA=xxxxxx;\n保留相同长度随机修改其中的值\n例如SESSDATA=xxyt8490vnw00invsejfyyfsid;\n然后添加到要绑定的cookie后面\n或者替换要绑定的cookie里原有的SESSDATA即可。`)
+    await this.reply(`★B站动态功能必要配置详情看仓库主页叭~\n\n★摘要:\n1.运行bot的设备或局域网内的设备挂机登录账号的B站客户端\n2.修改配置文件bilibili.set.yaml增加动态监测间隔时长\n3. #删除b站临时ck，后仍失败的，\n\n尝试绑定自己的B站ck,\n务必包含以下字段的相等式内容： \n\nbuvid3 \nbuvid4 \n_uuid  \nb_nut \nDedeUserID\n\n★风险选项：\n绑定cookie时添加/保留 \nSESSDATA=xxxxxx;\n该选项如果使用自己真实的SESSDATA有封号的可能性\n特别是群人数多/推送订阅多的慎用！！`)
     return
   }
 
