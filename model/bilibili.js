@@ -26,7 +26,7 @@ const _headers = {
   'Sec-Fetch-Mode': 'navigate',
   'Sec-Fetch-Site': 'none',
   'Sec-Fetch-User': '?1',
-  'TE': 'TE: trailers',
+  'TE': 'trailers',
   "upgrade-insecure-requests": 1,
   'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1',
 }
