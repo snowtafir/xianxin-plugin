@@ -678,7 +678,7 @@ class BiliHandler {
 
             tempCk = `${buvid3_b_nut}${uuid}${buvid4}${b_lsid}`
 
-            redis.set(ckKey, tempCk, { EX: 3600 * 24 * 30 });
+            redis.set(ckKey, tempCk, { EX: 3600 * 24 * 360 });
             return tempCk;
         } else {
             return tempCk;

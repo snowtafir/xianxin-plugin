@@ -3,6 +3,7 @@ import xxCfg from "../model/xxCfg.js";
 import fs from "node:fs";
 import fetch from "node-fetch";
 import Bilibili from "../model/bilibili.js";
+import { BiliHandler } from "../model/biliHandler.js";
 import lodash from 'lodash'
 
 let bilibiliSetFile = "./plugins/trss-xianxin-plugin/config/bilibili.set.yaml";
@@ -88,10 +89,10 @@ export class bilibili extends plugin {
           fnc: 'delMyBCk'
         },
         {
-          reg: '^#*删除*(b|B)站临时(ck|CK|Ck|Ck|cookie)$',
+          reg: '^#*刷新*(b|B)站临时(ck|CK|Ck|Ck|cookie)$',
           event: 'message',
           permission: "master",
-          fnc: 'delTempBck'
+          fnc: 'reflashTempBck'
         },
       ],
     });
@@ -204,10 +205,15 @@ export class bilibili extends plugin {
   }
 
   /** 删除redis缓存的临时B站ck */
-  async delTempBck() {
+  async reflashTempBck() {
     let ckKey = "Yz:xianxin:bilibili:biliTempCookie";
     redis.set(ckKey, '', { EX: 3600 * 24 * 30 })
-    this.e.reply(`~当前xianxin-plugin自动获取的临时b站ck已删除~`);
+    let newTempCk = await BiliHandler.getTempCk();
+    if ((newTempCk !== null) && (newTempCk !== undefined) && (newTempCk.length !== 0) && (newTempCk !== '')) {
+      this.e.reply(`~trss-xianxin-plugin的临时b站ck刷新成功❤~`);
+    } else {
+      this.e.reply(`~trss-xianxin-plugin的临时b站ck刷新失败X﹏X`);
+    }
   }
 
   /** 添加b站推送 */
