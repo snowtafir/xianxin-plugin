@@ -9,10 +9,12 @@ import lodash from 'lodash'
 
 /**统一设定请求头 header */
 const _headers = {
-  'Referer': `https://www.bilibili.com/`,
-  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+  'Host': `api.bilibili.com`,
+  'Origin': 'https://space.bilibili.com',
+  'Accept': '*/*',
   'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
   'Accept-Encoding': 'gzip, deflate, br',
+  'Content-type': 'application/json;charset=UTF-8',
   cookie: '',
   pragma: "no-cache",
   "cache-control": "max-age=0",
@@ -22,10 +24,10 @@ const _headers = {
   'sec-ch-ua': '"Microsoft Edge";v="114", "Chromium";v="114", "Not-A.Brand";v="24"',
   'sec-ch-ua-platform': '',
   'sec-ch-ua-mobile':'?0',
-  'Sec-Fetch-Dest': 'document',
-  'Sec-Fetch-Mode': 'navigate',
-  'Sec-Fetch-Site': 'none',
-  'Sec-Fetch-User': '?1',
+  'Sec-Fetch-Dest': 'empty',
+  'Sec-Fetch-Mode': 'cors',
+  'Sec-Fetch-Site': 'same-site',
+  'Sec-Fetch-User': '?0',
   'TE': 'trailers',
   "upgrade-insecure-requests": 1,
   'user-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1',
@@ -102,13 +104,14 @@ export default class Bilibili extends base {
   async getBilibiliDynamicInfo(uid) {
     let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}`;
     let localCk = await BiliHandler.getLocalCookie();
-    let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}DedeUserID=${uid};` : localCk;
+    let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk; //DedeUserID=${uid};
 
     /**动态请求函数 */
     async function fetchDynamicInfo(url, addHeader) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
       const response = await fetch(url, {
         method: 'GET',
-        headers: lodash.merge(_headers, addHeader, { 'Host': `api.bilibili.com`, }),
+        headers: lodash.merge(_headers, addHeader, { 'Referer': `https://space.bilibili.com/${uid}/dynamic`,} ),
         redirect: 'follow',
         timeout: 15000, // 设置超时时间为 15 秒
       });
@@ -135,7 +138,7 @@ export default class Bilibili extends base {
       Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`);
 
       /**执行接口校验 */
-      const result = await BiliHandler.postExClimbWuzhiParam(cookie);
+      const result = await BiliHandler.postExClimbWuzhiParam(cookie, uid);
       const data = await result.json();
       const dataCode = data.code;
 
@@ -152,7 +155,7 @@ export default class Bilibili extends base {
 
         if (resDataCode !== 0) {
           /**接口校验成功，但是动态请求仍失败，使用 Mozilla/5.0*/
-          return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie, 'Host': `api.bilibili.com`, });
+          return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie, 'Referer': `https://space.bilibili.com/${uid}/dynamic`, });
         }
         if (resDataCode === 0) {
           return resData;

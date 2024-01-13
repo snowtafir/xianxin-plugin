@@ -267,6 +267,7 @@ class BiliWbi {
     // 获取最新的 img_key 和 sub_key
     static async getWbiKeys() {
         const url = 'https://api.bilibili.com/x/web-interface/nav';
+        await new Promise((resolve) => setTimeout(resolve, 0));
         const resp = await fetch(url);
         const json_content = await resp.json();
         const img_url = json_content.data.wbi_img.img_url;
@@ -402,9 +403,10 @@ class BiliHandler {
         }
     }
 
-    /**获取 buvid4 */
-    static async get_buvid4() {
+    /**获取 buvid3 buvid4 */
+    static async get_buvid3_buvid4() {
         const url = 'https://api.bilibili.com/x/frontend/finger/spi/';
+        await new Promise((resolve) => setTimeout(resolve, 0));
         const response = await fetch(url, {
             method: 'GET',
             headers: _headers,
@@ -412,17 +414,18 @@ class BiliHandler {
         })
         const data = await response.json();
         const buvid4 = data.data.b_4;
-        //const buvid3 = data.data.b_3;
+        const buvid3 = data.data.b_3;
         if (data.code == 0) {
-            return `buvid4=${buvid4};`;
+            return `buvid3=${buvid3};buvid4=${buvid4};`;
         } else {
             return ''
         }
     }
 
     /**获取 buvid3 b_nut*/
-    static async get_buvid3_b_nut() {
+    static async get_b_nut() {
         const url = 'https://space.bilibili.com/401742377/dynamic';
+        await new Promise((resolve) => setTimeout(resolve, 0));
         const response = await fetch(url, {
             method: 'GET',
             headers: _headers,
@@ -431,7 +434,7 @@ class BiliHandler {
 
         const setCookie = response.headers.get('set-cookie');
         if ((setCookie !== null) && (setCookie !== undefined) && (setCookie.length !== 0) && (setCookie !== '')) {
-            var keysToKeep = ['buvid3', 'b_nut'];
+            var keysToKeep = ['b_nut'];
             let map_key = String(setCookie)
                 .trim()
                 .match(/(\w+)=([^;|,]+)/g) /**使用正则表达式 /(\w+)=([^;]+);/g 来匹配形式为 a=b 的内容,使用 [^;|,]+ 来匹配值，其中 [^;|,] 表示除了 分号 , 以外的任意字符*/
@@ -499,7 +502,7 @@ class BiliHandler {
     }
 
     /**请求参数POST接口(ExClimbWuzhi)过校验*/
-    static async postExClimbWuzhiParam(cookie) {
+    static async postExClimbWuzhiParam(cookie, uid) {
         const payloadData = {
             "3064": 1, // ptype, mobile => 2, others => 1
             "5062": `${Date.now()}`, // timestamp
@@ -655,9 +658,10 @@ class BiliHandler {
         };
         let dataLength = String(json_data).length - 1;
         let mergeCookie = { cookie: `${cookie}`, 'content-type': 'application/json', 'charset': 'UTF-8', 'Content-Length': `${dataLength}`, }
+        await new Promise((resolve) => setTimeout(resolve, 0));
         const res = await fetch('https://api.bilibili.com/x/internal/gaia-gateway/ExClimbWuzhi', {
             method: 'POST',
-            headers: lodash.merge(_headers, mergeCookie),
+            headers: lodash.merge(_headers, mergeCookie, { 'Referer': `https://space.bilibili.com/${uid}/dynamic`,}),
             credentials: 'include',
             body: JSON.stringify(json_data),
         });
@@ -671,12 +675,12 @@ class BiliHandler {
         tempCk = await redis.get(ckKey);
 
         if ((tempCk == null) || (tempCk == undefined) || (tempCk.length == 0) || (tempCk == '')) {
-            const buvid3_b_nut = await BiliHandler.get_buvid3_b_nut();
+            const b_nut = await BiliHandler.get_b_nut();
             const uuid = await BiliHandler.get_uuid();
-            const buvid4 = await BiliHandler.get_buvid4();
+            const buvid3_buvid4 = await BiliHandler.get_buvid3_buvid4();
             const b_lsid = await  BiliHandler.get_b_lsid();
 
-            tempCk = `${buvid3_b_nut}${uuid}${buvid4}${b_lsid}`
+            tempCk = `${b_nut}${uuid}${buvid3_buvid4}${b_lsid}`
 
             redis.set(ckKey, tempCk, { EX: 3600 * 24 * 360 });
             return tempCk;
