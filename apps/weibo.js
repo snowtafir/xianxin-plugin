@@ -212,7 +212,7 @@ export class weibo extends plugin {
   async delPush() {
     let uid = this.e.msg
       .replace(
-        /#*(删除|取消|移除|去除)微博推送\s*(视频\\s*|图文\\s*|文章\\s*|转发\\s*)*/g,
+        /#*(删除|取消|移除|去除)微博推送\s*(视频\s*|图文\s*|文章\s*|转发\s*)*/g,
         ""
       )
       .trim();
