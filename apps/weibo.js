@@ -134,7 +134,7 @@ export class weibo extends plugin {
   async addPush() {
     let uid = this.e.msg
       .replace(
-        /#*(添加|订阅|新增|增加)微博推送\s*(视频\\s*|图文\\s*|文章\\s*|转发\\s*)*/g,
+        /#*(添加|订阅|新增|增加)微博推送\s*(视频\s*|图文\s*|文章\s*|转发\s*)*/g,
         ""
       )
       .trim();
