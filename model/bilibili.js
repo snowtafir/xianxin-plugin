@@ -23,7 +23,7 @@ const _headers = {
   'Sec-GPC': 1,
   'sec-ch-ua': '"Microsoft Edge";v="114", "Chromium";v="114", "Not-A.Brand";v="24"',
   'sec-ch-ua-platform': '',
-  'sec-ch-ua-mobile':'?0',
+  'sec-ch-ua-mobile': '?0',
   'Sec-Fetch-Dest': 'empty',
   'Sec-Fetch-Mode': 'cors',
   'Sec-Fetch-Site': 'same-site',
@@ -109,17 +109,21 @@ export default class Bilibili extends base {
     /**动态请求函数 */
     async function fetchDynamicInfo(url, addHeader) {
       await new Promise((resolve) => setTimeout(resolve, 0));
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: lodash.merge(_headers, addHeader, { 'Referer': `https://space.bilibili.com/${uid}/dynamic`,} ),
-        redirect: 'follow',
-        timeout: 15000, // 设置超时时间为 15 秒
-      });
-      if (!response.ok) {
-        Bot.logger?.mark(`trss-xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
-        return null;
-      } else {
-        return response.json();
+      try {
+        const response = await BiliHandler.fetchWithTimeout(url, {
+          method: 'GET',
+          headers: lodash.merge(_headers, addHeader, { 'Referer': `https://space.bilibili.com/${uid}/dynamic`, }),
+          redirect: 'follow',
+          timeout: 15000, // 设置超时时间为 15 秒
+        });
+        if (!response.ok) {
+          Bot.logger?.mark(`trss-xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
+          return null;
+        } else {
+          return response.json();
+        }
+      } catch (error) {
+        Bot.logger?.mark(`trss-xianxin插件：Dynamic Fetch error: ${error}`);
       }
     }
 
