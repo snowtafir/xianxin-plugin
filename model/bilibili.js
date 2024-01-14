@@ -106,8 +106,22 @@ export default class Bilibili extends base {
     let localCk = await BiliHandler.getLocalCookie();
     let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk; //DedeUserID=${uid};
 
+    let lastFetchTime = 0; // 上次调用的时间戳
+    const fetchInterval = 2000; // 轮询时间间隔，2秒
     /**动态请求函数 */
     async function fetchDynamicInfo(url, addHeader) {
+
+      const currentTime = Date.now();
+      const timeDiff = currentTime - lastFetchTime;
+
+      if (timeDiff < fetchInterval) {
+        // 如果距离上次调用的时间间隔小于单位时间间隔，等待剩余时间
+        const delay = fetchInterval - timeDiff;
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    
+      lastFetchTime = Date.now();
+      
       await new Promise((resolve) => setTimeout(resolve, 0));
       try {
         const response = await BiliHandler.fetchWithTimeout(url, {
