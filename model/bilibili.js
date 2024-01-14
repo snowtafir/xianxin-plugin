@@ -114,7 +114,7 @@ export default class Bilibili extends base {
           method: 'GET',
           headers: lodash.merge(_headers, addHeader, { 'Referer': `https://space.bilibili.com/${uid}/dynamic`, }),
           redirect: 'follow',
-          timeout: 15000, // 设置超时时间为 15 秒
+          timeout: 20000, // 设置超时时间为 15 秒
         });
         if (!response.ok) {
           Bot.logger?.mark(`trss-xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
@@ -123,7 +123,8 @@ export default class Bilibili extends base {
           return response.json();
         }
       } catch (error) {
-        Bot.logger?.mark(`trss-xianxin插件：Dynamic Fetch error: ${error}`);
+        Bot.logger?.mark(`trss-xianxin插件：Dynamic Fetch: ${error}`);
+        return null;
       }
     }
 
