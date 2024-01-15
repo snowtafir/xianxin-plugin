@@ -18,6 +18,11 @@ const header = {
     'upgrade-insecure-requests': '1',
     'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.72 Mobile Safari/537.36'
 };
+
+//动态获取函数变量
+let lastFetchTime = 0; // 上次调用的时间戳
+const fetchInterval = 5000; // 轮询时间间隔，2秒
+
 export default class Weibo extends base {
     constructor(e) {
         super(e);
@@ -54,6 +59,17 @@ export default class Weibo extends base {
         const params = { containerid: '107603' + target };
         const url = new URL('https://m.weibo.cn/api/container/getIndex');
         url.search = new URLSearchParams(params).toString();
+
+        const currentTime = Date.now();
+        const timeDiff = currentTime - lastFetchTime;
+  
+        if (timeDiff < fetchInterval) {
+          // 如果距离上次调用的时间间隔小于设定时间间隔，等待剩余时间
+          const delay = fetchInterval - timeDiff;
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      
+        lastFetchTime = Date.now();
 
         try {
             const response = await fetch(url, { method: 'GET', timeout: 15000 });

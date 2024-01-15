@@ -37,6 +37,10 @@ const _headers = {
 // Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1
 export { _headers }
 
+//动态获取函数变量
+let lastFetchTime = 0; // 上次调用的时间戳
+const fetchInterval = 2000; // 轮询时间间隔，2秒
+
 export default class Bilibili extends base {
   constructor(e) {
     super(e);
@@ -106,8 +110,6 @@ export default class Bilibili extends base {
     let localCk = await BiliHandler.getLocalCookie();
     let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk; //DedeUserID=${uid};
 
-    let lastFetchTime = 0; // 上次调用的时间戳
-    const fetchInterval = 2000; // 轮询时间间隔，2秒
     /**动态请求函数 */
     async function fetchDynamicInfo(url, addHeader) {
 
@@ -115,7 +117,7 @@ export default class Bilibili extends base {
       const timeDiff = currentTime - lastFetchTime;
 
       if (timeDiff < fetchInterval) {
-        // 如果距离上次调用的时间间隔小于单位时间间隔，等待剩余时间
+        // 如果距离上次调用的时间间隔小于设定时间间隔，等待剩余时间
         const delay = fetchInterval - timeDiff;
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
