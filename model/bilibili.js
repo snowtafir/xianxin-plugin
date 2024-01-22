@@ -9,8 +9,6 @@ import lodash from 'lodash'
 
 /**统一设定请求头 header */
 const _headers = {
-  'Host': `api.bilibili.com`,
-  'Origin': 'https://space.bilibili.com',
   'Accept': '*/*',
   'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
   'Accept-Encoding': 'gzip, deflate, br',
@@ -121,14 +119,18 @@ export default class Bilibili extends base {
         const delay = fetchInterval - timeDiff;
         await new Promise((resolve) => setTimeout(resolve, delay));
       }
-    
+
       lastFetchTime = Date.now();
-      
+
       await new Promise((resolve) => setTimeout(resolve, 0));
       try {
         const response = await BiliHandler.fetchWithTimeout(url, {
           method: 'GET',
-          headers: lodash.merge(_headers, addHeader, { 'Referer': `https://space.bilibili.com/${uid}/dynamic`, }),
+          headers: lodash.merge(_headers, addHeader, {
+            'Host': `api.bilibili.com`,
+            'Origin': 'https://www.bilibili.com',
+            'Referer': `https://www.bilibili.com/`,
+          }),
           redirect: 'follow',
           timeout: 20000, // 设置超时时间为 15 秒
         });

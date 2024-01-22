@@ -409,7 +409,11 @@ class BiliHandler {
         await new Promise((resolve) => setTimeout(resolve, 0));
         const response = await fetch(url, {
             method: 'GET',
-            headers: _headers,
+            headers: lodash.merge(_headers, {
+                'Host': `api.bilibili.com`,
+                'Origin': 'https://www.bilibili.com',
+                'Referer': `https://www.bilibili.com/`,
+            }),
             redirect: 'follow',
         })
         const data = await response.json();
@@ -424,11 +428,11 @@ class BiliHandler {
 
     /**获取 buvid3 b_nut*/
     static async get_b_nut() {
-        const url = 'https://space.bilibili.com/401742377/dynamic';
+        const url = 'https://www.bilibili.com/';
         await new Promise((resolve) => setTimeout(resolve, 0));
         const response = await fetch(url, {
             method: 'GET',
-            headers: _headers,
+            headers: lodash.merge(_headers, { 'Host': `www.bilibili.com`, }),
             redirect: 'follow',
         });
 
@@ -661,7 +665,11 @@ class BiliHandler {
         await new Promise((resolve) => setTimeout(resolve, 0));
         const res = await fetch('https://api.bilibili.com/x/internal/gaia-gateway/ExClimbWuzhi', {
             method: 'POST',
-            headers: lodash.merge(_headers, mergeCookie, { 'Referer': `https://space.bilibili.com/${uid}/dynamic`, }),
+            headers: lodash.merge(_headers, mergeCookie, {
+                'Host': `api.bilibili.com`,
+                'Origin': 'https://www.bilibili.com',
+                'Referer': `https://www.bilibili.com/`,
+            }),
             credentials: 'include',
             body: JSON.stringify(json_data),
         });
