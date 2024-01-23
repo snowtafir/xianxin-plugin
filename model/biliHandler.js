@@ -506,7 +506,7 @@ class BiliHandler {
     }
 
     /**请求参数POST接口(ExClimbWuzhi)过校验*/
-    static async postExClimbWuzhiParam(cookie, uid) {
+    static async postExClimbWuzhiParam(cookie) {
         const payloadData = {
             "3064": 1, // ptype, mobile => 2, others => 1
             "5062": `${Date.now()}`, // timestamp
@@ -690,7 +690,7 @@ class BiliHandler {
 
             tempCk = `${b_nut}${uuid}${buvid3_buvid4}${b_lsid}`
 
-            redis.set(ckKey, tempCk, { EX: 3600 * 24 * 360 });
+            redis.set(ckKey, tempCk, { EX: 3600 * 24 * 30 });
             return tempCk;
         } else {
             return tempCk;

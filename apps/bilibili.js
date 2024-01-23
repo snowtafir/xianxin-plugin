@@ -4,7 +4,8 @@ import fs from "node:fs";
 import fetch from "node-fetch";
 import Bilibili from "../model/bilibili.js";
 import { BiliHandler } from "../model/biliHandler.js";
-import lodash from 'lodash'
+import lodash from 'lodash';
+import { Restart } from "../../other/restart.js";
 
 let bilibiliSetFile = "./plugins/trss-xianxin-plugin/config/bilibili.set.yaml";
 if (!fs.existsSync(bilibiliSetFile)) {
@@ -204,15 +205,30 @@ export class bilibili extends plugin {
     return
   }
 
+  /**重启bot*/
+  restart() {
+    new Restart(this.e).restart();
+  }
+
   /** 删除redis缓存的临时B站ck */
   async reflashTempBck() {
     let ckKey = "Yz:xianxin:bilibili:biliTempCookie";
     redis.set(ckKey, '', { EX: 3600 * 24 * 30 })
     let newTempCk = await BiliHandler.getTempCk();
     if ((newTempCk !== null) && (newTempCk !== undefined) && (newTempCk.length !== 0) && (newTempCk !== '')) {
-      this.e.reply(`~trss-xianxin-plugin的临时b站ck刷新成功❤~`);
+
+      this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新成功~❤~\n约5秒后重启，等待重启刷新状态`);
+
+      let localCk = await BiliHandler.getLocalCookie();
+      let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk;
+
+      const result = await BiliHandler.postExClimbWuzhiParam(cookie);
+      const data = await result.json();
+      Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验info：${JSON.stringify(data)}`);
+
+      await new Promise(() => setTimeout(() => this.restart(), 5000));
     } else {
-      this.e.reply(`~trss-xianxin-plugin的临时b站ck刷新失败X﹏X`);
+      this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新失败X﹏X`);
     }
   }
 

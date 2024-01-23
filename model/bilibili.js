@@ -161,7 +161,7 @@ export default class Bilibili extends base {
       Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`);
 
       /**执行接口校验 */
-      const result = await BiliHandler.postExClimbWuzhiParam(cookie, uid);
+      const result = await BiliHandler.postExClimbWuzhiParam(cookie);
       const data = await result.json();
       const dataCode = data.code;
 
