@@ -307,6 +307,7 @@ export class bilibili extends plugin {
     }
 
     data[this.e.group_id].push({
+      e_self_id: this.e.self_id,
       uid,
       name: name,
       type: this.typeHandle(

@@ -62,13 +62,13 @@ export default class Weibo extends base {
 
         const currentTime = Date.now();
         const timeDiff = currentTime - lastFetchTime;
-  
+
         if (timeDiff < fetchInterval) {
-          // 如果距离上次调用的时间间隔小于设定时间间隔，等待剩余时间
-          const delay = fetchInterval - timeDiff;
-          await new Promise((resolve) => setTimeout(resolve, delay));
+            // 如果距离上次调用的时间间隔小于设定时间间隔，等待剩余时间
+            const delay = fetchInterval - timeDiff;
+            await new Promise((resolve) => setTimeout(resolve, delay));
         }
-      
+
         lastFetchTime = Date.now();
 
         try {
@@ -153,6 +153,7 @@ export default class Weibo extends base {
                             key,
                         ])
                     ),
+                    e_self_id: up.e_self_id || [],
                     upName: up.name,
                     type: up.type || [],
                 });
@@ -188,7 +189,7 @@ export default class Weibo extends base {
 
             const pushMapInfo = value || {};
 
-            const { groupIds, upName, type } = pushMapInfo;
+            const { groupIds, e_self_id, upName, type } = pushMapInfo;
 
             let willPushDynamicData = Array.from(willPushDynamicList, item => ({ ...item }));
             for (let i = 0; i < willPushDynamicData.length; i++) {
@@ -199,7 +200,7 @@ export default class Weibo extends base {
                             continue;
                         }
 
-                        await this.sendDynamic(groupId, upName, willPushDynamicData[i], setData);
+                        await this.sendDynamic(groupId, e_self_id, upName, willPushDynamicData[i], setData);
                     }
                 }
             }
@@ -207,13 +208,21 @@ export default class Weibo extends base {
         }
     }
 
-    async sendDynamic(groupId, upName, pushDynamicData, setData) {
+    async sendDynamic(groupId, e_self_id, upName, pushDynamicData, setData) {
         const id_str = pushDynamicData?.mblog?.mid || pushDynamicData?.mblog?.id;
 
         let sended = await redis.get(`${this.key}${groupId}:${id_str}`);
         if (sended) return;
 
-        this.e.group = Bot.pickGroup(String(groupId));
+        const yunzaiName = await xxCfg.getYunzaiName();
+        if (yunzaiName === 'miao-yunzai') {
+            let uin = e_self_id;
+            this.e.group = (Bot[uin] ?? Bot).pickGroup(String(groupId));
+        } else if (yunzaiName === 'trss-yunzai') {
+            this.e.group = Bot.pickGroup(String(groupId));
+        } else {
+            this.e.group = Bot.pickGroup(String(groupId));
+        }
 
         if (!!setData.pushMsgMode) {
             const data = await this.dynamicDataHandle(pushDynamicData);

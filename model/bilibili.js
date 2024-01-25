@@ -249,6 +249,7 @@ export default class Bilibili extends base {
               key,
             ])
           ),
+          e_self_id: up.e_self_id || [],
           upName: up.name,
           type: up.type || [],
         });
@@ -293,7 +294,7 @@ export default class Bilibili extends base {
 
       const pushMapInfo = value || {};
 
-      const { groupIds, upName, type } = pushMapInfo;
+      const { groupIds, e_self_id, upName, type } = pushMapInfo;
 
       // if (accInfoRes.ok) {
       //   const accInfoResJsonData = await accInfoRes.json();
@@ -332,7 +333,7 @@ export default class Bilibili extends base {
               continue;
             }
 
-            await this.sendDynamic(groupId, upName, pushDynamicData, setData);
+            await this.sendDynamic(groupId, e_self_id, upName, pushDynamicData, setData);
           }
         }
       }
@@ -352,13 +353,21 @@ export default class Bilibili extends base {
   //   return;
   // }
 
-  async sendDynamic(groupId, upName, pushDynamicData, setData) {
+  async sendDynamic(groupId, e_self_id, upName, pushDynamicData, setData) {
     const id_str = pushDynamicData.id_str;
 
     let sended = await redis.get(`${this.key}${groupId}:${id_str}`);
     if (sended) return;
 
-    this.e.group = Bot.pickGroup(String(groupId));
+    const yunzaiName = await xxCfg.getYunzaiName();
+    if (yunzaiName === 'miao-yunzai') {
+      let uin = e_self_id;
+      this.e.group = (Bot[uin] ?? Bot).pickGroup(String(groupId));
+    } else if (yunzaiName === 'trss-yunzai') {
+      this.e.group = Bot.pickGroup(String(groupId));
+    } else {
+      this.e.group = Bot.pickGroup(String(groupId));
+    }
 
     if (!!setData.pushMsgMode) {
       const data = this.dynamicDataHandle(pushDynamicData);

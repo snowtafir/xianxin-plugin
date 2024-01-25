@@ -131,6 +131,19 @@ class XsCfg {
       fs.writeFileSync(file, yaml, 'utf8')
     }
   }
+
+  /**获取Yunzai分支名*/
+  async getYunzaiName() {
+    let yunzaiName = null;
+    const readFileAsync = promisify(fs.readFile);
+    if (!yunzaiName) {
+      yunzaiName = await readFileAsync('./package.json')
+        .then(data => JSON.parse(data))
+        .then(pmcfg => pmcfg?.name || 'Yunzai-Bot')
+        .catch(() => 'Yunzai-Bot');
+    }
+    return yunzaiName;
+  }
 }
 
 export default new XsCfg();
