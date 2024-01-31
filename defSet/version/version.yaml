@@ -1,4 +1,11 @@
 - {
+    version: 2.0.4,
+    data:
+      [
+        B站功能添加扫码获取B站登录cookie，<span class="cmd">#扫码B站登录 </span>详细使用方法请查看 "#闲心帮助",
+      ],
+  }
+- {
     version: 2.0.3,
     data:
       [

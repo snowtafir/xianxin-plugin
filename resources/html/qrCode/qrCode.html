@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+    <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" type="text/css" href="{{pluResPath}}html/qrCode/qrCode.css" />
+</head>
+
+<body>
+    <div class="txt-0">
+        Created By trss-xianxin-plugin：扫码登录B站绑定cookie。
+    </div>
+    <div class="QrCode" style="margin: 10px auto;"></div>
+    <div class="txt-1">
+        免责声明：bot仅提供功能。<br />如果不良使用行为导致账号出问题的请自行承担后果。
+    </div>
+</body>
+<script type="text/javascript" src="{{pluResPath}}html/qrCode/js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="{{pluResPath}}html/qrCode/js/jquery.qrcode.min.js"></script>
+<script type="text/javascript">
+    let config = {
+        width: 500,//值是number类型, 表示的单位是px 必须传递
+        height: 500,//值是number类型, 表示的单位是px 必须传递
+        text: "{{data.url}}".replace(/#38;/g, ''),//text就表示二维码中存储的数据 必须传递
+        correctLevel: 0,//取值为0|1|2|3 表示二维码的纠错级别0:L/1:M/2:Q/3:H ,默认0 可选参数
+        render: "table"//取值:table/canvas , 默认table 可选参数
+    };
+    $(".QrCode").qrcode(config);
+</script>
+
+</html>

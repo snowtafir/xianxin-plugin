@@ -59,6 +59,12 @@
     - icon: 统计
       title: "#刷新B站临时ck"
       desc: "重新获取并刷新redis缓存的未绑定自己的B站ck而自动获取的 临时B站cookie"
+    - icon: 攻略
+      title: "#扫码B站登录"
+      desc: "app扫码获取登录ck"
+    - icon: 树脂
+      title: "#删除B站登陆"
+      desc: "删除已绑定的扫码登陆B站cookie，删除后将会自动启用临时ck"
     - icon: ledger
       title: "#B站ck帮助"
       desc: "查看B站ck帮助"

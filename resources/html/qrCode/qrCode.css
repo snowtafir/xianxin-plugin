@@ -1,0 +1,23 @@
+.container {
+    width: 600px !important;
+    font-size: 1.225rem;
+    /* 全局字体大小 */
+    background-color: rgb(243, 242, 241);
+    padding: 20px 0 10px 0 !important;
+}
+.QrCode table{
+    margin: 10px auto;
+}
+.txt-0{
+    text-align: center;
+    color: rgb(0, 123, 211);
+    margin-top: 10px;
+    padding: 0 10px;
+}
+.txt-1{
+    text-align: center;
+    color: red;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 0 10px;
+}

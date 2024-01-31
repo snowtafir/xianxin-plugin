@@ -67,6 +67,11 @@ export class bilibili extends plugin {
           event: "message.group",
         },
         {
+          reg: '^#扫码(B|b)站登录$',
+          fnc: "BiliLogin",
+          event: 'message'
+        },
+        {
           reg: "^#*绑定*(b|B)站(ck|CK|cK|Ck)*(:|：)*.*$",
           fnc: "bingBiliCk",
           permission: "master",
@@ -88,6 +93,12 @@ export class bilibili extends plugin {
           event: 'message',
           permission: "master",
           fnc: 'delMyBCk'
+        },
+        {
+          reg: '^#删除(b|B)站登录$',
+          event: 'message',
+          permission: "master",
+          fnc: 'delLoginBCk'
         },
         {
           reg: '^#*刷新*(b|B)站临时(ck|CK|Ck|Ck|cookie)$',
@@ -115,6 +126,33 @@ export class bilibili extends plugin {
     let bilibili = new Bilibili(this.e);
     await bilibili.upTask();
   }
+
+  /**B站扫码登陆获取登陆ck */
+  async BiliLogin() {
+    if (this.e.isMaster) {
+      try {
+        const token = await BiliHandler.applyQRCode(this.e);
+
+        const biliLoginCk = await BiliHandler.pollQRCode(this.e, token);
+
+        if ((biliLoginCk !== null) || (biliLoginCk !== undefined) || (biliLoginCk.length !== 0) || (biliLoginCk !== '')) {
+          const LoginCkKey = "Yz:xianxin:bilibili:biliLoginCookie";
+          redis.set(LoginCkKey, `${biliLoginCk}`, { EX: 3600 * 24 * 180 });
+        } else if (biliLoginCk === null) {
+          this.e.reply("扫码超时");
+        }
+      } catch (Error) {
+        Bot.logger?.info(`trss-xianxin-plugin Login bilibili Failed：${Error}`);
+      }
+    } else {
+      this.e.reply("未取得bot主人身份，无权限配置B站登录ck");
+    }
+  }
+
+  /**验证B站登录 
+    async checkLogin() {
+      await BiliHandler.checkLogin(this.e);
+    } */
 
   /** 绑定B站ck */
   async bingBiliCk() {
@@ -176,8 +214,15 @@ export class bilibili extends plugin {
   async delMyBCk() {
     let Bck = ''
     xxCfg.saveBiliCk(Bck)
-    await this.e.reply(`绑定的B站ck已删除`)
+    await this.e.reply(`手动绑定的B站ck已删除~`)
+  }
 
+  /** 删除登陆的B站ck */
+  async delLoginBCk() {
+    const LoginCkKey = "Yz:xianxin:bilibili:biliLoginCookie";
+    let loginCK = "";
+    redis.set(LoginCkKey, loginCK, { EX: 3600 * 24 * 180 });
+    this.e.reply(`二维码登陆B站的ck已删除~`);
   }
 
   /** 我的B站ck */
@@ -201,7 +246,7 @@ export class bilibili extends plugin {
 
   /** B站ck帮助 */
   async BCkHelp() {
-    await this.reply(`★B站动态功能必要配置详情看仓库主页叭~\n\n★摘要:\n1.运行bot的设备或局域网内的设备挂机登录账号的B站客户端\n2.修改配置文件bilibili.set.yaml增加动态监测间隔时长\n3. #删除b站临时ck，后仍失败的，\n\n尝试绑定自己的B站ck,\n务必包含以下字段的相等式内容： \n\nbuvid3 \nbuvid4 \n_uuid  \nb_nut \nDedeUserID\n\n★风险选项：\n绑定cookie时添加/保留 \nSESSDATA=xxxxxx;\n该选项如果使用自己真实的SESSDATA有封号的可能性\n特别是群人数多/推送订阅多的慎用！！`)
+    await this.reply(`★B站动态功能必要配置详情看仓库主页叭~\n\n★摘要:\n1.#刷新B站临时ck\n2.#扫码登录B站\n3.配置文件增加动态监测时长\n4.运行bot的设备或局域网内的设备挂机登录账号的B站客户端\n5.手动配置自定义ck：#绑定B站ck: xxx`)
     return
   }
 

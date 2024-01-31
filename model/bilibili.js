@@ -46,18 +46,10 @@ export default class Bilibili extends base {
   }
   async getBilibiliDetail(uid) {
     let url = `https://api.bilibili.com/x/relation/stat?vmid=${uid}`;
-    let localCk = await BiliHandler.getLocalCookie();
-    var miniBck = ''
-
-    if (!localCk || localCk.trim().length === 0) {
-      miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
-    } else {
-      miniBck = localCk
-    }
-    const cookie = { 'cookie': `${miniBck}`, }
+    let { cookie, mark } = await BiliHandler.synCookie();
     const response = await fetch(url, {
       method: "GET",
-      headers: lodash.merge(_headers, cookie),
+      headers: lodash.merge(_headers, { "cookie": `${cookie}` }),
       redirect: "follow",
     });
     return response;
@@ -66,18 +58,10 @@ export default class Bilibili extends base {
   async getBilibiliUserInfo(uid) {
     let wrid = await BiliWbi.wbi_Code();
     let url = `https://api.bilibili.com/x/space/wbi/acc/info?mid=${uid}${wrid}&jsonp=jsonp`;
-    let localCk = await BiliHandler.getLocalCookie();
-    var miniBck = ''
-
-    if (!localCk || localCk.trim().length === 0) {
-      miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
-    } else {
-      miniBck = localCk
-    }
-    const cookie = { 'cookie': `${miniBck}`, }
+    let { cookie, mark } = await BiliHandler.synCookie();
     const response = await fetch(url, {
       method: "GET",
-      headers: lodash.merge(_headers, cookie),
+      headers: lodash.merge(_headers, { "cookie": `${cookie}` }),
       redirect: "follow",
     });
     return response;
@@ -86,18 +70,10 @@ export default class Bilibili extends base {
   async getBilibiliUserInfoDetail(uid) {
     let wrid = await BiliWbi.wbi_Code();
     let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
-    let localCk = await BiliHandler.getLocalCookie();
-    var miniBck = ''
-
-    if (!localCk || localCk.trim().length === 0) {
-      miniBck = `${await BiliHandler.getTempCk()}DedeUserID=${uid};`
-    } else {
-      miniBck = localCk
-    }
-    const cookie = { 'cookie': `${miniBck}`, }
+    let { cookie, mark } = await BiliHandler.synCookie();
     const response = await fetch(url, {
       method: "GET",
-      headers: lodash.merge(_headers, cookie),
+      headers: lodash.merge(_headers, { "cookie": `${cookie}` }),
       redirect: "follow",
     });
     return response;
@@ -105,8 +81,7 @@ export default class Bilibili extends base {
 
   async getBilibiliDynamicInfo(uid) {
     let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}`;
-    let localCk = await BiliHandler.getLocalCookie();
-    let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk; //DedeUserID=${uid};
+    let { cookie, mark } = await BiliHandler.synCookie();
 
     /**动态请求函数 */
     async function fetchDynamicInfo(url, addHeader) {

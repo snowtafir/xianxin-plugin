@@ -3,6 +3,9 @@ import { _headers } from "./bilibili.js";
 import lodash from 'lodash';
 import fetch from "node-fetch";
 import md5 from 'md5';
+import puppeteer from "../../../lib/puppeteer/puppeteer.js";
+
+const _path = process.cwd().replace(/\\/g, "/");
 
 const PayloadReplaceCode = {
     abtest: "54ef",
@@ -697,6 +700,41 @@ class BiliHandler {
         }
     }
 
+    /**读取扫码登陆后缓存的cookie*/
+    static async getLoginCk() {
+        var tempCk = '';
+        var ckKey = "Yz:xianxin:bilibili:biliLoginCookie";
+        tempCk = await redis.get(ckKey);
+
+        if ((tempCk !== null) || (tempCk !== undefined) || (tempCk.length !== 0) || (tempCk !== '')) {
+            return tempCk;
+        } else {
+            return '';
+        }
+    }
+
+    /**综合ck */
+    static async synCookie() {
+        let localCk, tempCk, loginCk, mark, cookie;
+        localCk = await BiliHandler.getLocalCookie();
+        tempCk = await BiliHandler.getTempCk();
+        loginCk = await BiliHandler.getLoginCk();
+
+        if (localCk?.trim().length !== 0) {
+            mark = "localCk";
+            cookie = localCk;
+            return { cookie, mark };
+        } else if (loginCk?.trim().length !== 0) {
+            mark = "loginCk";
+            cookie = loginCk + ";";
+            return { cookie, mark };
+        } else {
+            mark = "tempCk";
+            cookie = tempCk;
+            return { cookie, mark };
+        }
+    }
+
     /**超时请求终止控制器*/
     static async fetchWithTimeout(url, options = {}) {
         const { timeout = 20000 } = options;  //默认20秒
@@ -710,6 +748,112 @@ class BiliHandler {
         clearTimeout(id);
         return response;
     }
+    /**登录header ******************************************************************/
+    static loginHeaders = {
+        'Accept': '*/*',
+        'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'DNT': 1,
+        'Sec-GPC': 1,
+        'Connection': 'keep-alive',
+        'Upgrade-Insecure-Requests': 1,
+        'Sec-Fetch-Dest': 'document',
+        'Sec-Fetch-Mode': 'navigate',
+        'Sec-Fetch-Site': 'none',
+        'Sec-Fetch-User': '?1',
+        'TE': 'trailers',
+    }
+    /**申请登陆二维码(web端) */
+    static async applyQRCode(e) {
+        const url = 'https://passport.bilibili.com/x/passport-login/web/qrcode/generate?source=main-fe-header'
+        const response = await fetch(url, {
+            method: "GET",
+            headers: lodash.merge(this.loginHeaders, { 'user-agent': _headers['user-agent'] }, { 'Host': 'passport.bilibili.com', }),
+            redirect: "follow",
+        });
+        const res = await response.json();
+
+        if (res.code === 0) {
+            const qrcodeKey = res.data.qrcode_key;
+            const qrcodeUrl = res.data.url;
+            let rendata = {
+                data: { url: `${qrcodeUrl}` },
+                pluResPath: _path + "/plugins/trss-xianxin-plugin/resources/",
+                tplFile: "./plugins/trss-xianxin-plugin/resources/html/qrCode/qrCode.html",
+                saveId: `qrCode`,
+            }
+            const qrCodeImage = await puppeteer.screenshot("html/qrCode", rendata, { e, scale: 1.4 });
+
+            let msg = [];
+            msg.push(qrCodeImage);
+            e.reply('请在3分钟内扫码以完成B站登陆绑定');
+            e.reply(msg);
+
+            return qrcodeKey;
+        } else {
+            throw new Error(`获取B站登录二维码失败: ${data.message}`);
+        }
+    }
+
+    /**处理扫码结果 */
+    static async pollQRCode(e, token) {
+        const url = `https://passport.bilibili.com/x/passport-login/web/qrcode/poll?qrcode_key=${token}&source=main-fe-header`;
+        const response = await fetch(url, {
+            method: "GET",
+            headers: lodash.merge(this.loginHeaders, { 'user-agent': _headers['user-agent'] }, { 'Host': 'passport.bilibili.com', }),
+            redirect: "follow",
+        });
+        const data = await response.json();
+
+        if (data.code === 0) {
+            if (data.data.code === 0) {
+                // 登录成功，获取 cookie
+                const LoginCookie = response.headers.get('set-cookie');
+                e.reply(`~B站登陆成功~`);
+                return LoginCookie;
+            } else if (data.data.code === 86101) {
+                // 未扫码
+                // 继续轮询
+                await new Promise((resolve) => setTimeout(resolve, 2000));
+                return this.pollQRCode(e, token);
+            } else if (data.data.code === 86090) {
+                // 已扫码未确认
+                // 继续轮询
+                await new Promise((resolve) => setTimeout(resolve, 2000))
+                return this.pollQRCode(e, token);
+            } else if (data.data.code === 86038) {
+                // 二维码已失效
+                e.reply('B站登陆二维码已失效');
+                return null;
+            } else {
+                throw new Error(`处理扫码结果出错: ${data?.data?.message}`);
+            }
+        } else {
+            throw new Error(`处理扫码结果出错: ${data?.message}`);
+        }
+    }
+
+/*     static async checkLogin(e) {
+        const LoginCookie = await BiliHandler.synCookie();
+        const res = await fetch("https://api.bilibili.com/x/web-interface/nav", {
+            method: "GET",
+            headers: lodash.merge(this.loginHeaders, { 'user-agent': _headers['user-agent'] }, { "cookie": `${LoginCookie}`, }),
+            redirect: "follow",
+        });
+        const resData = await res.json();
+        Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resData)}`);
+        if (resData.code === 0) {
+            let uname = resData.data?.uname;
+            let mid = resData.data?.mid;
+            let level_info = resData.data?.level_info;
+            let current_level = level_info?.current_level;
+            let current_exp = level_info?.current_exp;
+            let next_exp = level_info?.next_exp;
+            e.reply(`~B站账号已登陆~\n昵称：${uname}\nuid：${mid}\n经验等级：${current_level}\n当前经验值：|${current_exp} —>下等级所需经验<${next_exp}>`);
+        } else {
+            e.reply(`~当前B站账号未登陆~`);
+        }
+    } */
 }
 
 export { BiliHandler, BiliWbi } 
