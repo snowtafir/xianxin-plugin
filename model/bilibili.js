@@ -237,7 +237,7 @@ export default class Bilibili extends base {
 
     this.key = "Yz:xianxin:bilibili:upPush:";
 
-    //Bot.logger?.mark("xianxin插件：B站动态定时检测");
+    //Bot.logger?.mark("trss-xianxin插件：B站动态定时检测");
 
     for (let [key, value] of uidMap) {
       // const accInfoRes = await this.getBilibiliUserInfo(key);
@@ -372,7 +372,7 @@ export default class Bilibili extends base {
 
       redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
-      Bot.logger?.mark("xianxin插件：B站动态执行推送");
+      Bot.logger?.mark("trss-xianxin插件：B站动态执行推送");
 
       /*QQ频道午夜时间推送有限制，会报错code: 304022*/
       const images = Array.from(this[id_str].img, item => ({ ...item }));

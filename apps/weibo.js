@@ -77,7 +77,7 @@ export class weibo extends plugin {
     this.task = {
       cron: !!this.weiboSetData.pushStatus ?
         this.weiboSetData.pushTime : "",
-      name: "xianxin插件---微博推送定时任务",
+      name: "trss-xianxin插件---微博推送定时任务",
       fnc: () => this.newPushTask(),
       log: !!this.weiboSetData.pushTaskLog,
     };

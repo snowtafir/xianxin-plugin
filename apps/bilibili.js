@@ -116,7 +116,7 @@ export class bilibili extends plugin {
       cron: !!this.bilibiliSetData.pushStatus
         ? this.bilibiliSetData.pushTime
         : "",
-      name: "xianxin插件---B站推送定时任务",
+      name: "trss-xianxin插件---B站推送定时任务",
       fnc: () => this.newPushTask(),
       log: !!this.bilibiliSetData.pushTaskLog,
     };
@@ -258,22 +258,27 @@ export class bilibili extends plugin {
   /** 删除redis缓存的临时B站ck */
   async reflashTempBck() {
     let ckKey = "Yz:xianxin:bilibili:biliTempCookie";
-    redis.set(ckKey, '', { EX: 3600 * 24 * 30 })
-    let newTempCk = await BiliHandler.getTempCk();
-    if ((newTempCk !== null) && (newTempCk !== undefined) && (newTempCk.length !== 0) && (newTempCk !== '')) {
-
-      this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新成功~❤~\n约5秒后重启，等待重启刷新状态`);
-
-      let localCk = await BiliHandler.getLocalCookie();
-      let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk;
-
-      const result = await BiliHandler.postExClimbWuzhiParam(cookie);
-      const data = await result.json();
-      Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验info：${JSON.stringify(data)}`);
-
-      await new Promise(() => setTimeout(() => this.restart(), 5000));
-    } else {
-      this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新失败X﹏X`);
+    redis.set(ckKey, '', { EX: 3600 * 24 * 30 });
+    try {
+      let newTempCk = await BiliHandler.getTempCk();
+      if ((newTempCk !== null) && (newTempCk !== undefined) && (newTempCk.length !== 0) && (newTempCk !== '')) {
+  
+        this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新成功~❤~\n约5秒后重启，等待重启刷新状态`);
+  
+        let localCk = await BiliHandler.getLocalCookie();
+        let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk;
+  
+        const result = await BiliHandler.postExClimbWuzhiParam(cookie);
+        const data = await result.json();
+        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验info：${JSON.stringify(data)}`);
+  
+        await new Promise(() => setTimeout(() => this.restart(), 5000));
+      } else {
+        this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新失败X﹏X`);
+      }
+    } catch (error) {
+      this.e.reply(`~trss-xianxin-plugin:\n临时b站ck接口刷新失败X﹏X，请手动重启bot(#重启)后重试`);
+      Bot.logger?.mark(`trss-xianxin插件：B站临时ck刷新error：${error}`);
     }
   }
 

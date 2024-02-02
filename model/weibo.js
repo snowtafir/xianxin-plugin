@@ -252,7 +252,7 @@ export default class Weibo extends base {
 
             redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
-            Bot.logger?.mark("xianxin插件：微博动态执行推送");
+            Bot.logger?.mark("trss-xianxin插件：微博动态执行推送");
 
             /*QQ频道午夜时间推送有限制，会报错code: 304022*/
             const images = Array.from(this[id_str].img, item => ({ ...item }));
@@ -308,7 +308,7 @@ export default class Weibo extends base {
                     info = JSON.parse(full_json_text);
                 }
             } catch (err) {
-                Bot.logger?.mark(`xianxin插件：微博 detail message error(https://m.weibo.cn/detail/${info?.mid})`);
+                Bot.logger?.mark(`trss-xianxin插件：微博 detail message error(https://m.weibo.cn/detail/${info?.mid})`);
             }
         }
 
@@ -427,7 +427,7 @@ export default class Weibo extends base {
                     info = JSON.parse(full_json_text);
                 }
             } catch (err) {
-                Bot.logger?.mark(`xianxin插件：微博 detail message error(https://m.weibo.cn/detail/${info?.mid})`);
+                Bot.logger?.mark(`trss-xianxin插件：微博 detail message error(https://m.weibo.cn/detail/${info?.mid})`);
             }
         }
 
