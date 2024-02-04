@@ -69,7 +69,7 @@ export default class Bilibili extends base {
 
   async getBilibiliUserInfoDetail(uid) {
     let wrid = await BiliWbi.wbi_Code();
-    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}&${wrid}`;
+    let url = `https://api.obfs.dev/api/bilibili/v3/user_info?uid=${uid}`;
     let { cookie, mark } = await BiliHandler.synCookie();
     const response = await fetch(url, {
       method: "GET",
