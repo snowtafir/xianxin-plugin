@@ -497,7 +497,7 @@ export default class Bilibili extends base {
       dynamic.data.content = "";
       dynamic.data.pubTime = "";
       dynamic.data.pubTs = "";
-      dynamic.data.url = desc.link;
+      dynamic.data.url = `https:${desc.link}`;
       dynamic.data.pics = [desc.cover];
       dynamic.data.category = "直播动态";
     }
@@ -659,7 +659,7 @@ export default class Bilibili extends base {
           title,
           `-----------------------------\n`,
           `标题：${desc.title}\n`,
-          `链接：${desc.link}\n`,
+          `链接：https:${desc.link}\n`,
           segment.image(desc.cover),
         ];
 
