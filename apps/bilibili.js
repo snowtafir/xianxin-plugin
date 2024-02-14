@@ -231,15 +231,20 @@ export class bilibili extends plugin {
       await this.reply('请私聊查看叭')
       return
     } else {
-      const ck = await xxCfg.getBiliCk();
-      if (ck && ck.length == 0) {
-        this.e.reply(
-          `惹~当前尚未配置B站ck`
-        );
-      } else {
-        this.e.reply(
-          `芜湖~当前配置的B站ck为：${ck}`
-        );
+      let ck;
+      const { cookie, mark } = BiliHandler.synCookie;
+      if (mark === "localCk") {
+        ck = await xxCfg.getBiliCk();
+        this.e.reply(`当前使用自定义的B站cookie：`);
+        this.e.reply(`${ck}`);
+      } else if (mark === "loginCk") {
+        ck = cookie;
+        this.e.reply(`当前使用扫码登录的B站cookie：`);
+        this.e.reply(`${ck}`);
+      } else if (mark === "tempCk") {
+        ck = cookie;
+        this.e.reply(`当前使用临时B站cookie：`);
+        this.e.reply(`${ck}`);
       }
     }
   }
@@ -262,16 +267,16 @@ export class bilibili extends plugin {
     try {
       let newTempCk = await BiliHandler.getTempCk();
       if ((newTempCk !== null) && (newTempCk !== undefined) && (newTempCk.length !== 0) && (newTempCk !== '')) {
-  
+
         this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新成功~❤~\n约5秒后重启，等待重启刷新状态`);
-  
+
         let localCk = await BiliHandler.getLocalCookie();
         let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk;
-  
+
         const result = await BiliHandler.postExClimbWuzhiParam(cookie);
         const data = await result.json();
         Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验info：${JSON.stringify(data)}`);
-  
+
         await new Promise(() => setTimeout(() => this.restart(), 5000));
       } else {
         this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新失败X﹏X`);

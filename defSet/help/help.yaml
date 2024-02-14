@@ -52,7 +52,7 @@
       desc: "如果推送总失败，可配置使用自己的B站cookie,仅限私聊/私信"
     - icon: ledger
       title: "#我的B站ck"
-      desc: "查看配置的B站ck,仅限私聊"
+      desc: "查看当前启用的B站ck,仅限私聊"
     - icon: 树脂
       title: "#删除B站ck"
       desc: "删除已绑定的自己的B站cookie，删除后将会自动启用临时ck"
