@@ -232,7 +232,7 @@ export class bilibili extends plugin {
       return
     } else {
       let ck;
-      const { cookie, mark } = BiliHandler.synCookie;
+      const { cookie, mark } = await BiliHandler.synCookie();
       if (mark === "localCk") {
         ck = await xxCfg.getBiliCk();
         this.e.reply(`当前使用自定义的B站cookie：`);
