@@ -29,7 +29,7 @@ if (!fs.existsSync(mysterySetFile)) {
 }
 
 if (fs.existsSync(mysterySetFile) && fs.existsSync(toolsSetFile)) {
-  fs.unlink(toolsSetFile, () => {});
+  fs.unlink(toolsSetFile, () => { });
 }
 
 let urlTypeCache = {};
@@ -97,6 +97,11 @@ export class mystery extends plugin {
   }
 
   async woc() {
+
+    const statu = !!this.mysterySetData.status === false ? true : false;
+    if (statu) {
+      return "return";
+    }
     const isPrivate = this.e.isPrivate;
 
     if (!this.mysterySetData.isPrivate && isPrivate) {
@@ -121,7 +126,7 @@ export class mystery extends plugin {
       redis.set(key, "1", { EX: Number(this.mysterySetData.cd) });
     }
 
-    this.e.reply("触发探索未知的神秘空间，请稍等...");
+    this.e.reply("触发探索未知的神秘空间，请稍等...", undefined, { recallMsg: 60, });
     let images = [];
     const isDimtown = this.mysterySetData.wocUrl.indexOf("dimtown.com") !== -1;
 
@@ -146,14 +151,14 @@ export class mystery extends plugin {
       const index = idx ? idx % 10 : randomIndex % 10;
 
       if (!resJsonData.length) {
-        this.e.reply("额。没有探索到，换个姿势再来一次吧～");
+        this.e.reply("额。没有探索到，换个姿势再来一次吧～", undefined, { recallMsg: 60, });
         return "return";
       }
 
       const content = resJsonData[index].content;
 
       if (!content || !content.rendered) {
-        this.e.reply("额。没有探索到，换个姿势再来一次吧～");
+        this.e.reply("额。没有探索到，换个姿势再来一次吧～", undefined, { recallMsg: 60, });
         return "return";
       }
 
@@ -194,37 +199,64 @@ export class mystery extends plugin {
       this.mysterySetData.forwarder == "bot"
         ? { nickname: Bot.nickname, user_id: Bot.uin }
         : {
-            nickname: this.e.sender.card || this.e.user_id,
-            user_id: this.e.user_id,
-          };
+          nickname: this.e.sender.card || this.e.user_id,
+          user_id: this.e.user_id,
+        };
 
     if (images && images.length) {
-      let msgList = [];
+      let temp, msgList = [];
       for (let imageItem of images) {
-        const temp = isCcy
-          ? segment.image(imageItem, false, 10000, {
-              referer: "https://www.ccy.moe/",
-            })
-          : segment.image(imageItem);
+        /*const temp = isCcy
+                  ? segment.image(imageItem, false, 10000, {
+                      referer: "https://www.ccy.moe/",
+                    })
+                  : segment.image(imageItem); */
+        if (isCcy) {
+          const response = await fetch(imageItem, {
+            method: "GET",
+            headers: {
+              'Accept': '*/*',
+              'Accept-Language': 'zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2',
+              'Accept-Encoding': 'gzip, deflate, br',
+              'Content-type': 'application/json;charset=UTF-8',
+              "referer": "https://i.lls.moe/",
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36 Edg/108.0.1462.46',
+            },
+            redirect: "follow",
+          });
+          const buffer = await response.arrayBuffer();
+          const Data = Buffer.from(buffer);
+          temp = segment.image(Data);
+        } else if (!isCcy) {
+          temp = segment.image(imageItem);
+        }
         if (isPrivate) {
           await this.e.reply(temp, false, {
             recallMsg: this.mysterySetData.delMsg,
           });
           await common.sleep(600);
         } else {
-          msgList.push({
-            message: temp,
-            ...forwarder,
-          });
+          /*msgList.push({
+                      message: temp,
+                      ...forwarder,
+                    }); */
+          msgList.push(temp);
         }
       }
       if (isPrivate) {
         return;
       }
-      msgList = await this.e.group.makeForwardMsg(msgList);
-      const res = await this.e.reply(msgList, false, {
-        recallMsg: this.mysterySetData.delMsg,
-      });
+      /*msgList = await this.e.group.makeForwardMsg(msgList);
+            const res = await this.e.reply(msgList, false, {
+              recallMsg: this.mysterySetData.delMsg,
+            }); */
+      let res;
+      const imgs = Array.from(msgList, item => ({ ...item }));
+      for (let i = 0; i < imgs.length; i++) {
+        res = await this.e.reply(imgs[i], false, {
+          recallMsg: this.mysterySetData.delMsg,
+        });
+      }
       if (!res) {
         if (!res) {
           if (this.e.group && this.e.group.is_admin) {
@@ -235,22 +267,27 @@ export class mystery extends plugin {
               let duration = Math.floor(Math.random() * 600) + 1;
               this.e.group.muteMember(this.e.sender.user_id, duration);
               await this.e.reply(
-                `不用等了，你想要的已经被神秘的力量吞噬了～ 并随手将你禁锢${duration}秒`
+                `不用等了，你想要的已经被神秘的力量吞噬了～ 并随手将你禁锢${duration}秒`, undefined, { recallMsg: 60, }
               );
             } else {
-              this.reply("不用等了，你想要的已经被神秘的力量吞噬了～");
+              this.reply("不用等了，你想要的已经被神秘的力量吞噬了～", undefined, { recallMsg: 60, });
             }
           } else {
-            this.reply("不用等了，你想要的已经被神秘的力量吞噬了～");
+            this.reply("不用等了，你想要的已经被神秘的力量吞噬了～", undefined, { recallMsg: 60, });
           }
         }
       }
     } else {
-      this.reply("额。没有探索到，换个姿势再来一次吧～");
+      this.reply("额。没有探索到，换个姿势再来一次吧～", undefined, { recallMsg: 60, });
     }
   }
 
   async wocpro() {
+
+    const statu = !!this.mysterySetData.status === false ? true : false;
+    if (statu) {
+      return "return";
+    }
     const isPrivate = this.e.isPrivate;
 
     if (!this.mysterySetData.isPrivate && isPrivate && !this.e.isMaster) {
@@ -260,13 +297,13 @@ export class mystery extends plugin {
     let key = `Yz:wocpro:${this.e.group_id || this.e.user_id}`;
 
     if (await redis.get(key)) {
-      this.e.reply("探索中，请稍等...");
+      this.e.reply("探索中，请稍等...", undefined, { recallMsg: 60, });
       return;
     }
     // await fs.rmSync(`${this.path}${this.e.group_id}/temp.mp4`);
     redis.set(key, "1", { EX: 60 });
 
-    this.e.reply("触发探索更深层面的未知神秘空间，请稍等...");
+    this.e.reply("触发探索更深层面的未知神秘空间，请稍等...", undefined, { recallMsg: 60, });
 
     let url = this.mysterySetData.wocproUrl;
 
@@ -288,7 +325,7 @@ export class mystery extends plugin {
 
       redis.del(key);
       if (!res) {
-        this.e.reply("视频发送失败，可能被风控");
+        this.e.reply("视频发送失败，可能被风控", undefined, { recallMsg: 60, });
         return;
       }
       return;
@@ -297,7 +334,7 @@ export class mystery extends plugin {
     ) {
       const fetchData = await fetch(this.mysterySetData.wocproUrl);
       if (!fetchData.ok) {
-        this.e.reply("诶嘿，网络或者源接口出了点问题，等会再试试吧~");
+        this.e.reply("诶嘿，网络或者源接口出了点问题，等会再试试吧~", undefined, { recallMsg: 60, });
         return;
       }
       const resJsonData = await fetchData.json();
@@ -313,7 +350,7 @@ export class mystery extends plugin {
     } else if (url.indexOf("api.wuxixindong.top/api/xjj.php") !== -1) {
       const fetchData = await fetch(`${this.mysterySetData.wocproUrl}`);
       if (!fetchData.ok) {
-        this.e.reply("诶嘿，网络或者源接口出了点问题，等会再试试吧~");
+        this.e.reply("诶嘿，网络或者源接口出了点问题，等会再试试吧~", undefined, { recallMsg: 60, });
         return;
       }
       url = await fetchData.text();
@@ -420,7 +457,7 @@ export class mystery extends plugin {
 
     redis.set(key, "1", { EX: 60 });
 
-    this.e.reply("触发探索更深层面的未知神秘空间，请稍等...");
+    this.e.reply("触发探索更深层面的未知神秘空间，请稍等...", undefined, { recallMsg: 60, });
 
     let url = `https://xiaobai.klizi.cn/API/video/spzm.php?data=&msg=${keyword}&n=${index}`;
 
@@ -457,7 +494,7 @@ export class mystery extends plugin {
       redis.set(key, "1");
       this.e.reply(
         qq +
-          "已开启sp功能\n#sp  -- 随机p站图\n#sp 2  -- 随机2张p站图\n#sp 雷神 2  -- 雷神相关2张p站图\n#lsp 雷神 2  -- 雷神相关2张p站r18图"
+        "已开启sp功能\n#sp  -- 随机p站图\n#sp 2  -- 随机2张p站图\n#sp 雷神 2  -- 雷神相关2张p站图\n#lsp 雷神 2  -- 雷神相关2张p站r18图"
       );
     } else {
       redis.del(key);
@@ -500,11 +537,10 @@ export class mystery extends plugin {
         .replace(num, "")
         .trim() || "黑丝|白丝";
 
-    this.e.reply("触发探索未知的神秘空间，请稍等...");
+    this.e.reply("触发探索未知的神秘空间，请稍等...", undefined, { recallMsg: 60, });
 
     const fetchData = await fetch(
-      `https://api.lolicon.app/setu/v2?tag=${keyword}&proxy=sex.nyan.xyz&num=${num}&r18=${
-        this.e.msg.indexOf("lsp") !== -1 ? 1 : 0
+      `https://api.lolicon.app/setu/v2?tag=${keyword}&proxy=sex.nyan.xyz&num=${num}&r18=${this.e.msg.indexOf("lsp") !== -1 ? 1 : 0
       }`
     );
     const resJsonData = await fetchData.json();
@@ -515,9 +551,9 @@ export class mystery extends plugin {
       this.mysterySetData.forwarder == "bot"
         ? { nickname: Bot.nickname, user_id: Bot.uin }
         : {
-            nickname: this.e.sender.card || this.e.user_id,
-            user_id: this.e.user_id,
-          };
+          nickname: this.e.sender.card || this.e.user_id,
+          user_id: this.e.user_id,
+        };
 
     if (images && images.length) {
       let msgList = [];
@@ -553,18 +589,18 @@ export class mystery extends plugin {
               let duration = Math.floor(Math.random() * 600) + 1;
               this.e.group.muteMember(this.e.sender.user_id, duration);
               await this.e.reply(
-                `不用等了，你想要的已经被神秘的力量吞噬了～ 并随手将你禁锢${duration}秒`
+                `不用等了，你想要的已经被神秘的力量吞噬了～ 并随手将你禁锢${duration}秒`, undefined, { recallMsg: 60, }
               );
             } else {
-              this.reply("不用等了，你想要的已经被神秘的力量吞噬了～");
+              this.reply("不用等了，你想要的已经被神秘的力量吞噬了～", undefined, { recallMsg: 60, });
             }
           } else {
-            this.reply("不用等了，你想要的已经被神秘的力量吞噬了～");
+            this.reply("不用等了，你想要的已经被神秘的力量吞噬了～", undefined, { recallMsg: 60, });
           }
         }
       }
     } else {
-      this.reply("额。没有探索到，换个姿势再来一次吧～");
+      this.reply("额。没有探索到，换个姿势再来一次吧～", undefined, { recallMsg: 60, });
     }
   }
 
