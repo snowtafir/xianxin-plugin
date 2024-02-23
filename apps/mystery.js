@@ -236,27 +236,27 @@ export class mystery extends plugin {
           });
           await common.sleep(600);
         } else {
-          /*msgList.push({
-                      message: temp,
-                      ...forwarder,
-                    }); */
-          msgList.push(temp);
+          msgList.push({
+            message: temp,
+            ...forwarder,
+          });
+          //msgList.push(temp);
         }
       }
       if (isPrivate) {
         return;
       }
-      /*msgList = await this.e.group.makeForwardMsg(msgList);
-            const res = await this.e.reply(msgList, false, {
-              recallMsg: this.mysterySetData.delMsg,
-            }); */
-      let res;
-      const imgs = Array.from(msgList, item => ({ ...item }));
-      for (let i = 0; i < imgs.length; i++) {
-        res = await this.e.reply(imgs[i], false, {
-          recallMsg: this.mysterySetData.delMsg,
-        });
-      }
+      msgList = await this.e.group.makeForwardMsg(msgList);
+      const res = await this.e.reply(msgList, false, {
+        recallMsg: this.mysterySetData.delMsg,
+      });
+      //let res;
+      //const imgs = Array.from(msgList, item => ({ ...item }));
+      //for (let i = 0; i < imgs.length; i++) {
+      //  res = await this.e.reply(imgs[i], false, {
+      //    recallMsg: this.mysterySetData.delMsg,
+      //  });
+      //}
       if (!res) {
         if (!res) {
           if (this.e.group && this.e.group.is_admin) {
