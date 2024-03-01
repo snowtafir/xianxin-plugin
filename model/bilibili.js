@@ -335,14 +335,6 @@ export default class Bilibili extends base {
     if (sended) return;
 
     const yunzaiName = await xxCfg.getYunzaiName();
-    if (yunzaiName === 'miao-yunzai') {
-      let uin = e_self_id;
-      this.e.group = (Bot[uin] ?? Bot).pickGroup(String(groupId));
-    } else if (yunzaiName === 'trss-yunzai') {
-      this.e.group = Bot.pickGroup(String(groupId));
-    } else {
-      this.e.group = Bot.pickGroup(String(groupId));
-    }
 
     if (!!setData.pushMsgMode) {
       const data = this.dynamicDataHandle(pushDynamicData);
@@ -377,11 +369,23 @@ export default class Bilibili extends base {
       /*QQ频道午夜时间推送有限制，会报错code: 304022*/
       const images = Array.from(this[id_str].img, item => ({ ...item }));
       for (let i = 0; i < images.length; i++) {
-        await this.e.group
-          .sendMsg(images[i])
-          .catch((err) => {
-            Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-          });
+        if (yunzaiName === 'miao-yunzai') {
+          let uin = e_self_id;
+          await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(images[i])
+            .catch((err) => {
+              Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+            });
+        } else if (yunzaiName === 'trss-yunzai') {
+          await Bot.pickGroup(String(groupId)).sendMsg(images[i])
+            .catch((err) => {
+              Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+            });
+        } else {
+          await Bot.pickGroup(String(groupId)).sendMsg(images[i])
+            .catch((err) => {
+              Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+            });
+        }
       }
       await common.sleep(1000);
     } else {

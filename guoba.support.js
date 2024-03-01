@@ -166,6 +166,19 @@ export function supportGuoba() {
           },
         },
         {
+          field: "mystery.status",
+          label: "woc是否启用",
+          bottomHelpMessage: "woc启用开关",
+          component: "Select",
+          componentProps: {
+            options: [
+              { label: "开启", value: 1 },
+              { label: "关闭", value: 0 },
+            ],
+            placeholder: "请选择设置woc是否开启",
+          },
+        },
+        {
           field: "mystery.forwarder",
           label: "转发谁的消息",
           bottomHelpMessage: "转发的消息中 谁发的消息",
