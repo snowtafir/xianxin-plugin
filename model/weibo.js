@@ -287,9 +287,23 @@ export default class Weibo extends base {
             if (new RegExp(banWords).test(dynamicMsg.join(""))) {
                 return "return";
             }
-            await this.e.group.sendMsg(dynamicMsg).catch((err) => {
-                Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-            });
+            if (yunzaiName === 'miao-yunzai') {
+                let uin = e_self_id;
+                await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(dynamicMsg)
+                    .catch((err) => {
+                        Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+                    });
+            } else if (yunzaiName === 'trss-yunzai') {
+                await Bot.pickGroup(String(groupId)).sendMsg(dynamicMsg)
+                    .catch((err) => {
+                        Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+                    });
+            } else {
+                await Bot.pickGroup(String(groupId)).sendMsg(dynamicMsg)
+                    .catch((err) => {
+                        Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+                    });
+            }
             await common.sleep(1000);
         }
     }
