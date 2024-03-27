@@ -2,7 +2,7 @@
 pushStatus: 1
 
 # 检测b站推送定时任务，Cron表达式，作用域共6位，具体方法浏览器搜索 “node-schedule cron表达式”
-pushTime: "0 5,35,51 * * * *"
+pushTime: "*/23  * * * *"
 
 # 是否推送转发的动态 1 - 推送 0 - 不推送
 pushTransmit: 1

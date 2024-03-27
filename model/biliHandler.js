@@ -353,7 +353,7 @@ class BiliHandler {
         let permanentCookie = await xxCfg.getBiliCk();
         let Bck = lodash.trim(permanentCookie);
         if ((Bck !== null) && (Bck !== undefined) && (Bck.length !== 0) && (Bck !== '')) {
-            var keysToKeep = ['buvid3', 'buvid4', '_uuid', 'DedeUserID', 'b_nut', 'b_lsid', 'bili_jct', 'SESSDATA'];
+            var keysToKeep = ['buvid3', 'buvid4', '_uuid', 'SESSDATA', 'DedeUserID', 'DedeUserID__ckMd5', 'bili_jct', 'b_nut', 'b_lsid'];
             var localCk = String(Bck)
                 .trim()
                 .match(/(\w+)=([^;|,]+)/g) /**使用正则表达式 /(\w+)=([^;]+);/g 来匹配形式为 a=b 的内容,使用 [^;|,]+ 来匹配值，其中 [^;|,] 表示除了分号和,以外的任意字符*/
