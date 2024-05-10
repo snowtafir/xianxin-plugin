@@ -199,8 +199,8 @@ export default class Weibo extends base {
                         if (type && type.length && !type.includes(this.get_category(willPushDynamicData[i]))) {
                             continue;
                         }
-
                         await this.sendDynamic(groupId, e_self_id, upName, willPushDynamicData[i], setData);
+                        await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (10500 - 2000 + 1) + 2000)));
                     }
                 }
             }
@@ -266,6 +266,7 @@ export default class Weibo extends base {
                             Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
                         });
                 }
+                await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 2000)));
             }
             await common.sleep(1000);
         } else {

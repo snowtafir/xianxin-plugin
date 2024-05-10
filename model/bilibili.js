@@ -307,8 +307,8 @@ export default class Bilibili extends base {
             if (type && type.length && !type.includes(pushDynamicData.type)) {
               continue;
             }
-
             await this.sendDynamic(groupId, e_self_id, upName, pushDynamicData, setData);
+            await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (10500 - 2000 + 1) + 2000)));
           }
         }
       }
@@ -386,6 +386,7 @@ export default class Bilibili extends base {
               Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
             });
         }
+        await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 2000)));
       }
       await common.sleep(1000);
     } else {
