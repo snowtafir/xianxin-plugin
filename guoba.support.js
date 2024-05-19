@@ -10,8 +10,14 @@ export function supportGuoba() {
     pluginInfo: {
       name: "trss-xianxin-plugin",
       title: "trss-xianxin-plugin",
-      author: "@闲心 @snowtafir/珊星雪",
-      authorLink: "https://gitee.com/snowtafir",
+      author: [
+        '@闲心',
+        '@snowtafir',
+      ],
+      authorLink: [
+        'https://gitee.com/xianxincoder',
+        'https://gitee.com/snowtafir',
+      ],
       link: "https://gitee.com/snowtafir/xianxin-plugin.git",
       isV3: true,
       isV2: false,
@@ -27,12 +33,17 @@ export function supportGuoba() {
     // 配置项信息
     configInfo: {
       // 配置项 schemas
-      schemas: [
+      // 功能配置项
+      schemas: [{
+          component: 'Divider',
+          label: 'B站推送设置'
+        },
         {
           field: "bilibili.pushStatus",
           label: "B站推送状态",
           bottomHelpMessage: "B站推送任务状态",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "不推送", value: 0 },
@@ -44,8 +55,9 @@ export function supportGuoba() {
         {
           field: "bilibili.pushTime",
           label: "B站定时任务",
-          bottomHelpMessage: "检测b站推送定时任务，Cron表达式",
+          bottomHelpMessage: "检测b站推送定时任务，Cron表达式，作用域共6位，具体方法浏览器搜索 “node-schedule cron表达式",
           component: "Input",
+          required: true,
           componentProps: {
             placeholder: "请输入检测b站推送定时任务",
           },
@@ -55,6 +67,7 @@ export function supportGuoba() {
           label: "推送转发动态",
           bottomHelpMessage: "推送转发动态设置",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "不推送", value: 0 },
@@ -68,6 +81,7 @@ export function supportGuoba() {
           label: "B站推送消息模式",
           bottomHelpMessage: "设置B站动态推送消息模式",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "文字模式", value: 0 },
@@ -90,10 +104,15 @@ export function supportGuoba() {
           },
         },
         {
+          component: 'Divider',
+          label: '微博推送设置'
+        },
+        {
           field: "weibo.pushStatus",
           label: "微博推送状态",
           bottomHelpMessage: "微博推送任务状态",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "不推送", value: 0 },
@@ -105,8 +124,9 @@ export function supportGuoba() {
         {
           field: "weibo.pushTime",
           label: "微博定时任务",
-          bottomHelpMessage: "检测微博推送定时任务，Cron表达式",
+          bottomHelpMessage: "检测微博推送定时任务，Cron表达式，作用域共6位，具体方法浏览器搜索 “node-schedule cron表达式",
           component: "Input",
+          required: true,
           componentProps: {
             placeholder: "请输入检测微博推送定时任务",
           },
@@ -116,6 +136,7 @@ export function supportGuoba() {
           label: "推送转发动态",
           bottomHelpMessage: "推送转发动态设置",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "不推送", value: 0 },
@@ -129,6 +150,7 @@ export function supportGuoba() {
           label: "微博推送消息模式",
           bottomHelpMessage: "设置微博动态推送消息模式",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "文字模式", value: 0 },
@@ -142,6 +164,7 @@ export function supportGuoba() {
           label: "微博推送分片截图模式",
           bottomHelpMessage: "设置微博动态推分片截图模式，仅分片截图模式下才会推送全部长动态，默认开启",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "关闭分片截图", value: 0 },
@@ -149,6 +172,10 @@ export function supportGuoba() {
             ],
             placeholder: "请选择是否开启微博动态分片截图模式",
           },
+        },
+        {
+          component: 'Divider',
+          label: '神秘指令设置'
         },
         {
           field: "mystery.permission",
@@ -223,10 +250,15 @@ export function supportGuoba() {
           },
         },
         {
+          component: 'Divider',
+          label: '米游社功能设置'
+        },
+        {
           field: "mys.wikiMode",
           label: "wiki消息模式",
           bottomHelpMessage: "设置wiki消息模式",
           component: "Select",
+          required: true,
           componentProps: {
             options: [
               { label: "图片模式", value: 0 },
@@ -248,6 +280,10 @@ export function supportGuoba() {
             ],
             placeholder: "设置攻略消息模式",
           },
+        },
+        {
+          component: 'Divider',
+          label: '群战设置'
         },
         {
           field: "game.limitTimes",
@@ -272,91 +308,46 @@ export function supportGuoba() {
           },
         },
       ],
-      // 获取配置数据方法（用于前端填充显示数据）
-      getConfigData() {
-        const bilibiliSetData = {
-          bilibili: xxCfg.getConfig("bilibili", "set"),
-        };
-        const weiboSetData = {
-          weibo: xxCfg.getConfig("weibo", "set"),
-        };
-        const gameSetData = {
-          game: xxCfg.getConfig("game", "set"),
-        };
-        const mysSetData = {
-          mys: xxCfg.getConfig("mys", "set"),
-        };
-        const mysterySetData = {
-          mystery: xxCfg.getConfig("mystery", "set"),
-        };
+    // 获取配置数据方法（用于前端填充显示数据）
+    getConfigData() {
+      const models = ["bilibili", "weibo", "game", "mys", "mystery"]; //要配置cofig的功能
+      const data = {};
+      for (let model of models) {
+        data[model] = xxCfg.getConfig(model, "set");
+      }
+      return data;
+    },
 
-        return {
-          ...bilibiliSetData,
-          ...weiboSetData,
-          ...gameSetData,
-          ...mysSetData,
-          ...mysterySetData,
-        };
-      },
-      // 设置配置的方法（前端点确定后调用的方法）
-      setConfigData(data, { Result }) {
-        const bilibiliSetData = xxCfg.getConfig("bilibili", "set");
-        const weiboSetData = xxCfg.getConfig("weibo", "set");
-        const gameSetData = xxCfg.getConfig("game", "set");
-        const mysSetData = xxCfg.getConfig("mys", "set");
-        const mysterySetData = xxCfg.getConfig("mystery", "set");
+    // 设置配置的方法（前端点确定后调用的方法）
+    setConfigData(data, { Result }) {
+      const models = ["bilibili", "weibo", "game", "mys", "mystery"]; //要配置cofig的功能
+      const mergedData = {};
+      for (let model of models) {
+        mergedData[model] = xxCfg.getConfig(model, "set");
+      }
 
-        const mergedData = {
-          ...bilibiliSetData,
-          ...weiboSetData,
-          ...gameSetData,
-          ...mysSetData,
-          ...mysterySetData,
-        };
-
-        const setedData = { bilibili: {}, weibo: {}, game: {}, mys: {}, mystery: {} };
-
-        for (let key in mergedData) {
-          if (typeof data[`bilibili.${key}`] != "undefined") {
-            setedData.bilibili[key] = data[`bilibili.${key}`];
-          }
-          if (typeof data[`weibo.${key}`] != "undefined") {
-            setedData.weibo[key] = data[`weibo.${key}`];
-          }
-          if (typeof data[`game.${key}`] != "undefined") {
-            setedData.game[key] = data[`game.${key}`];
-          }
-          if (typeof data[`mys.${key}`] != "undefined") {
-            setedData.mys[key] = data[`mys.${key}`];
-          }
-          if (typeof data[`mystery.${key}`] != "undefined") {
-            setedData.mystery[key] = data[`mystery.${key}`];
+      const setedData = {};
+      for (let model of models) {
+        setedData[model] = {};
+      }
+      
+      //保留未设定值的配置项
+      for (let model of models) {
+        for (let key in mergedData[model]) {
+          if (typeof data[`${model}.${key}`] != "undefined") {
+            setedData[model][key] = data[`${model}.${key}`];
+          } else {
+            setedData[model][key] = mergedData[model][key];
           }
         }
-
-        xxCfg.saveSet("bilibili", "set", "config", {
-          ...bilibiliSetData,
-          ...setedData.bilibili,
+      }
+      //保存配置
+      for (let model of models) {
+        xxCfg.saveSet(model, "set", "config", {
+          ...mergedData[model],
+          ...setedData[model],
         });
-
-        xxCfg.saveSet("weibo", "set", "config", {
-          ...weiboSetData,
-          ...setedData.weibo,
-        });
-
-        xxCfg.saveSet("game", "set", "config", {
-          ...gameSetData,
-          ...setedData.game,
-        });
-
-        xxCfg.saveSet("mys", "set", "config", {
-          ...mysSetData,
-          ...setedData.mys,
-        });
-        xxCfg.saveSet("mystery", "set", "config", {
-          ...mysterySetData,
-          ...setedData.mystery,
-        });
+      }
         return Result.ok({}, "保存成功~");
       },
     },
