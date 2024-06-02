@@ -15,18 +15,12 @@ async function getPuppeteer() {
   }
 
   if (yunzaiName === 'miao-yunzai' || yunzaiName === 'trss-yunzai') {
-    if (!puppeteerRendererClass) {
-      const module = await import('../../../renderers/puppeteer/lib/puppeteer.js');
-      puppeteerRendererClass = module.default;
-    }
-    if (!puppeteerInst) {
-      puppeteerInst = new puppeteerRendererClass(getYunzaiRendererCfg());
-    }
+    puppeteerRendererClass = puppeteerRendererClass || (await import('../../../renderers/puppeteer/lib/puppeteer.js')).default;
+    puppeteerInst = puppeteerInst || new puppeteerRendererClass(getYunzaiRendererCfg());
     return puppeteerInst;
   }
 
-  return import('../../../lib/puppeteer/puppeteer.js')
-    .then(module => module.default);
+  return (await import('../../../lib/puppeteer/puppeteer.js')).default;
 }
 
 function getYunzaiRendererCfg() {
