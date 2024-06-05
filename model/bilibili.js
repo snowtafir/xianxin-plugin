@@ -37,7 +37,7 @@ export { _headers }
 
 //动态获取函数变量
 let lastFetchTime = 0; // 上次调用的时间戳
-const fetchInterval = 2000; // 轮询时间间隔，2秒
+const fetchInterval = Math.floor(Math.random() * (6000 - 2000 + 1) + 2000); // 轮询时间间隔，2-6秒
 
 export default class Bilibili extends base {
   constructor(e) {
@@ -230,6 +230,7 @@ export default class Bilibili extends base {
         });
 
         await common.sleep(2000);
+        await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (4000 - 1000 + 1) + 1000)));
       }
     }
 
