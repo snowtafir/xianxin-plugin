@@ -663,8 +663,8 @@ class BiliHandler {
         const json_data = {
             payload: JSON.stringify(payloadData),
         };
-        let dataLength = String(json_data).length - 1;
-        let mergeCookie = { cookie: `${cookie}`, 'content-type': 'application/json', 'charset': 'UTF-8', 'Content-Length': `${dataLength}`, }
+        let dataLength = Buffer.byteLength(JSON.stringify(json_data));
+        let mergeCookie = { cookie: `${cookie}`, 'content-type': 'application/json', 'charset': 'UTF-8', 'Content-Length': `${dataLength}` }
         await new Promise((resolve) => setTimeout(resolve, 0));
         const res = await fetch('https://api.bilibili.com/x/internal/gaia-gateway/ExClimbWuzhi', {
             method: 'POST',
@@ -681,8 +681,66 @@ class BiliHandler {
 
     /**获取临时cookie*/
     static async getTempCk() {
-        var tempCk = '';
-        var ckKey = "Yz:xianxin:bilibili:biliTempCookie";
+        let tempCk = '';
+        const ckKey = "Yz:xianxin:bilibili:biliTempCookie";
+        const TempCkStatuKey = "Yz:xianxin:bilibili:biliTempCkStatu";
+        tempCk = await redis.get(ckKey);
+
+        let setData = xxCfg.getConfig("bilibili", "set");
+
+        /**是否开启自动刷新tempCk，默认关闭*/
+        let flashTempCkAutoReboot = !!setData.flashTempCkAutoReboot === true ? true : false;
+
+        /**是否开启tempCK风控报错自动重启，默认开启*/
+        let tempCkflashErrReboot = !!setData.tempCkflashErrReboot === false ? false : true;
+
+        if ((tempCk == null) || (tempCk == undefined) || (tempCk.length == 0) || (tempCk == '')) {
+
+            try {
+                const b_nut = await BiliHandler.get_b_nut();
+                const uuid = await BiliHandler.get_uuid();
+                const buvid3_buvid4 = await BiliHandler.get_buvid3_buvid4();
+                const b_lsid = await BiliHandler.get_b_lsid();
+
+                tempCk = `${b_nut}${uuid}${buvid3_buvid4}${b_lsid}`
+
+                await redis.set(ckKey, tempCk, { EX: 3600 * 24 * 30 });
+                await redis.set(TempCkStatuKey, 1, { EX: 3600 * 24 * 2 });
+
+                if (flashTempCkAutoReboot == true) {
+                    Bot.logger?.mark(`trss-xianxin插件：刷新tempCK：已开启自动重启，5秒后在执行重启...`);
+                    await new Promise((resolve) => setTimeout(resolve, 5000));
+                    await new Promise(() => setTimeout(() => this.restart(), 5000));
+                }
+            } catch (error) {
+                Bot.logger?.mark(`trss-xianxin插件：刷新tempCK：${error}`);
+
+                if (tempCkflashErrReboot == true) {
+                    Bot.logger?.mark(`trss-xianxin插件：刷新tempCK：已开启报错自动重启，5秒后在执行重启...`);
+                    await new Promise((resolve) => setTimeout(resolve, 5000));
+                    await new Promise(() => setTimeout(() => this.restart(), 5000));
+                }
+            }
+            return tempCk;
+        } else {
+            return tempCk;
+        }
+    }
+
+    /**重启bot*/
+    static async restart() {
+        if (process.env.app_type === "pm2") {
+            const ret = await Bot.exec("pnpm run restart");
+            if (!ret.error) process.exit();
+            Bot.makeLog("error", ["重启错误", ret]);
+        } else process.exit()
+    }
+
+    /**刷新临时cookie*/
+    static async flashTempCk() {
+        let tempCk = '';
+        const ckKey = "Yz:xianxin:bilibili:biliTempCookie";
+        const TempCkStatuKey = "Yz:xianxin:bilibili:biliTempCkStatu";
         tempCk = await redis.get(ckKey);
 
         if ((tempCk == null) || (tempCk == undefined) || (tempCk.length == 0) || (tempCk == '')) {
@@ -693,7 +751,9 @@ class BiliHandler {
 
             tempCk = `${b_nut}${uuid}${buvid3_buvid4}${b_lsid}`
 
-            redis.set(ckKey, tempCk, { EX: 3600 * 24 * 30 });
+            await redis.set(ckKey, tempCk, { EX: 3600 * 24 * 30 });
+            await redis.set(TempCkStatuKey, 1, { EX: 3600 * 24 * 2 });
+
             return tempCk;
         } else {
             return tempCk;
@@ -702,8 +762,8 @@ class BiliHandler {
 
     /**读取扫码登陆后缓存的cookie*/
     static async getLoginCk() {
-        var tempCk = '';
-        var ckKey = "Yz:xianxin:bilibili:biliLoginCookie";
+        let tempCk = '';
+        let ckKey = "Yz:xianxin:bilibili:biliLoginCookie";
         tempCk = await redis.get(ckKey);
 
         if ((tempCk !== null) || (tempCk !== undefined) || (tempCk.length !== 0) || (tempCk !== '')) {
@@ -716,15 +776,15 @@ class BiliHandler {
     /**综合ck */
     static async synCookie() {
         let localCk, tempCk, loginCk, mark, cookie;
-        localCk = await BiliHandler.getLocalCookie();
-        tempCk = await BiliHandler.getTempCk();
-        loginCk = await BiliHandler.getLoginCk();
+        localCk = `${await BiliHandler.getLocalCookie()}`;
+        tempCk = `${await BiliHandler.getTempCk()}`;
+        loginCk = `${await BiliHandler.getLoginCk()}`;
 
-        if (localCk?.trim().length !== 0) {
+        if (localCk?.trim().length > 10) {
             mark = "localCk";
             cookie = localCk;
             return { cookie, mark };
-        } else if (loginCk?.trim().length !== 0) {
+        } else if (loginCk?.trim().length > 10) {
             mark = "loginCk";
             cookie = loginCk + ";";
             return { cookie, mark };

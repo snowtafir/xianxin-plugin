@@ -16,7 +16,7 @@ const _headers = {
   cookie: '',
   pragma: "no-cache",
   "cache-control": "max-age=0",
-  'Connection': 'keep-alive',
+  'Connection': 'close',
   'DNT': 1,
   'Sec-GPC': 1,
   'sec-ch-ua': '"Microsoft Edge";v="114", "Chromium";v="114", "Not-A.Brand";v="24"',
@@ -34,10 +34,6 @@ const _headers = {
 /*'Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0'*/
 // Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1
 export { _headers }
-
-//动态获取函数变量
-let lastFetchTime = 0; // 上次调用的时间戳
-const fetchInterval = Math.floor(Math.random() * (6000 - 2000 + 1) + 2000); // 轮询时间间隔，2-6秒
 
 export default class Bilibili extends base {
   constructor(e) {
@@ -82,84 +78,128 @@ export default class Bilibili extends base {
   async getBilibiliDynamicInfo(uid) {
     let url = `https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/space?host_mid=${uid}`;
     let { cookie, mark } = await BiliHandler.synCookie();
+    let fetchGetHeaders = lodash.merge(_headers, { cookie: `${cookie}`, 'Host': `api.bilibili.com`, 'Origin': 'https://www.bilibili.com', 'Referer': `https://www.bilibili.com/`, });
 
-    /**动态请求函数 */
-    async function fetchDynamicInfo(url, addHeader) {
+    let setData = xxCfg.getConfig("bilibili", "set");
+    let resData;
 
-      const currentTime = Date.now();
-      const timeDiff = currentTime - lastFetchTime;
-
-      if (timeDiff < fetchInterval) {
-        // 如果距离上次调用的时间间隔小于设定时间间隔，等待剩余时间
-        const delay = fetchInterval - timeDiff;
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-
-      lastFetchTime = Date.now();
-
-      await new Promise((resolve) => setTimeout(resolve, 0));
-      try {
-        const response = await BiliHandler.fetchWithTimeout(url, {
-          method: 'GET',
-          headers: lodash.merge(_headers, addHeader, {
-            'Host': `api.bilibili.com`,
-            'Origin': 'https://www.bilibili.com',
-            'Referer': `https://www.bilibili.com/`,
-          }),
-          redirect: 'follow',
-          timeout: 20000, // 设置超时时间为 15 秒
-        });
-        if (!response.ok) {
-          Bot.logger?.mark(`trss-xianxin插件：Failed to fetch Bilibili dynamic info: ${response.status} ${response.statusText}`);
-          return null;
-        } else {
-          return response.json();
-        }
-      } catch (error) {
-        Bot.logger?.mark(`trss-xianxin插件：Dynamic Fetch: ${error}`);
-        return null;
-      }
-    }
-
-    /**传入cookie */
-    const mergeCookie = { cookie: `${cookie}`, };
-    /**首层请求动态 */
-    const resData = await fetchDynamicInfo(url, mergeCookie);
-
-    const resDataCode = resData.code;
-
-    if (resDataCode === 0) {
+    /**fetch()获取动态列表*/
+    async function getDynamicInfoList() {
+      await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (10500 - 2000 + 1) + 2000)));
+      const response = await fetch(url, { method: "GET", headers: fetchGetHeaders, redirect: "follow", });
+      let resData = response.json();
       return resData;
     }
-    if (resDataCode !== 0) {
 
-      Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resDataCode)}`);
-
-      /**执行接口校验 */
+    /**Post校验ExC+获取动态列表数据*/
+    async function postExCfetchGetAction() {
       const result = await BiliHandler.postExClimbWuzhiParam(cookie);
+      await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 1000)));
       const data = await result.json();
       const dataCode = data.code;
 
       if (dataCode !== 0) {
-        /**接口校验失败，使用 Mozilla/5.0*/
         Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验失败：${JSON.stringify(data)}`);
-        return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie });
-      }
-      if (dataCode === 0) {
-
+        Bot.logger?.mark(`trss-xianxin插件：尝试获取B站动态`);
+        resData = await getDynamicInfoList();
+      } else if (dataCode === 0) {
         Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验成功：${JSON.stringify(data)}`);
-        const resData = fetchDynamicInfo(url, mergeCookie);
-        const resDataCode = resData.code;
+        Bot.logger?.mark(`trss-xianxin插件：再次尝试获取B站动态`);
+        resData = await getDynamicInfoList();
+      }
+      return resData;
+    }
 
-        if (resDataCode !== 0) {
-          /**接口校验成功，但是动态请求仍失败，使用 Mozilla/5.0*/
-          return fetchDynamicInfo(url, { 'user-agent': 'Mozilla/5.0', 'cookie': cookie, 'Referer': `https://space.bilibili.com/${uid}/dynamic`, });
-        }
-        if (resDataCode === 0) {
-          return resData;
-        }
+    /**获取动态列表数据*/
+    async function fetchGetAction() {
+      try {
+        resData = await getDynamicInfoList();
+        return resData;
+      } catch (err) {
+        Bot.logger?.mark(`trss-xianxin插件：获取B站动态：${err}`);
+        resData = await postExCfetchGetAction();
+        return resData;
       }
     }
+
+    async function tempCkAutoFlashModeFetch() {
+      try {
+        resData = await getDynamicInfoList();
+        tempCkStatuTTL = await redis.ttl(TempCkStatuKey);
+        tempCkStatu = parseInt(tempCkStatu) + 1;
+        await redis.set(TempCkStatuKey, tempCkStatu, { EX: tempCkStatuTTL });
+        return resData;
+
+      } catch (err) {
+        Bot.logger?.mark(`trss-xianxin插件：tempCkAutoFlashModeFetch：${err}`);
+        await redis.set(tempCkKey, '', { EX: 1 });
+        await redis.set(TempCkStatuKey, 1, { EX: 3600 * 24 * 2 });
+
+        await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 1000)));
+        resData = await postExCfetchGetAction();
+
+        tempCkStatuTTL = await redis.ttl(TempCkStatuKey);
+        tempCkStatu = parseInt(tempCkStatu) + 1;
+        await redis.set(TempCkStatuKey, tempCkStatu, { EX: tempCkStatuTTL });
+
+        Bot.logger?.mark(`trss-xianxin插件：Dynamic_json：${JSON.stringify(resData)}`);
+        return resData;
+      }
+    }
+
+    const TempCkStatuKey = "Yz:xianxin:bilibili:biliTempCkStatu";
+    const tempCkKey = "Yz:xianxin:bilibili:biliTempCookie";
+    let tempCkTTL, tempCkStatu, tempCkStatuTTL;
+
+    /**是否开启自动刷新tempCk，默认关闭*/
+    let tempCkAutoFlash = !!setData.tempCkAutoFlash === true ? true : false;
+
+    Bot.logger?.mark(`trss-xianxin插件：B站功能当前使用：${mark}`);
+
+    switch (mark) {
+      case 'loginCk':
+        resData = await fetchGetAction();
+        break;
+      case 'localCk':
+        resData = await fetchGetAction();
+        break;
+      case 'tempCk':
+        tempCkTTL = await redis.ttl(tempCkKey);
+        tempCkStatu = await redis.get(TempCkStatuKey);
+
+        if (!tempCkStatu) {
+          await redis.set(TempCkStatuKey, 1, { EX: 3600 * 24 * 2 });
+        }
+
+        if (tempCkTTL < 3600 * 24 * 28) {
+
+          if (tempCkAutoFlash == true) {
+            resData = await tempCkAutoFlashModeFetch();
+
+          } else if (tempCkAutoFlash == false) {
+
+            resData = await fetchGetAction();
+
+            tempCkStatuTTL = await redis.ttl(TempCkStatuKey);
+            tempCkStatu = parseInt(tempCkStatu) + 1;
+            await redis.set(TempCkStatuKey, tempCkStatu, { EX: tempCkStatuTTL });
+          }
+
+        } else if (tempCkTTL >= 3600 * 24 * 28) {
+
+          if (tempCkAutoFlash == true) {
+            if (tempCkStatu > 180) {
+              resData = await tempCkAutoFlashModeFetch();
+
+            } else {
+              resData = await fetchGetAction();
+            }
+          } else if (tempCkAutoFlash == false) {
+            resData = await fetchGetAction();
+          }
+        }
+    }
+    return resData;
   }
 
   async getBilibiliUp(keyword) {
@@ -172,7 +212,7 @@ export default class Bilibili extends base {
     } else {
       miniBck = localCk
     }
-    const cookie = { 'cookie': `${miniBck}`, }
+    let cookie = { 'cookie': `${miniBck}`, }
     const response = await fetch(url, {
       method: "GET",
       headers: lodash.merge(_headers, cookie),

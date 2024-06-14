@@ -232,7 +232,7 @@ export class bilibili extends plugin {
       return
     } else {
       let ck;
-      const { cookie, mark } = await BiliHandler.synCookie();
+      let { cookie, mark } = await BiliHandler.synCookie();
       if (mark === "localCk") {
         ck = await xxCfg.getBiliCk();
         this.e.reply(`当前使用自定义的B站cookie：`);
@@ -262,27 +262,27 @@ export class bilibili extends plugin {
 
   /** 删除redis缓存的临时B站ck */
   async reflashTempBck() {
-    let ckKey = "Yz:xianxin:bilibili:biliTempCookie";
+    const ckKey = "Yz:xianxin:bilibili:biliTempCookie";
     redis.set(ckKey, '', { EX: 3600 * 24 * 30 });
     try {
-      let newTempCk = await BiliHandler.getTempCk();
+      let newTempCk = await BiliHandler.flashTempCk();
       if ((newTempCk !== null) && (newTempCk !== undefined) && (newTempCk.length !== 0) && (newTempCk !== '')) {
 
-        this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新成功~❤~\n约5秒后重启，等待重启刷新状态`);
+        this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新成功~❤~\n接下来如果获取动态失败，请重启bot(手动或发送指令 #重启)刷新状态~`);
 
         let localCk = await BiliHandler.getLocalCookie();
-        let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.getTempCk()}` : localCk;
+        let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.flashTempCk()}` : localCk;
 
         const result = await BiliHandler.postExClimbWuzhiParam(cookie);
         const data = await result.json();
-        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验info：${JSON.stringify(data)}`);
+        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口响应：${JSON.stringify(data)}`);
 
         await new Promise(() => setTimeout(() => this.restart(), 5000));
       } else {
-        this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新失败X﹏X`);
+        this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新失败X﹏X\n请重启bot(手动或发送指令 #重启)后重试`);
       }
     } catch (error) {
-      this.e.reply(`~trss-xianxin-plugin:\n临时b站ck接口刷新失败X﹏X，请手动重启bot(#重启)后重试`);
+      this.e.reply(`~trss-xianxin-plugin:\n临时b站ck接口刷新失败X﹏X\n请重启bot(手动或发送指令 #重启)后重试`);
       Bot.logger?.mark(`trss-xianxin插件：B站临时ck刷新error：${error}`);
     }
   }
@@ -337,13 +337,6 @@ export class bilibili extends plugin {
     }
     const resJson = res;
     //const resJson = await res.json();
-
-    /* 用于debug的代码段
-    const ck = await xxCfg.getBiliCk()
-    this.e.reply(
-      `当前绑定的B站ck为：${ck}`
-    );
-    */
 
     if (resJson.code != 0 || !resJson?.data) {
       this.e.reply(
