@@ -142,7 +142,6 @@ export default class Bilibili extends base {
         tempCkStatu = parseInt(tempCkStatu) + 1;
         await redis.set(TempCkStatuKey, tempCkStatu, { EX: tempCkStatuTTL });
 
-        Bot.logger?.mark(`trss-xianxin插件：Dynamic_json：${JSON.stringify(resData)}`);
         return resData;
       }
     }
@@ -198,6 +197,9 @@ export default class Bilibili extends base {
             resData = await fetchGetAction();
           }
         }
+    }
+    if (resData.code != 0 || !resData?.data) {
+      Bot.logger?.warn(`trss-xianxin插件：Dynamic_err：${JSON.stringify(resData)}`);
     }
     return resData;
   }
