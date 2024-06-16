@@ -36,5 +36,5 @@ tempCkAutoFlash: 0
 # 自动刷新 tempCK 模式下，刷新后 是否自动重启Bot：0 关闭，1 启用。默认 0 关闭。
 flashTempCkAutoReboot: 0
 
-# 刷新或首次获取 tempCK 出现风控报错失败，是否开启 自动重启Bot刷新状态：0 关闭，1 启用。默认 1 开启。
-tempCkflashErrReboot: 1
+# 刷新或首次获取 tempCK 出现风控报错失败，是否开启 自动重启Bot刷新状态：0 关闭，1 启用。默认 0 关闭。
+tempCkflashErrReboot: 0

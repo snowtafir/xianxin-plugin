@@ -1,11 +1,10 @@
 import plugin from "../../../lib/plugins/plugin.js";
 import xxCfg from "../model/xxCfg.js";
 import fs from "node:fs";
-import fetch from "node-fetch";
 import Bilibili from "../model/bilibili.js";
-import { BiliHandler } from "../model/biliHandler.js";
 import lodash from 'lodash';
 import { Restart } from "../../other/restart.js";
+import { BILIBILI_HEADERS, applyQRCode, pollQRCode, readSavedCookieItems, saveLoginCK, saveLocalBiliCk, getNewTempCk, readTempCk, get_buvid_fp, postExClimbWuzhi } from "../util/BiliApi.js";
 
 let bilibiliSetFile = "./plugins/trss-xianxin-plugin/config/bilibili.set.yaml";
 if (!fs.existsSync(bilibiliSetFile)) {
@@ -131,15 +130,26 @@ export class bilibili extends plugin {
   async BiliLogin() {
     if (this.e.isMaster) {
       try {
-        const token = await BiliHandler.applyQRCode(this.e);
+        const token = await applyQRCode(this.e);
 
-        const biliLoginCk = await BiliHandler.pollQRCode(this.e, token);
+        let biliLoginCk = await pollQRCode(this.e, token);
 
-        if ((biliLoginCk !== null) || (biliLoginCk !== undefined) || (biliLoginCk.length !== 0) || (biliLoginCk !== '')) {
-          const LoginCkKey = "Yz:xianxin:bilibili:biliLoginCookie";
-          redis.set(LoginCkKey, `${biliLoginCk}`, { EX: 3600 * 24 * 180 });
-        } else if (biliLoginCk === null) {
-          this.e.reply("扫码超时");
+        //let _uuid = readSavedCookieItems(biliLoginCk, ['_uuid'])
+
+        //const buvid_fp = await get_buvid_fp(_uuid);
+
+        //biliLoginCk = buvid_fp + biliLoginCk;
+
+        await saveLoginCK(this.e, biliLoginCk);
+
+        const result = await postExClimbWuzhi(biliLoginCk); //激活ck
+
+        const data = await result.json(); // 解析校验结果
+        const dataCode = data.code; // 获取校验结果的 code
+        if (dataCode !== 0) {
+          Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
+        } else if (dataCode === 0) {
+          Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
         }
       } catch (Error) {
         Bot.logger?.info(`trss-xianxin-plugin Login bilibili Failed：${Error}`);
@@ -171,7 +181,7 @@ export class bilibili extends plugin {
         param[tmp[0]] = tmp[1]
       })
 
-      if ((!param.buvid3 || !param._uuid || !param.buvid4 || !param.b_nut) || !param.DedeUserID) {
+      if ((!param.buvid3 || !param._uuid || !param.buvid4) || !param.DedeUserID) {
         await this.e.reply('诶呀~发送cookie不完整\n请获取完整cookie进行绑定\nB站cookie的获取方法查看仓库主页或者百度一下');
 
         if (!param.buvid3 || (param.buvid3).length === 0) {
@@ -186,10 +196,6 @@ export class bilibili extends plugin {
           let _uuid_ = '_uuid';
           await this.e.reply(`B站cookie：当前缺失：\n${_uuid_}`)
         }
-        if (!param.b_nut || (param.b_nut).length === 0) {
-          let _b_nut_ = 'b_nut';
-          await this.e.reply(`B站cookie：当前缺失：\n${_b_nut_}`)
-        }
         if (!param.DedeUserID || (param.DedeUserID).length === 0) {
           let DedeUserID_ = 'DedeUserID';
           await this.e.reply(`B站cookie：当前缺失：\n${DedeUserID_}`)
@@ -197,23 +203,37 @@ export class bilibili extends plugin {
         return
       }
 
-      //var UID = param.DedeUserID
-      /*this.Bck = `buvid3=${param.buvid3};buvid4=${param.buvid4};_uuid=${param._uuid}; rpdid=${param.rpdid}; fingerprint=${param.fingerprint};`*/
+      //筛选ck
+      Bck = readSavedCookieItems(Bck, ['buvid3', 'buvid4', '_uuid', 'SESSDATA', 'DedeUserID', 'DedeUserID__ckMd5', 'bili_jct', 'b_nut', 'b_lsid'])
 
-      xxCfg.saveBiliCk(Bck)
+      //const buvid_fp = await get_buvid_fp(param._uuid)
+
+      //Bck = buvid_fp + Bck; //添加buvid_fp值
+
+      await saveLocalBiliCk(Bck);
 
       logger.mark(`${this.e.logFnc} 保存B站cookie成功 [UID:${param.DedeUserID}]`)
 
       let uidMsg = [`好耶~绑定B站cookie成功：\n${param.DedeUserID}`]
 
-      await this.e.reply(uidMsg)
+      await this.e.reply(uidMsg);
+
+      const result = await postExClimbWuzhi(Bck); //激活ck
+
+      const data = await result.json(); // 解析校验结果
+      const dataCode = data.code; // 获取校验结果的 code
+      if (dataCode !== 0) {
+        Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
+      } else if (dataCode === 0) {
+        Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
+      }
     }
   }
 
   /** 删除绑定的B站ck */
   async delMyBCk() {
     let Bck = ''
-    xxCfg.saveBiliCk(Bck)
+    await saveLocalBiliCk(Bck)
     await this.e.reply(`手动绑定的B站ck已删除~`)
   }
 
@@ -251,7 +271,7 @@ export class bilibili extends plugin {
 
   /** B站ck帮助 */
   async BCkHelp() {
-    await this.reply(`★B站动态功能必要配置详情看仓库主页叭~\n\n★摘要:\n1.#刷新B站临时ck\n2.#扫码登录B站\n3.配置文件增加动态监测时长\n4.运行bot的设备或局域网内的设备挂机登录账号的B站客户端\n5.手动配置自定义ck：#绑定B站ck: xxx`)
+    await this.reply(`★B站动态功能必要配置详情看仓库主页叭~\n\n★摘要:\n1.#扫码登录B站 推荐\n2.#刷新B站临时ck 大概率风控1次/2天\n3.配置文件增加动态监测时长\n4.运行bot的设备或局域网内的设备挂机登录账号的B站客户端\n5.手动配置自定义ck：#绑定B站ck: xxx`)
     return
   }
 
@@ -262,20 +282,12 @@ export class bilibili extends plugin {
 
   /** 删除redis缓存的临时B站ck */
   async reflashTempBck() {
-    const ckKey = "Yz:xianxin:bilibili:biliTempCookie";
-    redis.set(ckKey, '', { EX: 3600 * 24 * 30 });
     try {
-      let newTempCk = await BiliHandler.flashTempCk();
+      await getNewTempCk();
+      let newTempCk = await readTempCk();
       if ((newTempCk !== null) && (newTempCk !== undefined) && (newTempCk.length !== 0) && (newTempCk !== '')) {
 
         this.e.reply(`~trss-xianxin-plugin:\n临时b站ck刷新成功~❤~\n接下来如果获取动态失败，请重启bot(手动或发送指令 #重启)刷新状态~`);
-
-        let localCk = await BiliHandler.getLocalCookie();
-        let cookie = localCk?.trim().length === 0 ? `${await BiliHandler.flashTempCk()}` : localCk;
-
-        const result = await BiliHandler.postExClimbWuzhiParam(cookie);
-        const data = await result.json();
-        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口响应：${JSON.stringify(data)}`);
 
         await new Promise(() => setTimeout(() => this.restart(), 5000));
       } else {
@@ -287,38 +299,28 @@ export class bilibili extends plugin {
     }
   }
 
-  /** 添加b站推送 */
+  /**通过uid订阅对应用户的b站动态 */
   async addPush() {
-    let uid = this.e.msg
-      .replace(
-        /#*(添加|订阅|新增|增加)up推送\s*(直播\s*|视频\s*|图文\s*|文章\s*|转发\s*|直播\s*)*/g,
-        ""
-      )
-      .trim();
-    // (直播\\s*|视频\\s*|图文\\s*|文章\\s*|转发\\s*|直播\\s*)*
-
+    let uid = this.e.msg.replace(/#*(添加|订阅|新增|增加)up推送\s*(直播\s*|视频\s*|图文\s*|文章\s*|转发\s*|直播\s*)*/g, "").trim();
 
     if (!uid) {
-      this.e.reply(
-        `请输入正确的推送的uid叭\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377`
-      );
+      this.e.reply(`请输入正确的推送的uid叭\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377`);
       return true;
     }
 
     let data = this.bilibiliPushData || {};
 
-    if (!data[this.e.group_id]) data[this.e.group_id] = new Array();
+    if (!data[this.e.group_id]) {
+      data[this.e.group_id] = [];
+    }
 
-    // const existUids = data[this.e.group_id].map((item) => item.uid || "");
-
-    const upData = data[this.e.group_id].find((item) => item.uid == uid);
+    const upData = data[this.e.group_id].find((item) => item.uid === uid);
 
     if (upData) {
-      data[this.e.group_id].map((item) => {
-        if (item.uid == uid) {
+      data[this.e.group_id].forEach((item) => {
+        if (item.uid === uid) {
           item.type = this.typeHandle(item, this.e.msg, "add");
         }
-        return item;
       });
 
       this.bilibiliPushData = data;
@@ -327,53 +329,33 @@ export class bilibili extends plugin {
       return;
     }
 
-    // const res = await new Bilibili(this.e).getBilibiliUserInfo(uid);
-
     const res = await new Bilibili(this.e).getBilibiliDynamicInfo(uid);
 
     if (!res) {
       this.e.reply("诶嘿，出了点网络问题，等会再试试吧~");
       return;
     }
-    const resJson = res;
-    //const resJson = await res.json();
 
-    if (resJson.code != 0 || !resJson?.data) {
-      this.e.reply(
-        "uid错误或遭遇风控或绑定的B站ck失效了耶\n示例1(订阅全部动态)：#订阅up推送 401742377\n示例2(订阅直播动态)：#订阅up推送 直播 401742377\n示例3(订阅直播、转发、图文、文章、视频动态)：#订阅up推送 直播 转发 图文 文章 视频 401742377"
-      );
+    if (!res.data || res.code !== 0) {
+      this.e.reply(`订阅失败了耶~\n${uid}可能是无效的UID或遭遇了风控，请稍后再试~`);
       return true;
     }
 
-    const dynamics = resJson?.data?.items || [];
-
-    let name = uid;
-
-    if (dynamics.length) {
-      let dynamic = dynamics[0];
-      name = dynamic?.modules?.module_author?.name || uid;
-    }
+    let dynamics = res.data.items || [];
+    let name = dynamics.length ? (dynamics[0].modules.module_author?.name || uid) : uid;
 
     data[this.e.group_id].push({
       e_self_id: this.e.self_id,
       uid,
-      name: name,
-      type: this.typeHandle(
-        {
-          uid,
-          name,
-        },
-        this.e.msg,
-        "add"
-      ),
+      name,
+      type: this.typeHandle({ uid, name }, this.e.msg, "add"),
     });
 
     this.bilibiliPushData = data;
-
     xxCfg.saveSet("bilibili", "push", "config", data);
-
     this.e.reply(`好耶~添加b站推送成功~\n${name}：${uid}`);
   }
+
 
   /** 删除b站推送 */
   async delPush() {
@@ -466,9 +448,7 @@ export class bilibili extends plugin {
   async detail() {
     let uid = this.e.msg.replace(/#*up/g, "").trim();
 
-    const accInfoRes = await new Bilibili(this.e).getBilibiliUserInfoDetail(
-      uid
-    );
+    const accInfoRes = await new Bilibili(this.e).getBilibiliUserInfo(uid);
 
     if (!accInfoRes.ok) {
       this.reply("诶嘿，出了点网络问题，等会再试试吧~");
@@ -484,22 +464,21 @@ export class bilibili extends plugin {
       return true;
     }
     const message = [
-      `昵称：${data.card.name}`,
-      `\n性别：${data.card.sex}`,
-      `\n等级：${data.card.level_info.current_level}`,
-      `\n粉丝人数：${data.card.fans}`,
+      `昵称：${data?.name}`,
+      `\n性别：${data?.sex}`,
+      `\n等级：${data?.level}`,
+      //`\n粉丝人数：${data?.card?.fans}`,
     ];
 
-    if (data.live) {
+    if (data.live_room) {
       message.push(
-        `\n\n直播信息`,
-        `\n直播标题：${data.live.title}`,
-        `\n直播状态：${data.live.liveStatus ? "直播中" : "未开播"}`,
-        `\n直播链接：${data.live.url}`
+        `\n***********\n---直播信息---`,
+        `\n直播标题：${data?.live_room?.title}`,
+        `\n直播房间：${data?.live_room?.roomid}`,
+        `\n直播状态：${data?.live_room?.liveStatus ? "直播中" : "未开播"}`,
+        `\n直播链接：${data?.live_room?.url}`,
+        `\n观看人数：${data?.live_room?.watched_show?.num}人`
       );
-      // if (data.live_room.watched_show) {
-      //   message.push(`\n观看人数：${data.live_room.watched_show.num}人`);
-      // }
     }
 
     this.reply(message);

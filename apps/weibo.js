@@ -1,9 +1,7 @@
 import plugin from "../../../lib/plugins/plugin.js";
 import xxCfg from "../model/xxCfg.js";
 import fs from "node:fs";
-import fetch from "node-fetch";
 import Weibo from "../model/weibo.js";
-import lodash from 'lodash'
 
 let weiboSetFile = "./plugins/trss-xianxin-plugin/config/weibo.set.yaml";
 if (!fs.existsSync(weiboSetFile)) {

@@ -236,33 +236,16 @@ export default class Weibo extends base {
             /*QQ频道午夜时间推送有限制，会报错code: 304022*/
             const images = Array.from(this[id_str].img, item => ({ ...item }));
             for (let i = 0; i < images.length; i++) {
-                if (yunzaiName === 'miao-yunzai') {
-                    let uin = e_self_id;
-                    await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(images[i])
-                        .catch((err) => {
-                            Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-                        });
-                } else if (yunzaiName === 'trss-yunzai') {
-                    await Bot.pickGroup(String(groupId)).sendMsg(images[i])
-                        .catch((err) => {
-                            Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-                        });
-                } else {
-                    await Bot.pickGroup(String(groupId)).sendMsg(images[i])
-                        .catch((err) => {
-                            Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-                        });
-                }
-                await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 2000)));
-            }
+                let uin = yunzaiName === 'miao-yunzai' ? e_self_id : undefined;
+                await (Bot[uin] || Bot).pickGroup(String(groupId)).sendMsg(images[i]) // 发送动态图片消息
+                  .catch((err) => {
+                    Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+                  });
+                await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 2000))); // 随机延时2-6.5秒
+              }
             await common.sleep(1000);
         } else {
-            const dynamicMsg = await this.buildDynamic(
-                upName,
-                pushDynamicData,
-                false,
-                setData
-            );
+            const dynamicMsg = this.buildDynamic(upName, pushDynamicData, false, setData); // 构建普通动态消息
 
             redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 });
 
@@ -275,23 +258,12 @@ export default class Weibo extends base {
             if (new RegExp(banWords).test(dynamicMsg.join(""))) {
                 return "return";
             }
-            if (yunzaiName === 'miao-yunzai') {
-                let uin = e_self_id;
-                await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(dynamicMsg)
-                    .catch((err) => {
-                        Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-                    });
-            } else if (yunzaiName === 'trss-yunzai') {
-                await Bot.pickGroup(String(groupId)).sendMsg(dynamicMsg)
-                    .catch((err) => {
-                        Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-                    });
-            } else {
-                await Bot.pickGroup(String(groupId)).sendMsg(dynamicMsg)
-                    .catch((err) => {
-                        Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-                    });
-            }
+
+            let uin = yunzaiName === 'miao-yunzai' ? e_self_id : undefined;
+            await (Bot[uin] || Bot).pickGroup(String(groupId)).sendMsg(dynamicMsg) // 发送普通动态消息
+              .catch((err) => {
+                Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+              });
             await common.sleep(1000);
         }
     }
