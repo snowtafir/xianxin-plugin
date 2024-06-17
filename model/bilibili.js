@@ -41,19 +41,21 @@ export default class Bilibili extends base {
     let parama = {
       host_mid: uid,
       //timezone_offset: -480,
-      //platform: 'web',
-      //features: 'itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote',
+      //platform: "web",
+      //features: "itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote",
       //web_location: "333.999",
-      //...DmImg,
+      //"x-bili-device-req-json":{"platform":"web","device":"pc"},
+      //"x-bili-web-req-json":{"spm_id":"333.999"},
+      //dm_img_str:"V2ViR0wgMS",
       //dm_img_list:[],
-      //dm_img_inter: { ds: [], wh: [0, 0, 0], of: [0, 0, 0] },
-      //"x-bili-device-req-json": { "platform": "web", "device": "pc" },
-      //"x-bili-web-req-json": { "spm_id": "333.999" },
+      //dm_img_inter:{ds:[], wh:[0,0,0],of:[0,0,0]},
+     // dm_cover_img_str:"QU5HTEUgKEludGVsLCBJbnRlbChSKSBIRCBHcmFwaGljcyBEaXJlY3QzRDExIHZzXzVfMCBwc181XzApLCBvciBzaW1pbGFyR29vZ2xlIEluYy4gKEludGVsKQ"
     }
     let url = appendUrlQueryParams(DynamicApiUrl, parama);
     let { cookie, mark } = await synCookie();
-    let fetchGetHeaders = lodash.merge(BILIBILI_HEADERS, { cookie: `${cookie}`, 'Host': `api.bilibili.com`, 'Origin': 'https://www.bilibili.com', 'Referer': `https://www.bilibili.com/`, });
-
+    let fetchGetHeaders = lodash.merge(BILIBILI_HEADERS, { 'Cookie': `${cookie}`, 'Host': `api.bilibili.com`, 'Origin': 'https://www.bilibili.com', 'Referer': `https://www.bilibili.com/`, });
+    //const { wts, w_rid } = await getWbiSign(parama, fetchGetHeaders);
+    //let url = DynamicApiUrl + `?host_mid=${uid}&timezone_offset=-480&platform=web&features=itemOpusStyle,listOnlyfans,opusBigCover,onlyfansVote&web_location=333.999&dm_img_list=[]&dm_img_str=V2ViR0wgMS&dm_cover_img_str=QU5HTEUgKEludGVsLCBJbnRlbChSKSBIRCBHcmFwaGljcyBEaXJlY3QzRDExIHZzXzVfMCBwc181XzApLCBvciBzaW1pbGFyR29vZ2xlIEluYy4gKEludGVsKQ&dm_img_inter={"ds":[],"wh":[0,0,0],"of":[0,0,0]}&x-bili-device-req-json={"platform":"web","device":"pc"}&x-bili-web-req-json={"spm_id":"333.999"}&w_rid=${w_rid}&wts=${wts}`
     let setData = xxCfg.getConfig("bilibili", "set");
     let resData;
 
@@ -73,12 +75,12 @@ export default class Bilibili extends base {
       const dataCode = data.code;
 
       if (dataCode !== 0) {
-        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验失败：${JSON.stringify(data)}`);
-        Bot.logger?.mark(`trss-xianxin插件：尝试获取B站动态`);
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：B站动态ExC接口校验失败：${JSON.stringify(data)}`);
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：尝试获取B站动态`);
         resData = await getDynamicInfoList();
       } else if (dataCode === 0) {
-        Bot.logger?.mark(`trss-xianxin插件：B站动态ExC接口校验成功：${JSON.stringify(data)}`);
-        Bot.logger?.mark(`trss-xianxin插件：再次尝试获取B站动态`);
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：B站动态ExC接口校验成功：${JSON.stringify(data)}`);
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：再次尝试获取B站动态`);
         resData = await getDynamicInfoList();
       }
       return resData;
@@ -90,7 +92,7 @@ export default class Bilibili extends base {
       resData = await getDynamicInfoList();
 
       if (!resData || resData.code !== 0) {
-        Bot.logger?.mark(`trss-xianxin插件：获取B站动态：遭遇风控，失败`);
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：获取B站动态：遭遇风控，失败`);
         resData = await postExCfetchGetAction();
       }
       return resData;
@@ -103,7 +105,7 @@ export default class Bilibili extends base {
       await redis.set(TempCkStatuKey, tempCkStatu, { EX: tempCkStatuTTL });
 
       if (!resData || resData.code !== 0) {
-        Bot.logger?.mark(`trss-xianxin插件：tempCkAutoFlashModeFetch：遭遇风控，失败`);
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：tempCkAutoFlashModeFetch：遭遇风控，失败`);
         await getNewTempCk();
         await redis.set(TempCkStatuKey, 1, { EX: 3600 * 24 * 2 });
 
@@ -125,7 +127,7 @@ export default class Bilibili extends base {
     /**是否开启自动刷新tempCk，默认关闭*/
     let tempCkAutoFlash = !!setData.tempCkAutoFlash === true ? true : false;
 
-    Bot.logger?.mark(`trss-xianxin插件：B站功能当前使用：${mark}`);
+    (logger ?? Bot.logger)?.mark(`trss-xianxin插件：B站功能当前使用：${mark}`);
 
     switch (mark) {
       case 'loginCk':
@@ -171,7 +173,7 @@ export default class Bilibili extends base {
         }
     }
     if (!resData || resData.code !== 0) {
-      Bot.logger?.warn(`trss-xianxin插件：Dynamic_err：${JSON.stringify(resData)}`);
+      (logger ?? Bot.logger)?.warn(`trss-xianxin插件：Dynamic_err：${JSON.stringify(resData)}`);
     }
     return resData;
   }
@@ -295,15 +297,15 @@ export default class Bilibili extends base {
 
       redis.set(`${this.key}${groupId}:${id_str}`, "1", { EX: 3600 * 10 }); // 设置已发送标记
 
-      Bot.logger?.mark("trss-xianxin插件：B站动态执行推送");
+      (logger ?? Bot.logger)?.mark("trss-xianxin插件：B站动态执行推送");
 
       /*QQ频道午夜时间推送有限制，会报错code: 304022*/
       const images = Array.from(this[id_str].img, item => ({ ...item }));
       for (let i = 0; i < images.length; i++) {
         let uin = yunzaiName === 'miao-yunzai' ? e_self_id : undefined;
-        await (Bot[uin] || Bot).pickGroup(String(groupId)).sendMsg(images[i]) // 发送动态图片消息
+        await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(images[i]) // 发送动态图片消息
           .catch((err) => {
-            Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+            (logger ?? Bot.logger)?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
           });
         await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 2000))); // 随机延时2-6.5秒
       }
@@ -323,9 +325,9 @@ export default class Bilibili extends base {
       }
 
       let uin = yunzaiName === 'miao-yunzai' ? e_self_id : undefined;
-      await (Bot[uin] || Bot).pickGroup(String(groupId)).sendMsg(dynamicMsg) // 发送普通动态消息
+      await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(dynamicMsg) // 发送普通动态消息
         .catch((err) => {
-          Bot.logger?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+          (logger ?? Bot.logger)?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
         });
       await common.sleep(1000);
     }
@@ -588,7 +590,7 @@ export default class Bilibili extends base {
 
         return msg;
       default:
-        Bot.logger?.mark(`未处理的B站推送【${upName}】：${dynamic.type}`);
+        (logger ?? Bot.logger)?.mark(`未处理的B站推送【${upName}】：${dynamic.type}`);
         return "continue";
     }
   }

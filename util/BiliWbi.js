@@ -84,7 +84,7 @@ async function getDmImg() {
 	const dm_img_list = [];
 	// 这俩值可以不用随机，直接用实际的真实值即可。
 	const dm_img_str = "V2ViR0wgMS4wIChPcGVuR0wgRVMgMi4wIENocm9taXVtKQ";// "webgl version:" base64Decode=
-	const dm_cover_img_str = "QU5HTEUgKEludGVsIEluYy4sIEludGVsKFIpIFVIRCBHcmFwaGljcyA2MzAsIE9wZW5HTCA0LjEp" + "R29vZ2xlIEluYy4gKEludGVs";// "webgl unmasked renderer" + Google Inc. (Intel ： base64Decode = ANGLE (Intel Inc., Intel(R) UHD Graphics 630, OpenGL 4.1)Google Inc. (Intel
+	const dm_cover_img_str = "QU5HTEUgKEludGVsLCBJbnRlbChSKSBIRCBHcmFwaGljcyBEaXJlY3QzRDExIHZzXzVfMCBwc181XzApLCBvciBzaW1pbGFyR29vZ2xlIEluYy4gKEludGVsKQ";// "webgl unmasked renderer" + Google Inc. (Intel) ： base64Decode = ANGLE (Intel Inc., Intel(R) UHD Graphics 630, OpenGL 4.1)Google Inc. (Intel)
 	const dm_img_inter = { ds: [], wh: [0, 0, 0], of: [0, 0, 0] };
 	return {
 		dm_img_list,

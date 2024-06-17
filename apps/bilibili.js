@@ -4,7 +4,7 @@ import fs from "node:fs";
 import Bilibili from "../model/bilibili.js";
 import lodash from 'lodash';
 import { Restart } from "../../other/restart.js";
-import { BILIBILI_HEADERS, applyQRCode, pollQRCode, readSavedCookieItems, saveLoginCK, saveLocalBiliCk, getNewTempCk, readTempCk, get_buvid_fp, postExClimbWuzhi } from "../util/BiliApi.js";
+import { BILIBILI_HEADERS, applyQRCode, pollQRCode, readSavedCookieItems, saveLoginCK, saveLocalBiliCk, getNewTempCk, readTempCk, synCookie, get_buvid_fp, postExClimbWuzhi } from "../util/BiliApi.js";
 
 let bilibiliSetFile = "./plugins/trss-xianxin-plugin/config/bilibili.set.yaml";
 if (!fs.existsSync(bilibiliSetFile)) {
@@ -147,12 +147,12 @@ export class bilibili extends plugin {
         const data = await result.json(); // 解析校验结果
         const dataCode = data.code; // 获取校验结果的 code
         if (dataCode !== 0) {
-          Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
+          (logger ?? Bot.logger)?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
         } else if (dataCode === 0) {
-          Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
+          (logger ?? Bot.logger)?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
         }
       } catch (Error) {
-        Bot.logger?.info(`trss-xianxin-plugin Login bilibili Failed：${Error}`);
+        (logger ?? Bot.logger)?.info(`trss-xianxin-plugin Login bilibili Failed：${Error}`);
       }
     } else {
       this.e.reply("未取得bot主人身份，无权限配置B站登录ck");
@@ -223,9 +223,9 @@ export class bilibili extends plugin {
       const data = await result.json(); // 解析校验结果
       const dataCode = data.code; // 获取校验结果的 code
       if (dataCode !== 0) {
-        Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
       } else if (dataCode === 0) {
-        Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
+        (logger ?? Bot.logger)?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
       }
     }
   }
@@ -251,20 +251,18 @@ export class bilibili extends plugin {
       await this.reply('请私聊查看叭')
       return
     } else {
-      let ck;
-      let { cookie, mark } = await BiliHandler.synCookie();
+      let { cookie, mark } = await synCookie();
       if (mark === "localCk") {
-        ck = await xxCfg.getBiliCk();
         this.e.reply(`当前使用自定义的B站cookie：`);
-        this.e.reply(`${ck}`);
+        this.e.reply(`${cookie}`);
       } else if (mark === "loginCk") {
-        ck = cookie;
         this.e.reply(`当前使用扫码登录的B站cookie：`);
-        this.e.reply(`${ck}`);
+        this.e.reply(`${cookie}`);
       } else if (mark === "tempCk") {
-        ck = cookie;
         this.e.reply(`当前使用临时B站cookie：`);
-        this.e.reply(`${ck}`);
+        this.e.reply(`${cookie}`);
+      } else if (mark == 'ckIsEmpty') {
+        this.e.reply(`当前无可使用的B站cookie。`)
       }
     }
   }
@@ -295,7 +293,7 @@ export class bilibili extends plugin {
       }
     } catch (error) {
       this.e.reply(`~trss-xianxin-plugin:\n临时b站ck接口刷新失败X﹏X\n请重启bot(手动或发送指令 #重启)后重试`);
-      Bot.logger?.mark(`trss-xianxin插件：B站临时ck刷新error：${error}`);
+      (logger ?? Bot.logger)?.mark(`trss-xianxin插件：B站临时ck刷新error：${error}`);
     }
   }
 

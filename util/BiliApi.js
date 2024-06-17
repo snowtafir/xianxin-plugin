@@ -44,7 +44,7 @@ const BILIBILI_HEADERS = {
     'Connection': 'close',
     'DNT': 1,
     'Sec-GPC': 1,
-    'sec-ch-ua': '"Microsoft Edge";v="114", "Chromium";v="114", "Not-A.Brand";v="24"',
+    //'sec-ch-ua': '"Microsoft Edge";v="114", "Chromium";v="114", "Not-A.Brand";v="24"',
     'sec-ch-ua-platform': '',
     'sec-ch-ua-mobile': '?0',
     'Sec-Fetch-Dest': 'empty',
@@ -53,7 +53,8 @@ const BILIBILI_HEADERS = {
     'Sec-Fetch-User': '?0',
     'TE': 'trailers',
     "Upgrade-insecure-requests": 1,
-    'User-agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1',
+    'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0'
+    //'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36 115Browser/9.1.1',
 }
 //Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36
 //'Mozilla/5.0 (X11; Linux x86_64; rv:100.0) Gecko/20100101 Firefox/100.0'
@@ -126,13 +127,13 @@ async function pollQRCode(e, token) {
             // 未扫码
             // 继续轮询
             await new Promise((resolve) => setTimeout(resolve, 2000));
-            Bot.logger?.mark(`trss-xianxin插件：扫码B站登录：未扫码，轮询中...`);
+            (logger ?? Bot.logger)?.mark(`trss-xianxin插件：扫码B站登录：未扫码，轮询中...`);
             return this.pollQRCode(e, token);
         } else if (data.data.code === 86090) {
             // 已扫码未确认
             // 继续轮询
             await new Promise((resolve) => setTimeout(resolve, 2000))
-            Bot.logger?.mark(`trss-xianxin插件：扫码B站登录：已扫码，等待确认...`);
+            (logger ?? Bot.logger)?.mark(`trss-xianxin插件：扫码B站登录：已扫码，等待确认...`);
             return this.pollQRCode(e, token);
         } else if (data.data.code === 86038) {
             // 二维码已失效
@@ -179,11 +180,11 @@ async function readLoginCk() {
 async function readSavedCookieItems(mark, items) {
     let ckString = '';
     if (mark == 'localCK') {
-        ckString = await xxCfg.getLocalBiliCk();
+        ckString = await readLocalBiliCk();
     } else if (mark == 'tempCK') {
-        ckString = await getTempCk();
+        ckString = await readTempCk();
     } else if (mark == 'loginCK') {
-        ckString = await getLoginCk();
+        ckString = await readLoginCk();
     } else {
         ckString = mark;
     }
@@ -197,6 +198,36 @@ async function readSavedCookieItems(mark, items) {
                 .match(/(\w+)=([^;|,]+)/g) /**使用正则表达式 /(\w+)=([^;]+);/g 来匹配形式为 a=b 的内容,使用 [^;|,]+ 来匹配值，其中 [^;|,] 表示除了分号和,以外的任意字符*/
                 ?.map(match => match.split('='))
                 .filter(([key, value]) => items.includes(key) && value !== '') /**过滤并仅保留键值对中值为非空的情况*/
+                .map(([key, value]) => `${key}=${value}`)
+                .join(';');
+            return Ck
+        }
+    } else {
+        return '';
+    }
+}
+//取反读取ck
+async function readSavedCookieOtherItems(mark, items) {
+    let ckString = '';
+    if (mark == 'localCK') {
+        ckString = await readLocalBiliCk();
+    } else if (mark == 'tempCK') {
+        ckString = await readTempCk();
+    } else if (mark == 'loginCK') {
+        ckString = await readLoginCk();
+    } else {
+        ckString = mark;
+    }
+    let Bck = lodash.trim(ckString);
+    if ((Bck !== null) && (Bck !== undefined) && (Bck.length !== 0) && (Bck !== '')) {
+        if (items[0] == 'all') {
+            return Bck;
+        } else {
+            let Ck = String(Bck)
+                .trim()
+                .match(/(\w+)=([^;|,]+)/g) /**使用正则表达式 /(\w+)=([^;]+);/g 来匹配形式为 a=b 的内容,使用 [^;|,]+ 来匹配值，其中 [^;|,] 表示除了分号和,以外的任意字符*/
+                ?.map(match => match.split('='))
+                .filter(([key, value]) => !items.includes(key) && value !== '') /**过滤并仅保留键值对中值为非空的情况*/
                 .map(([key, value]) => `${key}=${value}`)
                 .join(';');
             return Ck
@@ -411,7 +442,148 @@ async function payloadData(cookie) {
         "5f45": null, // laboratory, set from cookie, null if empty, source remains unknown
         "db46": 0 // is_selfdef, default 0
     };
-    return payloadData;
+    const pay = {
+        "3064": 1, // ptype, mobile => 2, others => 1
+        "5062": `${Date.now()}`, // timestamp
+        "03bf": "https://www.bilibili.com/", // url accessed
+        "39c8": "333.999.fp.risk",
+        "34f1": "", // target_url, default empty now
+        "d402": "", // screenx, default empty
+        "654a": "", // screeny, default empty
+        "6e7c": "878x1066",// browser_resolution, window.innerWidth || document.body && document.body.clientWidth + "x" + window.innerHeight || document.body && document.body.clientHeight
+        "3c43": {// 3c43 => msg
+            "2673": 0,// hasLiedResolution, window.screen.width < window.screen.availWidth || window.screen.height < window.screen.availHeight
+            "5766": 24, // colorDepth, window.screen.colorDepth
+            "6527": 0,// addBehavior, !!window.HTMLElement.prototype.addBehavior, html5 api
+            "7003": 1,// indexedDb, !!window.indexedDB, html5 api
+            "807e": 1,// cookieEnabled, navigator.cookieEnabled
+            "b8ce": BILIBILI_HEADERS['user-agent'], // ua "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:127.0) Gecko/20100101 Firefox/127.0",
+            "641c": 0,
+            "07a4": "zh-CN",
+            "1c57": "not available",
+            "0bd0": 16,
+            "748e": [1920, 1200],
+            "d61f": [1920, 1152],
+            "fc9d": -480,
+            "6aa9": "Asia/Shanghai",
+            "75b8": 1,
+            "3b21": 1,
+            "8a1c": 0,
+            "d52f": "not available",
+            "adca": BILIBILI_HEADERS['User-agent'].includes('Windows') ? 'Win32' : 'Linux', // platform, navigator.platform
+            "80c9": [
+                ["PDF Viewer", "Portable Document Format", [
+                    ["application/pdf", "pdf"],
+                    ["text/pdf", "pdf"]
+                ]],
+                ["Chrome PDF Viewer", "Portable Document Format", [
+                    ["application/pdf", "pdf"],
+                    ["text/pdf", "pdf"]
+                ]],
+                ["Chromium PDF Viewer", "Portable Document Format", [
+                    ["application/pdf", "pdf"],
+                    ["text/pdf", "pdf"]
+                ]],
+                ["Microsoft Edge PDF Viewer", "Portable Document Format", [
+                    ["application/pdf", "pdf"],
+                    ["text/pdf", "pdf"]
+                ]],
+                ["WebKit built-in PDF", "Portable Document Format", [
+                    ["application/pdf", "pdf"],
+                    ["text/pdf", "pdf"]
+                ]]
+            ],
+            "13ab": "f3YAAAAASUVORK5CYII=",
+            "bfe9": "kABYpRAGAVYzWJooB9Bf4P+UortSvxRY0AAAAASUVORK5CYII=",
+            "a3c1": [
+                "extensions:ANGLE_instanced_arrays;EXT_blend_minmax;EXT_color_buffer_half_float;EXT_float_blend;EXT_frag_depth;EXT_shader_texture_lod;EXT_sRGB;EXT_texture_compression_bptc;EXT_texture_compression_rgtc;EXT_texture_filter_anisotropic;OES_element_index_uint;OES_fbo_render_mipmap;OES_standard_derivatives;OES_texture_float;OES_texture_float_linear;OES_texture_half_float;OES_texture_half_float_linear;OES_vertex_array_object;WEBGL_color_buffer_float;WEBGL_compressed_texture_s3tc;WEBGL_compressed_texture_s3tc_srgb;WEBGL_debug_renderer_info;WEBGL_debug_shaders;WEBGL_depth_texture;WEBGL_draw_buffers;WEBGL_lose_context;WEBGL_provoking_vertex",
+                "webgl aliased line width range:[1, 1]",
+                "webgl aliased point size range:[1, 1024]",
+                "webgl alpha bits:8", "webgl antialiasing:yes",
+                "webgl blue bits:8",
+                "webgl depth bits:24",
+                "webgl green bits:8",
+                "webgl max anisotropy:16",
+                "webgl max combined texture image units:32",
+                "webgl max cube map texture size:16384",
+                "webgl max fragment uniform vectors:1024",
+                "webgl max render buffer size:16384",
+                "webgl max texture image units:16",
+                "webgl max texture size:16384",
+                "webgl max varying vectors:30",
+                "webgl max vertex attribs:16",
+                "webgl max vertex texture image units:16",
+                "webgl max vertex uniform vectors:4096",
+                "webgl max viewport dims:[32767, 32767]",
+                "webgl red bits:8",
+                "webgl renderer:ANGLE (Intel, Intel(R) HD Graphics Direct3D11 vs_5_0 ps_5_0), or similar",
+                "webgl shading language version:WebGL GLSL ES 1.0",
+                "webgl stencil bits:0",
+                "webgl vendor:Mozilla",
+                "webgl version:WebGL 1.0",
+                "webgl unmasked vendor:Google Inc. (Intel)",
+                "webgl unmasked renderer:ANGLE (Intel, Intel(R) HD Graphics Direct3D11 vs_5_0 ps_5_0), or similar",
+                "webgl vertex shader high float precision:23",
+                "webgl vertex shader high float precision rangeMin:127",
+                "webgl vertex shader high float precision rangeMax:127",
+                "webgl vertex shader medium float precision:23",
+                "webgl vertex shader medium float precision rangeMin:127",
+                "webgl vertex shader medium float precision rangeMax:127",
+                "webgl vertex shader low float precision:23",
+                "webgl vertex shader low float precision rangeMin:127",
+                "webgl vertex shader low float precision rangeMax:127",
+                "webgl fragment shader high float precision:23",
+                "webgl fragment shader high float precision rangeMin:127",
+                "webgl fragment shader high float precision rangeMax:127",
+                "webgl fragment shader medium float precision:23",
+                "webgl fragment shader medium float precision rangeMin:127",
+                "webgl fragment shader medium float precision rangeMax:127",
+                "webgl fragment shader low float precision:23",
+                "webgl fragment shader low float precision rangeMin:127",
+                "webgl fragment shader low float precision rangeMax:127",
+                "webgl vertex shader high int precision:0",
+                "webgl vertex shader high int precision rangeMin:31",
+                "webgl vertex shader high int precision rangeMax:30",
+                "webgl vertex shader medium int precision:0",
+                "webgl vertex shader medium int precision rangeMin:31",
+                "webgl vertex shader medium int precision rangeMax:30",
+                "webgl vertex shader low int precision:0",
+                "webgl vertex shader low int precision rangeMin:31",
+                "webgl vertex shader low int precision rangeMax:30",
+                "webgl fragment shader high int precision:0",
+                "webgl fragment shader high int precision rangeMin:31",
+                "webgl fragment shader high int precision rangeMax:30",
+                "webgl fragment shader medium int precision:0",
+                "webgl fragment shader medium int precision rangeMin:31",
+                "webgl fragment shader medium int precision rangeMax:30",
+                "webgl fragment shader low int precision:0",
+                "webgl fragment shader low int precision rangeMin:31",
+                "webgl fragment shader low int precision rangeMax:30"
+            ],
+            "6bc5": "Google Inc. (Intel)~ANGLE (Intel, Intel(R) HD Graphics Direct3D11 vs_5_0 ps_5_0), or similar",
+            "ed31": 0,
+            "72bd": 0,
+            "097b": 0,
+            "52cd": [0, 0, 0],
+            "a658": ["Arial", "Arial Black", "Calibri", "Cambria", "Cambria Math", "Comic Sans MS", "Consolas", "Courier", "Courier New", "Georgia", "Helvetica", "Impact", "Lucida Console", "Lucida Sans Unicode", "Microsoft Sans Serif", "MS Gothic", "MS PGothic", "MS Sans Serif", "MS Serif", "Palatino Linotype", "Segoe Print", "Segoe Script", "Segoe UI", "Segoe UI Light", "Segoe UI Symbol", "Tahoma", "Times", "Times New Roman", "Trebuchet MS", "Verdana", "Wingdings"],
+            "d02f": "35.749972093850374"
+        },
+        "54ef": {
+            "in_new_ab ": true,
+            "ab_version ": {
+                "waterfall_article ": "SHOW "
+            },
+            "ab_split_num ": {
+                "waterfall_article ": 0
+            }
+        },
+        "8b94": "",
+        "df35": (await readSavedCookieItems(cookie, ['_uuid'])), // _uuid, set from cookie, generated by client side(algorithm remains unknown)
+        "07a4": "zh-CN",
+        "5f45": null,
+        "db46": 0
+    }
+    return pay///payloadData;
 }
 /**请求参数POST接口(ExClimbWuzhi)过校验*/
 async function postExClimbWuzhi(cookie) {
@@ -492,7 +664,8 @@ async function gen_b_lsid() {
 */
 async function get_buvid_fp(cookie) {
     let payload = await payloadData(cookie);
-    let buvidFp = gen_buvid_fp(payload, 30);
+    const seedget = Math.floor(Math.random() * (6500 - 1 + 1) + 1);
+    let buvidFp = gen_buvid_fp(payload, seedget);
     return `buvid_fp=${buvidFp};`;
 }
 
@@ -523,6 +696,7 @@ async function get_buvid3_buvid4(uuid) {
 /**获取新的tempCK*/
 async function getNewTempCk() {
     const TempCkStatuKey = "Yz:xianxin:bilibili:biliTempCkStatu";
+    //const fp_key = "Yz:xianxin:bilibili:ckFpCount";
 
     let setData = xxCfg.getConfig("bilibili", "set");
 
@@ -549,23 +723,24 @@ async function getNewTempCk() {
         const data = await result.json(); // 解析校验结果
         const dataCode = data.code; // 获取校验结果的 code
         if (dataCode !== 0) {
-            Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
+            logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验失败：${JSON.stringify(data)}`); // 记录校验失败的日志
         } else if (dataCode === 0) {
-            Bot.logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
+            logger?.mark(`trss-xianxin插件：获取tempCK，B站ExC接口校验成功：${JSON.stringify(data)}`); // 记录校验成功的日志
         }
 
         await redis.set(TempCkStatuKey, 1, { EX: 3600 * 24 * 2 });
+        //await redis.set(fp_key, 1, { EX: 3600 * 24 * 356 });
 
         if (flashTempCkAutoReboot == true) {
-            Bot.logger?.mark(`trss-xianxin插件：刷新tempCK：已开启自动重启，5秒后在执行重启...`);
+            (logger ?? Bot.logger)?.mark(`trss-xianxin插件：刷新tempCK：已开启自动重启，5秒后在执行重启...`);
             await new Promise(() => setTimeout(() => restart(), 5000));
         }
 
     } catch (error) {
-        Bot.logger?.mark(`trss-xianxin插件：刷新tempCK：${error}`);
+        (logger ?? Bot.logger)?.error(`trss-xianxin插件：刷新tempCK：${error}`);
 
         if (tempCkflashErrReboot == true) {
-            Bot.logger?.mark(`trss-xianxin插件：刷新tempCK：已开启报错自动重启，5秒后在执行重启...`);
+            (logger ?? Bot.logger)?.mark(`trss-xianxin插件：刷新tempCK：已开启报错自动重启，5秒后在执行重启...`);
             await new Promise(() => setTimeout(() => restart(), 5000));
         }
     }
@@ -649,5 +824,5 @@ export {
     applyQRCode, fetchWithTimeout, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readLocalBiliCk,
     readLoginCk,
     readSavedCookieItems, readTempCk, saveLocalBiliCk,
-    saveLoginCK, saveTempCk, synCookie, restart
+    saveLoginCK, saveTempCk, synCookie, restart, readSavedCookieOtherItems
 };
