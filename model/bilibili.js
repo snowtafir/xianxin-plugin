@@ -49,7 +49,7 @@ export default class Bilibili extends base {
       //dm_img_str:"V2ViR0wgMS",
       //dm_img_list:[],
       //dm_img_inter:{ds:[], wh:[0,0,0],of:[0,0,0]},
-     // dm_cover_img_str:"QU5HTEUgKEludGVsLCBJbnRlbChSKSBIRCBHcmFwaGljcyBEaXJlY3QzRDExIHZzXzVfMCBwc181XzApLCBvciBzaW1pbGFyR29vZ2xlIEluYy4gKEludGVsKQ"
+      // dm_cover_img_str:"QU5HTEUgKEludGVsLCBJbnRlbChSKSBIRCBHcmFwaGljcyBEaXJlY3QzRDExIHZzXzVfMCBwc181XzApLCBvciBzaW1pbGFyR29vZ2xlIEluYy4gKEludGVsKQ"
     }
     let url = appendUrlQueryParams(DynamicApiUrl, parama);
     let { cookie, mark } = await synCookie();
@@ -302,11 +302,10 @@ export default class Bilibili extends base {
       /*QQ频道午夜时间推送有限制，会报错code: 304022*/
       const images = Array.from(this[id_str].img, item => ({ ...item }));
       for (let i = 0; i < images.length; i++) {
-        let uin = yunzaiName === 'miao-yunzai' ? e_self_id : undefined;
-        await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(images[i]) // 发送动态图片消息
-          .catch((err) => {
-            (logger ?? Bot.logger)?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-          });
+        await (Bot[e_self_id] ?? Bot)?.pickGroup(String(groupId)).sendMsg(images[i])
+        .catch((err) => {
+            (logger ?? Bot.logger)?.error(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+        });
         await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (6500 - 2000 + 1) + 2000))); // 随机延时2-6.5秒
       }
       await common.sleep(1000); // 休眠1秒
@@ -324,11 +323,10 @@ export default class Bilibili extends base {
         return "return"; // 如果动态消息包含屏蔽关键字，则直接返回
       }
 
-      let uin = yunzaiName === 'miao-yunzai' ? e_self_id : undefined;
-      await (Bot[uin] ?? Bot).pickGroup(String(groupId)).sendMsg(dynamicMsg) // 发送普通动态消息
-        .catch((err) => {
-          (logger ?? Bot.logger)?.mark(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
-        });
+      await (Bot[e_self_id] ?? Bot)?.pickGroup(String(groupId)).sendMsg(dynamicMsg) // 发送动态图片消息
+      .catch((err) => {
+          (logger ?? Bot.logger)?.error(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
+      });
       await common.sleep(1000);
     }
   }
