@@ -1,4 +1,11 @@
 - {
+    version: 2.0.5,
+    data:
+      [
+        新增自动刷新tempck配置可选项，B站功能添加查看app扫码获取的登录ck的有效状态，<span class="cmd">#我的B站登陆 </span>详细使用方法请查看 "#闲心帮助",
+      ],
+  }
+- {
     version: 2.0.4,
     data:
       [

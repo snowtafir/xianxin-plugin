@@ -302,7 +302,7 @@ export default class Bilibili extends base {
       /*QQ频道午夜时间推送有限制，会报错code: 304022*/
       const images = Array.from(this[id_str].img, item => ({ ...item }));
       for (let i = 0; i < images.length; i++) {
-        await (Bot[e_self_id] ?? Bot)?.pickGroup(String(groupId)).sendMsg(images[i])
+        await (Bot[e_self_id] ?? Bot)?.pickGroup(String(groupId)).sendMsg(images[i])  // 发送图片动态消息
         .catch((err) => {
             (logger ?? Bot.logger)?.error(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
         });
@@ -323,7 +323,7 @@ export default class Bilibili extends base {
         return "return"; // 如果动态消息包含屏蔽关键字，则直接返回
       }
 
-      await (Bot[e_self_id] ?? Bot)?.pickGroup(String(groupId)).sendMsg(dynamicMsg) // 发送动态图片消息
+      await (Bot[e_self_id] ?? Bot)?.pickGroup(String(groupId)).sendMsg(dynamicMsg) // 发送普通动态消息
       .catch((err) => {
           (logger ?? Bot.logger)?.error(`群/子频道[${groupId}]推送失败：${JSON.stringify(err)}`);
       });

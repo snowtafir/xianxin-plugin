@@ -103,6 +103,7 @@ async function applyQRCode(e) {
 
         return qrcodeKey;
     } else {
+        e.reply(`获取B站登录二维码失败: ${data.message}`);
         throw new Error(`获取B站登录二维码失败: ${data.message}`);
     }
 }
@@ -128,13 +129,13 @@ async function pollQRCode(e, token) {
             // 继续轮询
             await new Promise((resolve) => setTimeout(resolve, 2000));
             (logger ?? Bot.logger)?.mark(`trss-xianxin插件：扫码B站登录：未扫码，轮询中...`);
-            return this.pollQRCode(e, token);
+            return pollQRCode(e, token);
         } else if (data.data.code === 86090) {
             // 已扫码未确认
             // 继续轮询
             await new Promise((resolve) => setTimeout(resolve, 2000))
             (logger ?? Bot.logger)?.mark(`trss-xianxin插件：扫码B站登录：已扫码，等待确认...`);
-            return this.pollQRCode(e, token);
+            return pollQRCode(e, token);
         } else if (data.data.code === 86038) {
             // 二维码已失效
             e.reply('B站登陆二维码已失效');
@@ -168,6 +169,29 @@ async function readLoginCk() {
         return tempCk;
     } else {
         return '';
+    }
+}
+
+async function checkLogin(e) {
+    const LoginCookie = await readLoginCk();
+    const res = await fetch("https://api.bilibili.com/x/web-interface/nav", {
+        method: "GET",
+        headers: lodash.merge(BIlIBILI_LOGIN_HEADERS, { 'User-agent': BIlIBILI_LOGIN_HEADERS['User-agent'] }, { "Cookie": `${LoginCookie}`, }),
+        redirect: "follow",
+    });
+    const resData = await res.json();
+    Bot.logger?.mark(`B站动态请求code:${JSON.stringify(resData)}`);
+    if (resData.code === 0) {
+        let uname = resData.data?.uname;
+        let mid = resData.data?.mid;
+        let money = resData.data?.money;
+        let level_info = resData.data?.level_info;
+        let current_level = level_info?.current_level;
+        let current_exp = level_info?.current_exp;
+        let next_exp = level_info?.next_exp;
+        e.reply(`~B站账号已登陆~\n昵称：${uname}\nuid：${mid}\n硬币：${money}\n经验等级：${current_level}\n当前经验值exp：${current_exp}\n下一等级所需exp：${next_exp}`);
+    } else {
+        e.reply(`~B站账号未登陆~`);
     }
 }
 
@@ -822,7 +846,7 @@ export {
     BILIBILI_HEADERS,
     appendUrlQueryParams,
     applyQRCode, fetchWithTimeout, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readLocalBiliCk,
-    readLoginCk,
+    readLoginCk, checkLogin,
     readSavedCookieItems, readTempCk, saveLocalBiliCk,
     saveLoginCK, saveTempCk, synCookie, restart, readSavedCookieOtherItems
 };

@@ -62,6 +62,9 @@
     - icon: 攻略
       title: "#扫码B站登录"
       desc: "app扫码获取登录ck"
+    - icon: 攻略
+      title: "#我的B站登录"
+      desc: "查看app扫码获取的登录ck的有效状态"
     - icon: 树脂
       title: "#删除B站登陆"
       desc: "删除已绑定的扫码登陆B站cookie，删除后将会自动启用临时ck"

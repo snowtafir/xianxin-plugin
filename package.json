@@ -1,6 +1,6 @@
 {
   "name": "trss-xianxin-plugin",
-  "version": "2.0.4",
+  "version": "2.0.5",
   "description": "Yunzai-Bot插件扩展",
   "main": "index.js",
   "type": "module",
