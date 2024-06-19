@@ -134,7 +134,6 @@ async function pollQRCode(e, token) {
             // 已扫码未确认
             // 继续轮询
             await new Promise((resolve) => setTimeout(resolve, 2000))
-            (logger ?? Bot.logger)?.mark(`trss-xianxin插件：扫码B站登录：已扫码，等待确认...`);
             return pollQRCode(e, token);
         } else if (data.data.code === 86038) {
             // 二维码已失效
@@ -153,7 +152,7 @@ async function pollQRCode(e, token) {
 async function saveLoginCK(e, biliLoginCk) {
     if ((biliLoginCk !== null) || (biliLoginCk !== undefined) || (biliLoginCk.length !== 0) || (biliLoginCk !== '')) {
         const LoginCkKey = "Yz:xianxin:bilibili:biliLoginCookie";
-        redis.set(LoginCkKey, `${biliLoginCk}`, { EX: 3600 * 24 * 180 });
+        redis.set(LoginCkKey, `${biliLoginCk}`, { EX: 3600 * 24 * 360 });
     } else if (biliLoginCk === null) {
         e.reply("扫码超时");
     }
@@ -172,6 +171,7 @@ async function readLoginCk() {
     }
 }
 
+/**查看app扫码登陆获取的ck的有效状态*/
 async function checkLogin(e) {
     const LoginCookie = await readLoginCk();
     const res = await fetch("https://api.bilibili.com/x/web-interface/nav", {
@@ -845,8 +845,7 @@ export {
     API,
     BILIBILI_HEADERS,
     appendUrlQueryParams,
-    applyQRCode, fetchWithTimeout, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readLocalBiliCk,
-    readLoginCk, checkLogin,
-    readSavedCookieItems, readTempCk, saveLocalBiliCk,
-    saveLoginCK, saveTempCk, synCookie, restart, readSavedCookieOtherItems
+    applyQRCode, checkLogin, fetchWithTimeout, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readLocalBiliCk,
+    readLoginCk, readSavedCookieItems, readSavedCookieOtherItems, readTempCk, restart, saveLocalBiliCk,
+    saveLoginCK, saveTempCk, synCookie
 };
