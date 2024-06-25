@@ -195,6 +195,58 @@ async function checkLogin(e) {
     }
 }
 
+/**退出B站账号登录，将会删除redis缓存的LoginCK，并在服务器注销该登录 Token (SESSDATA)*/
+async function exitBiliLogin(e) {
+    let exitCk = readLoginCk();
+    let SESSDATA = readSavedCookieItems(exitCk, ['SESSDATA']);
+    let biliCSRF = readSavedCookieItems(exitCk, ['bili_jct']);
+    let DedeUserID = readSavedCookieItems(exitCk, ['DedeUserID']);
+    
+    if (lodash.trim(SESSDATA).length != 0 && lodash.trim(biliCSRF).length != 0 && lodash.trim(DedeUserID).length != 0) {
+        const data = {
+            "biliCSRF": biliCSRF,
+        };
+        try {
+            const response = await fetch('https://passport.bilibili.com/login/exit/v2', {
+                method: 'POST',
+                headers: {
+                    'Host': 'passport.bilibili.com',
+                    'Cookie': `${exitCk}`,
+                    'Content-type': 'application/x-www-form-urlencoded',
+                },
+                credentials: 'include',
+                body: new URLSearchParams(data),
+            });
+
+            const contentType = response.headers.get('content-type');
+            if (contentType && contentType.includes('text/html')) {
+                e.reply("当前缓存的B站登录CK早已失效！");
+                return; // 确保在这里结束处理流程
+            }
+
+            const responseData = await response.json(); // 只有在不是 text/html 的情况下才调用 json()
+            console.log('Response Data:', responseData); // 添加日志
+
+            if (responseData.code === 0) {
+                e.reply("当前缓存的B站登录CK已在服务器注销~");
+                const LoginCkKey = "Yz:xianxin:bilibili:biliLoginCookie";
+                let loginCK = "";
+                await redis.set(LoginCkKey, loginCK, { EX: 3600 * 24 * 180 });
+                e.reply(`登陆的B站ck并已删除~`);
+            } else if (responseData.code === 2202) {
+                e.reply("csrf 请求非法，退出登录请求出错");
+            } else {
+                e.reply("当前缓存的B站登录CK早已失效！");
+            }
+        } catch (error) {
+            console.error('Error during Bili login exit:', error);
+            e.reply("退出登录请求出错，请稍后再试");
+        }
+    } else {
+        e.reply("当前无可用的B站登录CK可退出登录");
+    }
+}
+
 /**
  *综合读取、筛选 传入的或本地或redis存储的cookie的item
  * @param {string} mark 读取存储的CK类型，'localCK' 'tempCK' 'loginCK' 或传入值 'xxx'并进行筛选
@@ -845,7 +897,7 @@ export {
     API,
     BILIBILI_HEADERS,
     appendUrlQueryParams,
-    applyQRCode, checkLogin, fetchWithTimeout, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readLocalBiliCk,
+    applyQRCode, checkLogin, exitBiliLogin, fetchWithTimeout, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readLocalBiliCk,
     readLoginCk, readSavedCookieItems, readSavedCookieOtherItems, readTempCk, restart, saveLocalBiliCk,
     saveLoginCK, saveTempCk, synCookie
 };

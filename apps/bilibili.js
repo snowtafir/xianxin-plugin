@@ -4,7 +4,7 @@ import plugin from "../../../lib/plugins/plugin.js";
 import { Restart } from "../../other/restart.js";
 import Bilibili from "../model/bilibili.js";
 import xxCfg from "../model/xxCfg.js";
-import { BILIBILI_HEADERS, applyQRCode, checkLogin, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readSavedCookieItems, readTempCk, saveLocalBiliCk, saveLoginCK, synCookie } from "../util/BiliApi.js";
+import { BILIBILI_HEADERS, applyQRCode, checkLogin, getNewTempCk, get_buvid_fp, pollQRCode, postExClimbWuzhi, readSavedCookieItems, readTempCk, exitBiliLogin, saveLocalBiliCk, saveLoginCK, synCookie } from "../util/BiliApi.js";
 
 let bilibiliSetFile = "./plugins/trss-xianxin-plugin/config/bilibili.set.yaml";
 if (!fs.existsSync(bilibiliSetFile)) {
@@ -251,8 +251,9 @@ export class bilibili extends plugin {
   async delLoginBCk() {
     const LoginCkKey = "Yz:xianxin:bilibili:biliLoginCookie";
     let loginCK = "";
-    redis.set(LoginCkKey, loginCK, { EX: 3600 * 24 * 180 });
-    this.e.reply(`二维码登陆B站的ck已删除~`);
+    await redis.set(LoginCkKey, loginCK, { EX: 3600 * 24 * 180 });
+    e.reply(`登陆的B站ck并已删除~`);
+    //await exitBiliLogin(this.e);
   }
 
   /** 我的B站ck */

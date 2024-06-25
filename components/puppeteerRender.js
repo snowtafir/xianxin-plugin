@@ -54,6 +54,14 @@ class puppeteerRender {
                     content: style,
                 });
             }
+            // 禁止 GIF 动图播放
+            await page.addStyleTag({
+                content: `
+                  img[src$=".gif"] {
+                    animation-play-state: paused !important;
+                  }
+                `
+            });
 
             const body = (await page.$("#container")) || (await page.$("body")); // 获取页面内容区域的 DOM 元素
             const boundingBox = await body.boundingBox(); // 获取内容区域的边界框信息
