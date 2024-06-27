@@ -340,7 +340,7 @@ async function readLocalBiliCk() {
 async function saveLocalBiliCk(data) {
     let dir = `./data/BilibiliCookie/`
     let file = dir + `bili_Ck.yaml`
-    let addData = data.replace(/\s/g, '').trim();
+    let addData = String(data).replace(/\s/g, '').trim();
     if (lodash.isEmpty(addData)) {
         fs.existsSync(file) && fs.unlinkSync(file)
     } else {

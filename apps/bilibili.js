@@ -252,7 +252,7 @@ export class bilibili extends plugin {
     const LoginCkKey = "Yz:xianxin:bilibili:biliLoginCookie";
     let loginCK = "";
     await redis.set(LoginCkKey, loginCK, { EX: 3600 * 24 * 180 });
-    e.reply(`登陆的B站ck并已删除~`);
+    this.e.reply(`登陆的B站ck并已删除~`);
     //await exitBiliLogin(this.e);
   }
 
