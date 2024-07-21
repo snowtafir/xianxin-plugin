@@ -101,8 +101,8 @@ async function applyQRCode(e) {
 
         return qrcodeKey;
     } else {
-        e.reply(`获取B站登录二维码失败: ${data.message}`);
-        throw new Error(`获取B站登录二维码失败: ${data.message}`);
+        e.reply(`获取B站登录二维码失败: ${res?.data?.message}`);
+        throw new Error(`获取B站登录二维码失败: ${res?.data?.message}`);
     }
 }
 
@@ -824,8 +824,8 @@ async function getNewTempCk() {
 async function synCookie() {
     let localCk, tempCk, loginCk, mark, cookie;
     localCk = `${await readLocalBiliCk()}`;
-    tempCk = `${await readTempCk()}}`;
-    loginCk = `${await readLoginCk()}}`;
+    tempCk = `${await readTempCk()}`;
+    loginCk = `${await readLoginCk()}`;
 
     if (localCk?.trim().length > 10) {
         mark = "localCk";
