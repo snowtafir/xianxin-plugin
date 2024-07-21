@@ -56,7 +56,7 @@ export function supportGuoba() {
           field: "bilibili.pushTime",
           label: "B站定时任务",
           bottomHelpMessage: "检测b站推送定时任务，Cron表达式，作用域共6位，具体方法浏览器搜索 “node-schedule cron表达式",
-          component: "Input",
+          component: "EasyCron",
           required: true,
           componentProps: {
             placeholder: "请输入检测b站推送定时任务",
@@ -125,7 +125,7 @@ export function supportGuoba() {
           field: "weibo.pushTime",
           label: "微博定时任务",
           bottomHelpMessage: "检测微博推送定时任务，Cron表达式，作用域共6位，具体方法浏览器搜索 “node-schedule cron表达式",
-          component: "Input",
+          component: "EasyCron",
           required: true,
           componentProps: {
             placeholder: "请输入检测微博推送定时任务",
