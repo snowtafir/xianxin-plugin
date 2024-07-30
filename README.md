@@ -1,3 +1,7 @@
+# 迁移说明：
+
+本插件动态功能以及基本用不到的零碎功能即将停止维护，B站/微博动态功能现已迁移至 [yuki-plugin](https://github.com/snowtafir/yuki-plugin) 项目，[gitee镜像](https://gitee.com/snowtafir/yuki-plugin)，并进行了功能的重构优化和更新，更加轻量，样式风格更加统一，新增支持私聊订阅。支持yunzai-v4、yunzai-3。
+
 <p align="center">
   <a href="https://gitee.com/snowtafir/xianxin-plugin">
     <img width="200" src="https://gitee.com/snowtafir/xianxin-plugin/raw/main/resources/img/rank/top.png">
